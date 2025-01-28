@@ -1,0 +1,107 @@
+﻿@model Bug_Tracking_System.Models.LoginModel;
+
+
+@{
+    ViewData["BodyClass"] = "login-page";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+    ViewData["Title"] = "Login";
+    // Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Login</title>
+</head>
+
+<body class="login-page">
+    <div class="container position-sticky z-index-sticky top-0">
+        <div class="row">
+            <div class="col-12">
+
+            </div>
+        </div>
+    </div>
+        <section>
+            <div class="page-header min-vh-100">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column mx-lg-0 mx-auto">
+                            <div class="card card-plain">
+                                <div class="card-header pb-0 text-start">
+                                    <h4 class="font-weight-bolder">Sign In</h4>
+                                    <p class="mb-0">Enter your email and password to sign in</p>
+                                </div>
+                                <div class="card-body">
+                                    <form role="form" id="loginForm">
+                                        <div class="mb-3">
+                                            <input type="email" asp-for="EmailOrUsername" class="form-control form-control-lg" placeholder="Enter your email here " aria-label="Email">
+                                        </div>
+                                        <div class="mb-3">
+                                            <input type="password" asp-for="Password" class="form-control form-control-lg" placeholder="Enter your password" aria-label="Password">
+                                        </div>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" asp-for="RememberMe">
+                                            <label class="form-check-label" for="RememberMe">Remember me</label>
+                                        </div>
+                                    <div class="mt-2">
+                                        <div class="alreadyuser">
+                                            <p><a href="~/Account/ForgotPassword" class="hover-a">Forgot Password?</a></p>
+                                        </div>
+                                    </div>
+                                        <div class="text-center">
+                                            <button type="submit" id="btnLogin" class="btn btn-lg btn-primary btn-lg w-100 mt-2 mb-0">
+                                                <span class="spinner-border spinner-border-sm d-none" id="btnLoader" role="status" aria-hidden="true"></span>
+                                                Sign In
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="card-footer text-center pt-0 px-lg-2 px-1">
+                                    <p class="mb-4 text-sm mx-auto">
+                                        Don't have an account?
+                                        <a href="~/Account/Registration" class="text-primary text-gradient font-weight-bold">Sign up</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 d-lg-flex d-none h-100 my-auto pe-0 position-absolute top-0 end-0 text-center justify-content-center flex-column">
+                        <div class="position-relative bg-gradient-primary h-100 m-3 px-7 border-radius-lg d-flex flex-column justify-content-center overflow-hidden" style="background-image: url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/signin-ill.jpg');
+          background-size: cover;">
+                                <span class="mask bg-gradient-primary opacity-6"></span>
+                            <h4 class="mt-5 text-white font-weight-bolder position-relative">"Efficiency is the key to success"</h4>
+                            <p class="text-white position-relative">
+                                Log in to streamline your bug tracking process. Stay organized, resolve issues faster, and keep your projects on track with ease.
+                            </p>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    <!--   Core JS Files   -->
+ 
+</body>
+
+</html>
+
+@* <style> *@
+@*     .input-group .toggle-password { *@
+@*         border-left: none; *@
+@*     } *@
+
+@*         .input-group .toggle-password i { *@
+@*             font-size: 1rem; *@
+@*         } *@
+@* </style> *@
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <script src="/js/Login.js"></script>
+}

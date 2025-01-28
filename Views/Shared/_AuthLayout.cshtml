@@ -1,0 +1,128 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    @* <title>@ViewData["Title"] - Bug_Tracking_System</title> *@
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Bug_Tracking_System.styles.css" asp-append-version="true" />
+    @* <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" /> *@
+
+    <link rel="apple-touch-icon" sizes="76x76" href="../AuthAssets/img/apple-icon.png">
+    <link rel="icon" type="image/png" href="../AuthAssets/img/favicon.png">
+    <title>
+        Bug Tracking System
+    </title>
+    <!--     Fonts and icons     -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+    <!-- Nucleo Icons -->
+    <link href="https://demos.creative-tim.com/argon-dashboard-pro/AuthAssets/css/nucleo-icons.css" rel="stylesheet" />
+    <link href="https://demos.creative-tim.com/argon-dashboard-pro/AuthAssets/css/nucleo-svg.css" rel="stylesheet" />
+    <!-- Font Awesome Icons -->
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <!-- CSS Files -->
+    <link id="pagestyle" href="../AuthAssets/css/argon-dashboard.css?v=2.1.0" rel="stylesheet" />
+
+    @RenderSection("Styles", required: false)
+</head>
+<body class="@ViewData["BodyClass"]">
+
+    <header>
+
+        <!-- Preloader Code -->
+        <div id="preloader">
+            <div class="bug-container">
+                <img src="~/images/ladybug.png" alt="Bug Walking" class="bug" />
+            </div>
+        </div>
+
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg position-absolute top-0 z-index-3 w-100 shadow-none my-3 navbar-transparent mt-4">
+            <div class="container">
+
+                <a class="navbar-brand font-weight-bolder ms-lg-0 ms-3 @((ViewData["Title"]?.ToString() == "Registration" ? "text-white" : "text-dark"))" href="#index" style="font-size: 18px">
+                    Bugify
+                </a>
+
+                <button class="navbar-toggler shadow-none ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon mt-2">
+                        <span class="navbar-toggler-bar bar1"></span>
+                        <span class="navbar-toggler-bar bar2"></span>
+                        <span class="navbar-toggler-bar bar3"></span>
+                    </span>
+                </button>
+                <div class="collapse navbar-collapse text-center" id="navigation">
+                    <!-- Added ms-auto class to move items to the right -->
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link me-2" href="~/Account/Registration">
+                                <i class="fas fa-user-circle opacity-6 me-1"></i>
+                                Sign Up
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link me-2" href="~/Account/Login">
+                                <i class="fas fa-key opacity-6 me-1"></i>
+                                Sign In
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- End Navbar -->
+
+    </header>
+
+        <main role="main" class="main-content mt-0">
+            @RenderBody()
+        </main>
+
+    <footer class="footer py-5">
+
+        <div class="row">
+            <div class="col-8 mx-auto text-center mt-1">
+                <p class="mb-0 text-secondary">
+                    Copyright © <script>
+                                    document.write(new Date().getFullYear())
+                    </script> Bug Tracking System.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- -------- END FOOTER 3 w/ COMPANY DESCRIPTION WITH LINKS & SOCIAL ICONS & COPYRIGHT ------- -->
+    <!--   Core JS Files   -->
+    <script src="../AuthAssets/js/core/popper.min.js"></script>
+    <script src="../AuthAssets/js/core/bootstrap.min.js"></script>
+    <script src="../AuthAssets/js/plugins/perfect-scrollbar.min.js"></script>
+    <script src="../AuthAssets/js/plugins/smooth-scrollbar.min.js"></script>
+    <script>
+        var win = navigator.platform.indexOf('Win') > -1;
+        if (win && document.querySelector('#sidenav-scrollbar')) {
+          var options = {
+            damping: '0.5'
+          }
+          Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+        }
+    </script>
+    <!-- Github buttons -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
+    <script src="../AuthAssets/js/argon-dashboard.min.js?v=2.1.0"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.rawgit.com/jzaefferer/jquery-validation/1.19.3/dist/jquery.validate.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+
+
+</body>
+</html>

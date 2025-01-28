@@ -1,0 +1,162 @@
+﻿@model Bug_Tracking_System.Models.User
+
+@{
+    ViewData["BodyClass"] = "login-page";
+    ViewData["Title"] = "OTP Verification";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Otp Verification</title>
+</head>
+
+<body class="login-page">
+    <div class="container position-sticky z-index-sticky top-0">
+        <div class="row">
+            <div class="col-12">
+            </div>
+        </div>
+    </div>
+    <section>
+        <div class="page-header min-vh-100">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column mx-lg-0 mx-auto">
+                        <div class="card card-plain">
+                            <div class="card-header pb-0 text-start">
+                                <h4 class="font-weight-bolder">OTP Verification</h4>
+                                <p class="mb-0">Check your email and enter the OTP sent!!!</p>
+                            </div>
+                            <div class="card-body">
+                                <form role="form" id="loginForm">
+                                    <div class="mb-3">
+                                        <input asp-for="Email" value="@Context.Session.GetString("UserEmail")" readonly />
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="otp-container" id="Otp">
+                                            <input type="text" maxlength="1" class="otp-box" />
+                                            <input type="text" maxlength="1" class="otp-box" />
+                                            <input type="text" maxlength="1" class="otp-box" />
+                                            <input type="text" maxlength="1" class="otp-box" />
+                                            <input type="text" maxlength="1" class="otp-box" />
+                                            <input type="text" maxlength="1" class="otp-box" />
+                                        </div>
+                                    </div>
+
+                                    <!-- Timer -->
+                                    <div class="mb-3">
+                                        <p id="timer" style="font-size: 14px; color: gray;">Time remaining: 01:00</p>
+                                    </div>
+
+                                    <!-- Submit Button -->
+                                    <div class="text-center">
+                                        <button type="submit" id="btnNext" class="btn btn-lg btn-primary btn-lg w-100 mt-2 mb-0">
+                                            <span class="spinner-border spinner-border-sm d-none" id="btnLoader" role="status" aria-hidden="true"></span>
+                                            Next
+                                        </button>
+                                    </div>
+
+                                    <!-- Resend OTP -->
+                                    <div id="resend-section" style="display: none; margin-top: 10px;">
+                                        <button id="resend-btn" class="btn btn-secondary">Resend OTP</button>
+                                    </div>
+
+                                    @* <div class="text-center"> *@
+                                    @*     <button type="submit" id="btnLogin" class="btn btn-lg btn-primary btn-lg w-100 mt-2 mb-0"> *@
+                                    @*         <span class="spinner-border spinner-border-sm d-none" id="btnLoader" role="status" aria-hidden="true"></span> *@
+                                    @*         Sign In *@
+                                    @*     </button> *@
+                                    @* </div> *@
+                                </form>
+                            </div>
+                            <div class="card-footer text-center pt-0 px-lg-2 px-1">
+                                <p class="mb-4 text-sm mx-auto">
+                                    Have an account?
+                                    <a href="~/Account/Login" class="text-primary text-gradient font-weight-bold">Sign in</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 d-lg-flex d-none h-100 my-auto pe-0 position-absolute top-0 end-0 text-center justify-content-center flex-column">
+                        <div class="position-relative bg-gradient-primary h-100 m-3 px-7 border-radius-lg d-flex flex-column justify-content-center overflow-hidden"
+                             style="
+            background-image: url('https://cdni.iconscout.com/illustration/premium/thumb/otp-verification-5152137-4309037.png');
+            background-size: 105%; /* Ensure the entire image fits */
+            background-repeat: no-repeat; /* Avoid tiling the image */
+            background-position: center; /* Center the image */
+        ">
+
+
+                            @* <span class="mask bg-gradient-primary opacity-6"></span> *@
+                            @* <h4 class="mt-5 text-white font-weight-bolder position-relative">"Efficiency is the key to success"</h4> *@
+                            @* <p class="text-white position-relative"> *@
+                            @*     Log in to streamline your bug tracking process. Stay organized, resolve issues faster, and keep your projects on track with ease. *@
+                            @* </p> *@
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!--   Core JS Files   -->
+
+</body>
+
+</html>
+
+<style>
+
+    /* Center the OTP input boxes */
+    .otp-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    /* Style each OTP box */
+    .otp-box {
+        width: 50px;
+        height: 50px;
+        text-align: center;
+        font-size: 18px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        outline: none;
+        transition: border-color 0.2s ease;
+    }
+
+        .otp-box:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        /* Add subtle hover effect */
+        .otp-box:hover {
+            border-color: #6c757d;
+        }
+
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/OtpCheck.js"></script>
+    <script>
+        // Automatically focus on the next input box
+        document.querySelectorAll('.otp-box').forEach((input, index, inputs) => {
+            input.addEventListener('input', (e) => {
+                if (input.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                } else if (e.inputType === 'deleteContentBackward' && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+    </script>
+}

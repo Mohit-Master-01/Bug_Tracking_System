@@ -1,0 +1,106 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+/* Preloader Container */
+#preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #f9f9f9; /* Light background color */
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Bug Container */
+.bug-container {
+    position: relative;
+}
+
+/* Bug Image Styling */
+.bug {
+    width: 100px; /* Adjust size of the bug */
+    animation: walk 1s steps(4) infinite, move 5s linear infinite; /* Walking and movement */
+}
+
+/* Bug Walking Animation */
+@keyframes walk {
+    from {
+        background-position: 0;
+    }
+
+    to {
+        background-position: -400px; /* Adjust based on sprite image width */
+    }
+}
+
+/* Bug Movement Animation (Zigzag path) */
+@keyframes move {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    25% {
+        transform: translate(50px, -30px);
+    }
+
+    50% {
+        transform: translate(100px, 0);
+    }
+
+    75% {
+        transform: translate(150px, -30px);
+    }
+
+    100% {
+        transform: translate(200px, 0);
+    }
+}
+
+/* Default navbar heading style */
+.navbar-brand {
+    color: #000; /* Default color */
+}
+
+/* Style for Registration Page */
+.registration-page .navbar-brand {
+    color: #fff; /* White color */
+}
+
+/* Style for Login Page */
+.login-page .navbar-brand {
+    color: #000; /* Default or black color */
+}
+
+.error {
+    font-size: 0.875rem; /* Smaller text size for error messages */
+    margin-top: 0.25rem; /* Space between the input and error message */
+    display: block; /* Ensure each error message is displayed on its own line */
+}
+
+.text-danger {
+    color: #e3342f; /* Red color for error messages */
+}
