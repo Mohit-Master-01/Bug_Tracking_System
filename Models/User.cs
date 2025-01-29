@@ -8,16 +8,16 @@ public partial class User
 {
     public int UserId { get; set; }
 
-    public string UserName { get; set; } = null!;
+    public string? UserName { get; set; }
 
-    public string Email { get; set; } = null!;
+    public string? Email { get; set; }
 
-    public string PasswordHash { get; set; } = null!;
+    public string? PasswordHash { get; set; }
 
     [NotMapped]
-    public string? ConfirmPassword { get; set; }
+    public string? ConfirmPassword {  get; set; }
 
-    public int RoleId { get; set; }
+    public int? RoleId { get; set; }
 
     public DateTime? CreatedDate { get; set; }
 
@@ -45,7 +45,7 @@ public partial class User
 
     public virtual ICollection<Project> Projects { get; set; } = new List<Project>();
 
-    public virtual Role Role { get; set; } = null!;
+    public virtual Role? Role { get; set; }
 
     public virtual ICollection<TaskAssignment> TaskAssignmentAssignedByNavigations { get; set; } = new List<TaskAssignment>();
 

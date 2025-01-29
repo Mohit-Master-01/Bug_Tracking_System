@@ -25,11 +25,15 @@ public partial class DbBug : DbContext
 
     public virtual DbSet<Notification> Notifications { get; set; }
 
+    public virtual DbSet<Permission> Permissions { get; set; }
+
     public virtual DbSet<Project> Projects { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<TaskAssignment> TaskAssignments { get; set; }
+
+    public virtual DbSet<TblTab> TblTabs { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -122,6 +126,30 @@ public partial class DbBug : DbContext
                 .HasConstraintName("FK_Notification_User");
         });
 
+        modelBuilder.Entity<Permission>(entity =>
+        {
+            entity.HasKey(e => e.Permissionid).HasName("PK__Permissi__D8200EA41AF01E9A");
+
+            entity.ToTable("Permission");
+
+            entity.Property(e => e.Permissionid).HasColumnName("permissionid");
+            entity.Property(e => e.Isactive)
+                .HasDefaultValue(true)
+                .HasColumnName("isactive");
+            entity.Property(e => e.Roleid).HasColumnName("roleid");
+            entity.Property(e => e.Tabid).HasColumnName("tabid");
+
+            entity.HasOne(d => d.Role).WithMany(p => p.Permissions)
+                .HasForeignKey(d => d.Roleid)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Permissio__rolei__17036CC0");
+
+            entity.HasOne(d => d.Tab).WithMany(p => p.Permissions)
+                .HasForeignKey(d => d.Tabid)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Permissio__tabid__17F790F9");
+        });
+
         modelBuilder.Entity<Project>(entity =>
         {
             entity.HasKey(e => e.ProjectId).HasName("PK__Projects__761ABEF0326FB046");
@@ -183,6 +211,23 @@ public partial class DbBug : DbContext
                 .HasConstraintName("FK_Task_ProjectManager");
         });
 
+        modelBuilder.Entity<TblTab>(entity =>
+        {
+            entity.HasKey(e => e.TabId).HasName("PK__tblTabs__80E37C1890796E7E");
+
+            entity.ToTable("tblTabs");
+
+            entity.Property(e => e.IconPath).IsUnicode(false);
+            entity.Property(e => e.IsActive).HasDefaultValue(false);
+            entity.Property(e => e.SortOrder).HasDefaultValue(1);
+            entity.Property(e => e.TabName)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.TabUrl)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+        });
+
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4C808D0975");
@@ -210,7 +255,6 @@ public partial class DbBug : DbContext
 
             entity.HasOne(d => d.Role).WithMany(p => p.Users)
                 .HasForeignKey(d => d.RoleId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Users_Roles");
         });
 

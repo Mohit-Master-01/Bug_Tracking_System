@@ -8,9 +8,79 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Bug_Tracking_System.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" />
+    <link rel="apple-touch-icon" sizes="76x76" href="../AuthAssets/img/apple-icon.png">
+    <link rel="icon" type="image/png" href="../AuthAssets/img/favicon.png">
+    <title>
+        Bugify Dashboard
+    </title>
+    <!--     Fonts and icons     -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+    <!-- Nucleo Icons -->
+    <link href="https://demos.creative-tim.com/argon-dashboard-pro/AuthAssets/css/nucleo-icons.css" rel="stylesheet" />
+    <link href="https://demos.creative-tim.com/argon-dashboard-pro/AuthAssets/css/nucleo-svg.css" rel="stylesheet" />
+    <!-- Font Awesome Icons -->
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <!-- CSS Files -->
+    <link id="pagestyle" href="../AuthAssets/css/argon-dashboard.css?v=2.1.0" rel="stylesheet" />
     @RenderSection("Styles", required: false)
+    <style>
+        /* Submenu styles */
+        .nav-item .submenu {
+        display: none;
+        list-style: none;
+        padding-left: 15px;
+        margin-top: 5px;
+        }
+
+        .nav-item .submenu .nav-link {
+        font-size: 0.85rem;
+        padding-left: 30px;
+        color: #6c757d;
+        transition: all 0.3s ease-in-out;
+        }
+
+        .nav-item .submenu .nav-link:hover {
+        color: #000; /* Dark color on hover */
+        }
+
+        /* Toggle submenu on click */
+        .nav-item.has-submenu > a {
+        position: relative;
+        }
+
+        .nav-item.has-submenu > a::after {
+        content: "\f107"; /* FontAwesome down arrow */
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.75rem;
+        color: #6c757d;
+        }
+
+        /* Show submenu on active state */
+        .nav-item.has-submenu.active .submenu {
+        display: block;
+        }
+
+        /* Animation for submenu */
+        .submenu {
+        opacity: 0;
+        height: 0;
+        overflow: hidden;
+        transition: all 0.3s ease-in-out;
+        }
+
+        .nav-item.has-submenu.active .submenu {
+        opacity: 1;
+        height: auto;
+        }
+
+    </style>
 </head>
-<body>
+<body class="g-sidenav-show bg-gray-100">
 
     <!-- Preloader Code -->
     <div id="preloader">
@@ -19,38 +89,126 @@
         </div>
     </div>
 
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Bug_Tracking_System</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
+    @* Sidebar *@
+    <div class="min-height-300 bg-dark position-absolute w-100"></div>
+    <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 " id="sidenav-main">
+        <div class="sidenav-header">
+            <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
+            <a class="navbar-brand m-0" href=" https://demos.creative-tim.com/argon-dashboard/pages/dashboard.html " target="_blank">
+                <img src="../AuthAssets/img/logo-ct-dark.png" width="26" height="26" class="navbar-brand-img h-100" alt="main_logo">
+                <span class="ms-1 font-weight-bold">Bugify</span>
+            </a>
+        </div>
+        <hr class="horizontal dark mt-0">
+        <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+            <ul class="navbar-nav">
+
+                @foreach(var tab in (List<SidebarModel>)ViewBag.SidebarTabs)
+                {
+                    var res = "";
+                    bool subtabs = tab.SubTabs != null && tab.SubTabs.Any();
+                    @if(subtabs)
+                    {
+                        res = "has-submenu";
+                    }
+                    <li class="nav-item @res">
+                        <a class="nav-link" href="@tab.TabUrl">
+                            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                                <i class="ni ni-folder-17 text-dark text-sm opacity-10"></i>
+                            </div>
+                            <span class="nav-link-text ms-1">@tab.TabName</span>
+                        </a>
+                        @if(subtabs)
+                        {
+                            <ul class="submenu">
+                                @foreach(var subTab in tab.SubTabs)
+                                {
+                                    <li>
+                                        <a class="nav-link" href="@subTab.TabUrl">@subTab.TabName</a>
+                                    </li>
+                                }
+                                
+                            </ul>
+                        }
+                        
+                    </li>
+                }
+                             
+
+                
+            </ul>
+        </div>
+    </aside>
+
+    @* <header> *@
+    @*     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3"> *@
+    @*         <div class="container-fluid"> *@
+    @*             <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Bug_Tracking_System</a> *@
+    @*             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent" *@
+    @*                     aria-expanded="false" aria-label="Toggle navigation"> *@
+    @*                 <span class="navbar-toggler-icon"></span> *@
+    @*             </button> *@
+    @*             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between"> *@
+    @*                 <ul class="navbar-nav flex-grow-1"> *@
+    @*                     <li class="nav-item"> *@
+    @*                         <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a> *@
+    @*                     </li> *@
+    @*                     <li class="nav-item"> *@
+    @*                         <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a> *@
+    @*                     </li> *@
+    @*                 </ul> *@
+    @*             </div> *@
+    @*         </div> *@
+    @*     </nav> *@
+    @* </header> *@
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - Bug_Tracking_System - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="footer pt-3  ">
+        <div class="container-fluid">
+          <div class="row align-items-center justify-content-lg-between">
+            <div class="col-lg-6 mb-lg-0 mb-4">
+              <div class="copyright text-center text-sm text-muted text-lg-start">
+                © <script>
+                  document.write(new Date().getFullYear())
+                </script>,
+                made with <i class="fa fa-heart"></i> by
+                <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Creative Tim</a>
+                for a better web.
+              </div>
+            </div>
+            <div class="col-lg-6">
+              <ul class="nav nav-footer justify-content-center justify-content-lg-end">
+                <li class="nav-item">
+                  <a href="https://www.creative-tim.com" class="nav-link text-muted" target="_blank">Creative Tim</a>
+                </li>
+                <li class="nav-item">
+                  <a href="https://www.creative-tim.com/presentation" class="nav-link text-muted" target="_blank">About Us</a>
+                </li>
+                <li class="nav-item">
+                  <a href="https://www.creative-tim.com/blog" class="nav-link text-muted" target="_blank">Blog</a>
+                </li>
+                <li class="nav-item">
+                  <a href="https://www.creative-tim.com/license" class="nav-link pe-0 text-muted" target="_blank">License</a>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
-    </footer>
+      </footer>
+
+
+    @* <footer class="border-top footer text-muted"> *@
+    @*     <div class="container"> *@
+    @*         &copy; 2025 - Bug_Tracking_System - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a> *@
+    @*     </div> *@
+    @* </footer> *@
+
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
@@ -59,6 +217,28 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.rawgit.com/jzaefferer/jquery-validation/1.19.3/dist/jquery.validate.min.js"></script>
+    <script src="~/AuthAssets/js/core/popper.min.js"></script>
+    <script src="~/AuthAssets/js/core/bootstrap.min.js"></script>
+    <script src="~/AuthAssets/js/plugins/perfect-scrollbar.min.js"></script>
+    <script src="~/AuthAssets/js/plugins/smooth-scrollbar.min.js"></script>
+    <script src="~/AuthAssets/js/plugins/chartjs.min.js"></script>
+    <script>
+                document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".nav-item.has-submenu > a").forEach((item) => {
+                item.addEventListener("click", function (e) {
+                    e.preventDefault(); // Prevent default anchor behavior
 
+                    let parent = this.parentElement;
+                    parent.classList.toggle("active");
+                });
+            });
+        });
+
+    </script>
+
+    <!-- Github buttons -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
+    <script src="../assets/js/argon-dashboard.min.js?v=2.1.0"></script>
 </body>
 </html>

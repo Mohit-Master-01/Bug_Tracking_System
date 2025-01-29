@@ -9,6 +9,6 @@
 
         public int? ParentId { get; set; }
         //public bool IsActive { get; set; }
-        public List<SidebarModel> SubTabs { get; set; } // Sub-tabs if any
+        public List<SidebarModel> SubTabs { get; set; } // Sub-tabs if any  
     }
 }

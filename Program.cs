@@ -1,4 +1,5 @@
 using Bug_Tracking_System.Models;
+using Bug_Tracking_System.Repositories;
 using Bug_Tracking_System.Repositories.AuthClasses;
 using Bug_Tracking_System.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ builder.Services.AddSingleton<IEmailSenderRepos, EmailSenderClassRepos>(); // Em
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IAccountRepos, AccountClassRepos>();
 builder.Services.AddScoped<ILoginRepos, LoginClassRepos>();
+builder.Services.AddScoped<ISidebarRepos, SidebarClassRepos>();
 
 
 

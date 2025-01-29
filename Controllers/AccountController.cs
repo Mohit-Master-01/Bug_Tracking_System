@@ -7,7 +7,7 @@ using System.Globalization;
 
 namespace Bug_Tracking_System.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController : BaseController 
     {
 
         private readonly IAccountRepos _acc;
@@ -17,7 +17,7 @@ namespace Bug_Tracking_System.Controllers
         private readonly ILoginRepos _login;
         private readonly IMemoryCache _memoryCache;
 
-        public AccountController(IAccountRepos acc,ILogger<AccountController> logger, DbBug dbBug, IEmailSenderRepos emailSender, ILoginRepos login,IMemoryCache memoryCache)
+        public AccountController(IAccountRepos acc,ILogger<AccountController> logger, DbBug dbBug, IEmailSenderRepos emailSender, ILoginRepos login,IMemoryCache memoryCache, ISidebarRepos sidebar) : base(sidebar)
         {
             _acc = acc;
             _logger = logger;
