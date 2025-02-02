@@ -1,0 +1,18 @@
+﻿using Bug_Tracking_System.Models;
+using X.PagedList;
+
+namespace Bug_Tracking_System.Repositories.Interfaces
+{
+    public interface IProjectsRepos
+    {
+        Task<IPagedList<Project>> GetAllProjects(int pageNumber, int pageSize);
+
+        Task<object> UpdateStatus(int projectId, bool status);
+
+        Project checkExistance(string ProjectName, int ProjectId);
+
+        Task<object> AddOrEditProject(Project projects);
+
+        Task<bool> DeleteProject(int projectId);
+    }
+}

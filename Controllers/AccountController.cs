@@ -65,6 +65,12 @@ namespace Bug_Tracking_System.Controllers
                 //TempData["UserEmail"] = user.Email;
                 HttpContext.Session.SetString("UserEmail", users.Email);
 
+                //Generate Default Profile Image
+                if (ImageFile == null)
+                {
+                    users.ProfileImage = _acc.GenerateDefaultProfileImage(users.UserName);
+                }
+
                 // Get session value
                 var email = HttpContext.Session.GetString("UserEmail");
                 if (!string.IsNullOrEmpty(email))

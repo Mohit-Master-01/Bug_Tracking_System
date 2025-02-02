@@ -1,14 +1,15 @@
 using System.Diagnostics;
 using Bug_Tracking_System.Models;
+using Bug_Tracking_System.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bug_Tracking_System.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ISidebarRepos sidebar) : base(sidebar)
         {
             _logger = logger;
         }

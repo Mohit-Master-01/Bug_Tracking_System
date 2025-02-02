@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Bug_Tracking_System.Models;
 
@@ -19,7 +20,8 @@ public partial class Project
 
     public virtual ICollection<Bug> Bugs { get; set; } = new List<Bug>();
 
-    public virtual User CreatedByNavigation { get; set; } = null!;
+    [JsonIgnore]
+    public virtual User? CreatedByNavigation { get; set; } 
 
     public virtual ICollection<TaskAssignment> TaskAssignments { get; set; } = new List<TaskAssignment>();
 

@@ -16,6 +16,8 @@ namespace Bug_Tracking_System.Repositories.Interfaces
 
         Task<int?> GetUserIdByEmail(string email);
 
+        string? GenerateDefaultProfileImage(string userName);
+
         //Task<List<Role>> GetRoles();
     }
 }

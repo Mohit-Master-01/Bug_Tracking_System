@@ -1,0 +1,50 @@
+﻿@model Bug_Tracking_System.Models.Project
+
+@{
+    ViewData["Title"] = Model.ProjectId == 0 ? "Create New Project" : "Edit Project";
+    string action = Model.ProjectId == 0 ? "Create" : "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-lg border-0">
+                <div class="card-header text-white">
+                    <h5 class="mb-0">@ViewData["Title"]</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="AddOrEditProject" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        <input type="hidden" asp-for="ProjectId" />
+
+                        <div class="mb-3">
+                            <label asp-for="ProjectName" class="form-label fw-bold"></label>
+                            <input asp-for="ProjectName" class="form-control" placeholder="Enter project name" />
+                            <span asp-validation-for="ProjectName" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label fw-bold"></label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Enter project description"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <input type="hidden" asp-for="CreatedBy" value="2018" />
+
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm">@action Project</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

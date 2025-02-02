@@ -22,34 +22,24 @@ $(document).ready(function () {
 
     $("#loginForm").validate({
         rules: {
-            EmailOrUsername: {
-                required: true,
-            },
-            Password: {
-                required: true,
-            }
+            EmailOrUsername: { required: true },
+            Password: { required: true }
         },
         messages: {
-            EmailOrUsername: {
-                required: "Please enter your Credentials."
-            },
-            Password: {
-                required: "Please enter your Password.",
-            }
+            EmailOrUsername: { required: "Please enter your credentials." },
+            Password: { required: "Please enter your password." }
         },
-
         submitHandler: function (form, event) {
-            event.preventDefault()
+            event.preventDefault();
+
             const formData = new FormData(form);
             const btnLogin = $("#btnLogin");
             const btnLoader = $("#btnLoader");
 
-            // Disable button and show loader
             btnLogin.prop("disabled", true);
             btnLoader.removeClass("d-none");
 
-            setTimeout(function () {
-                // AJAX submission
+            setTimeout(() => {
                 $.ajax({
                     url: '/Account/Login',
                     type: 'POST',
@@ -57,52 +47,44 @@ $(document).ready(function () {
                     contentType: false,
                     data: formData,
                     success: function (result) {
-                        alert(result.message);
                         if (result.success) {
-                            //window.location.href = '/Auth/Index';
-                            alert('Login successful');
+                            showToast("success", "Login successful! Redirecting...");
+                            setTimeout(() => { window.location.href = '/Auth/Index'; }, 2000);
+                        } else {
+                            showToast("error", result.message);
                         }
                     },
                     complete: function () {
-                        //Re-enable button and hide loader
                         btnLogin.prop("disabled", false);
                         btnLoader.addClass("d-none");
                     },
                     error: function () {
-                        alert('An error occurred while registering the user.');
+                        showToast("error", "An error occurred while logging in.");
                     }
                 });
             }, 1000);
-           
         }
     });
 
+
     $("#forgotPassword").validate({
         rules: {
-            Email: {
-                required: true,
-                email: true
-            }
+            Email: { required: true, email: true }
         },
         messages: {
-            Email: {
-                required: "Please enter your Email.",
-                email: "Not a valid email"
-            }
+            Email: { required: "Please enter your email.", email: "Not a valid email" }
         },
-
         submitHandler: function (form, event) {
-            event.preventDefault()
+            event.preventDefault();
+
             const formData = new FormData(form);
             const btnSubmit = $("#btnSubmit");
             const btnLoader = $("#btnLoader");
 
-            // Disable button and show loader
             btnSubmit.prop("disabled", true);
             btnLoader.removeClass("d-none");
 
-            setTimeout(function () {
-                // AJAX submission
+            setTimeout(() => {
                 $.ajax({
                     url: '/Account/ForgotPassword',
                     type: 'POST',
@@ -110,63 +92,42 @@ $(document).ready(function () {
                     contentType: false,
                     data: formData,
                     success: function (result) {
-                        alert(result.message);
-
+                        showToast("info", result.message);
                     },
                     complete: function () {
                         btnSubmit.prop("disabled", false);
                         btnLoader.addClass("d-none");
                     },
                     error: function () {
-                        alert('An error occurred while sending the email.');
+                        showToast("error", "An error occurred while sending the email.");
                     }
                 });
             }, 1000);
-            
         }
     });
 
 
+
     $("#ResetPassword").validate({
         rules: {
-            PasswordHash: {
-                required: true,
-                minlength: 8
-            },
-            ConfirmPassword: {
-                required: true,
-                minlength: 8,
-                equalTo: "#PasswordHash"
-            },
+            PasswordHash: { required: true, minlength: 8 },
+            ConfirmPassword: { required: true, minlength: 8, equalTo: "#PasswordHash" }
         },
         messages: {
-            PasswordHash: {
-                required: "Please enter a password.",
-                minlength: "Password must be at least 8 characters."
-            },
-            ConfirmPassword: {
-                required: "Please enter confirm password",
-                minlength: "Confirm password must be least 8 characters",
-                equalTo: "Password doesn't match"
-            },
+            PasswordHash: { required: "Please enter a password.", minlength: "Password must be at least 8 characters." },
+            ConfirmPassword: { required: "Please confirm password", equalTo: "Passwords don't match." }
         },
-
         submitHandler: function (form, event) {
-            event.preventDefault()
+            event.preventDefault();
+
             const formData = new FormData(form);
-            //var formData = {
-            //    PasswordHash: $('#PasswordHash').val(),
-            //}
-            
             const btnSubmit = $("#btnSubmit");
             const btnLoader = $("#btnLoader");
 
-            // Disable button and show loader
             btnSubmit.prop("disabled", true);
             btnLoader.removeClass("d-none");
 
-            setTimeout(function () {
-                // AJAX submission
+            setTimeout(() => {
                 $.ajax({
                     url: '/Account/ResetPassword',
                     type: 'POST',
@@ -174,23 +135,25 @@ $(document).ready(function () {
                     contentType: false,
                     data: formData,
                     success: function (result) {
-                        alert(result.message);
                         if (result.success) {
-                            window.location.href = '/Account/Login';
+                            showToast("success", "Password changed successfully! Redirecting...");
+                            setTimeout(() => { window.location.href = "/Account/Login"; }, 2000);
+                        } else {
+                            showToast("error", result.message);
                         }
                     },
                     complete: function () {
                         btnSubmit.prop("disabled", false);
                         btnLoader.addClass("d-none");
                     },
-                error: function () {
-                        alert('An error occurred while registering the user.');
+                    error: function () {
+                        showToast("error", "An error occurred while resetting password.");
                     }
                 });
-            },1000)
-            
+            }, 1000);
         }
     });
+
 
     document.querySelectorAll('.toggle-password').forEach(toggle => {
         toggle.addEventListener('click', () => {

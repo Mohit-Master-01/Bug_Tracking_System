@@ -1,6 +1,8 @@
 ﻿using Bug_Tracking_System.Models;
 using Bug_Tracking_System.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using static System.Net.Mime.MediaTypeNames;
+using System.Drawing;
 
 namespace Bug_Tracking_System.Repositories.AuthClasses
 {
@@ -28,9 +30,52 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
             string subj = "OTP Verification!!!";
             await _emailSender.SendEmailAsync(users.Email, subj, users.Otp,"Registration");
 
+            if (ImageFile == null)
+            {
+                users.ProfileImage = GenerateDefaultProfileImage(users.UserName);
+            }
+
             await _bug.Users.AddAsync(users);
             await _bug.SaveChangesAsync();
             return new { success = true, message = "Check your email for the OTP verification" };
+        }
+
+        public string GenerateDefaultProfileImage(string userName)
+        {
+            if (string.IsNullOrWhiteSpace(userName))
+                userName = "U"; // Default to 'U' if username is empty
+
+            string firstLetter = userName.Substring(0, 1).ToUpper();
+            string directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/ProfileImage");
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
+
+            string imagePath = Path.Combine(directoryPath, $"{userName}_profile.png");
+            string relativePath = $"/ProfileImage/{userName}_profile.png"; // Path for DB storage
+
+            int width = 200, height = 200;
+
+            using (Bitmap bmp = new Bitmap(width, height))
+            {
+                using (Graphics g = Graphics.FromImage(bmp))
+                {
+                    g.Clear(Color.Gray); // Set background color
+
+                    using (System.Drawing.Font font = new System.Drawing.Font("Arial", 80, FontStyle.Bold, GraphicsUnit.Pixel))
+                    using (SolidBrush textBrush = new SolidBrush(Color.White))
+                    {
+                        SizeF textSize = g.MeasureString(firstLetter, font);
+                        PointF position = new PointF((width - textSize.Width) / 2, (height - textSize.Height) / 2);
+                        g.DrawString(firstLetter, font, textBrush, position);
+                    }
+                }
+
+                bmp.Save(imagePath, System.Drawing.Imaging.ImageFormat.Png);
+            }
+
+            return relativePath;
         }
 
         public async Task<int?> GetUserIdByEmail(string email)
@@ -87,5 +132,7 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
 
             return new { success = false, message = "Email not found" };
         }
+
+
     }
 }

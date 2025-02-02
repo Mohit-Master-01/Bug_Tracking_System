@@ -1,0 +1,79 @@
+﻿@* @model IEnumerable<Bug_Tracking_System.Models.Project> *@
+@model X.PagedList.IPagedList<Bug_Tracking_System.Models.Project>
+@using X.PagedList.Mvc.Core
+
+
+
+@{
+    ViewData["Title"] = "Project List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="card shadow-lg border-0">
+        <div class="card-header text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Project List</h4>
+            <a asp-action="AddOrEditProject" class="btn btn-light btn-sm text-primary">
+                <i class="fas fa-plus"></i> Add New Project
+            </a>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover align-middle text-center">
+                <thead class="bg-dark">
+                    <tr>
+                        <th class="text-white">Project Name</th>
+                        <th class="text-white">Description</th>
+                        <th class="text-white">Created Date</th>
+                        <th class="text-white">Status</th>
+                        <th class="text-white">Created By</th>
+                        <th class="text-white">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.ProjectName</td>
+                            <td>@item.Description</td>
+                            <td>@item.CreatedDate?.ToString("dd-MM-yyyy HH:mm")</td>
+                            <td>
+                                <span class="badge @((bool)item.IsActive ? "bg-success" : "bg-danger")">
+                                    @((bool)item.IsActive ? "Active" : "Inactive")
+                                </span>
+                            </td>
+                            <td>@item.CreatedByNavigation?.UserName</td>
+                            <td>
+                                <a asp-action="AddOrEditProject" asp-route-id="@item.ProjectId" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="~/Projects/Delete" id="@item.ProjectId" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                                @* <a asp-action="Delete" asp-route-id="@item.ProjectId" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')"> *@
+                                @*     <i class="fas fa-trash-alt"></i> *@
+                                @* </a> *@
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <!-- Pagination UI -->
+            <div class="d-flex justify-content-center">
+                @Html.PagedListPager(Model, page => Url.Action("ProjectList", new { page }),
+                         new PagedListRenderOptions
+                {
+                    Display = PagedListDisplayMode.IfNeeded,
+                    UlElementClasses = new[] { "pagination", "justify-content-center" },
+                    LiElementClasses = new[] { "page-item" },
+                    PageClasses = new[] { "page-link" }
+                })
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+}

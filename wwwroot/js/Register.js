@@ -2,55 +2,23 @@
 
     $("#Registration").validate({
         rules: {
-            UserName: {
-                required: true,
-                minlength: 4,
-                maxlength: 50
-            },
-            Email: {
-                required: true,
-                email: true
-            },
-            PasswordHash: {
-                required: true,
-                minlength: 6
-            },
-            ConfirmPassword: {
-                required: true,
-                minlength: 8,
-                equalTo: "#PasswordHash"
-            },
+            UserName: { required: true, minlength: 4, maxlength: 50 },
+            Email: { required: true, email: true },
+            PasswordHash: { required: true, minlength: 6 },
+            ConfirmPassword: { required: true, minlength: 8, equalTo: "#PasswordHash" }
         },
         messages: {
-            Username: {
-                required: "Please enter a username.",
-                minlength: "Username must be at least 3 characters.",
-                maxlength: "Username cannot exceed 15 characters."
-            },
-            //FirstName: {
-            //    required: "Please enter your first name."
-            //},
-            Email: {
-                required: "Please enter your email.",
-                email: "Please enter a valid email address."
-            },
-            PasswordHash: {
-                required: "Please enter a password.",
-                minlength: "Password must be at least 8 characters."
-            },
-            ConfirmPassword: {
-                required: "Please enter confirm password",
-                minlength: "Confirm password must be least 8 characters",
-                equalTo: "Password doesn't match"
-            }
+            UserName: { required: "Please enter a username.", minlength: "At least 4 characters.", maxlength: "Max 50 characters." },
+            Email: { required: "Please enter your email.", email: "Invalid email format." },
+            PasswordHash: { required: "Please enter a password.", minlength: "At least 6 characters." },
+            ConfirmPassword: { required: "Confirm password required.", equalTo: "Passwords do not match." }
         },
-
         submitHandler: function (form, event) {
             event.preventDefault();
+
             const btnRegister = $("#btnRegister");
             const btnLoader = $("#btnLoader");
 
-            //Disable button and show loader
             btnRegister.prop("disabled", true);
             btnLoader.removeClass("d-none");
 
@@ -63,24 +31,24 @@
                 contentType: false,
                 data: formData,
                 success: function (result) {
-                    alert(result.message);
                     if (result.success) {
-                        alert('Successfull');
-                        window.location.href = '/Account/OtpCheck';
+                        showToast("success", "Registration successful! OTP sent to email.");
+                        setTimeout(() => { window.location.href = '/Account/OtpCheck'; }, 2000);
+                    } else {
+                        showToast("error", result.message);
                     }
                 },
                 complete: function () {
-                    //Re-enable button and hide loader
                     btnRegister.prop("disabled", false);
                     btnLoader.addClass("d-none");
                 },
                 error: function () {
-                    alert('An error occured while registering the user.');
+                    showToast("error", "An error occurred while registering.");
                 }
             });
         }
-
     });
+
 
 
 

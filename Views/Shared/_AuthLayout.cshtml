@@ -10,7 +10,7 @@
     @* <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" /> *@
 
     <link rel="apple-touch-icon" sizes="76x76" href="../AuthAssets/img/apple-icon.png">
-    <link rel="icon" type="image/png" href="../AuthAssets/img/favicon.png">
+    <link rel="icon" type="image/png" href="../AuthAssets/img/Bug.png.png">
     <title>
         Bug Tracking System
     </title>
@@ -122,6 +122,24 @@
     <script src="https://cdn.rawgit.com/jzaefferer/jquery-validation/1.19.3/dist/jquery.validate.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+
+    <!-- Toastr CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <script>
+        function showToast(type, message) {
+            toastr.options = {
+                closeButton: true,
+                progressBar: true,
+                positionClass: "toast-top-right",
+                timeOut: 5000
+            };
+            toastr[type](message);
+        }
+    </script>
 
 
 </body>
