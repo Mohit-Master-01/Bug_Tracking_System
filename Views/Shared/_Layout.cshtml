@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="~/Bug_Tracking_System.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" />
     <link rel="apple-touch-icon" sizes="76x76" href="../AuthAssets/img/apple-icon.png">
-    <link rel="icon" type="image/png" href="../AuthAssets/img/Bug.png.png">
+    <link rel="icon" type="image/png" href="~/AuthAssets/img/Bug.png.png">
     <title>
         Bugify Dashboard
     </title>
@@ -19,11 +19,35 @@
     <link href="https://demos.creative-tim.com/argon-dashboard-pro/AuthAssets/css/nucleo-icons.css" rel="stylesheet" />
     <link href="https://demos.creative-tim.com/argon-dashboard-pro/AuthAssets/css/nucleo-svg.css" rel="stylesheet" />
     <!-- Font Awesome Icons -->
-    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/42d5adcbca.js"></script>
     <!-- CSS Files -->
-    <link id="pagestyle" href="../AuthAssets/css/argon-dashboard.css?v=2.1.0" rel="stylesheet" />
+    <link id="pagestyle" href="~/AuthAssets/css/argon-dashboard.css" rel="stylesheet" />
     @RenderSection("Styles", required: false)
     <style>
+
+        /* Initially hide the sidebar */
+        .sidenav {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out, visibility 0s linear 0.0s;
+        }
+
+        /* Preloader should overlay everything */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white; /* Background to cover everything */
+            z-index: 1050; /* Keep above everything */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease-out;
+        }
+
+
         /* Submenu styles */
         .nav-item .submenu {
         display: none;
@@ -114,24 +138,26 @@
                     <li class="nav-item @res">
                         <a class="nav-link" href="@tab.TabUrl">
                             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                                <i class="ni ni-folder-17 text-dark text-sm opacity-10"></i>
+                                <i class="@tab.IconPath text-dark text-sm opacity-10"></i> <!-- Fixed Icon Usage -->
                             </div>
                             <span class="nav-link-text ms-1">@tab.TabName</span>
                         </a>
-                        @if(subtabs)
+                        @if (subtabs)
                         {
                             <ul class="submenu">
-                                @foreach(var subTab in tab.SubTabs)
+                                @foreach (var subTab in tab.SubTabs)
                                 {
                                     <li>
-                                        <a class="nav-link" href="@subTab.TabUrl">@subTab.TabName</a>
+                                        <a class="nav-link" href="@subTab.TabUrl">
+                                            <i class="fa fa-angle-right me-2"></i> <!-- Added Submenu Icon -->
+                                            @subTab.TabName
+                                        </a>
                                     </li>
                                 }
-                                
                             </ul>
                         }
-                        
                     </li>
+
                 }                                        
             </ul>
         </div>
@@ -141,7 +167,7 @@
      <main role="main" class="main-content position-relative border-radius-lg ">
 
             <!-- Navbar -->
-            <nav class="navbar navbar-main navbar-expand-lg bg-dark px-3 shadow-none border-radius-xl">
+         <nav class="navbar navbar-main navbar-expand-lg bg-dark px-3 shadow-none border-radius-xl">
 
             <div class="container-fluid">
                 <div class="d-flex flex-column">
@@ -158,24 +184,31 @@
                 </div>
             </div>
 
-                    <div class="collapse navbar-collapse" id="navbar">
-                        <ul class="navbar-nav ms-auto">
-                            <li class="nav-item px-3">
-                                <a href="#" class="nav-link text-white p-0">
-                                    <i class="fa fa-cog"></i>
-                                </a>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link text-white p-0" id="dropdownMenuButton" data-bs-toggle="dropdown">
-                                    <i class="fa fa-bell cursor-pointer"></i>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="#">No new notifications</a></li>
-                                </ul>
-                            </li>
+            <div class="collapse navbar-collapse" id="navbar">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a href="~/Profile/Profile" class="nav-link text-white p-0">
+                            <i class="fas fa-user"></i> <!-- Fixed: Ensure correct FA class -->
+                            <span class="d-sm-inline d-none">Profile</span>
+                        </a>
+                    </li>
+                    <li class="nav-item px-3">
+                        <a href="#" class="nav-link text-white p-0">
+                            <i class="fas fa-cog"></i> <!-- Fixed: Corrected FA class -->
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link text-white p-0" id="dropdownMenuButton" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell cursor-pointer"></i> <!-- Fixed: Corrected FA class -->
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">No new notifications</a></li>
                         </ul>
-                    </div>
-            </nav>
+                    </li>
+                </ul>
+            </div>
+
+         </nav>
 
         <!-- End Navbar -->
 
@@ -205,14 +238,14 @@
     @* </footer> *@
 
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdn.rawgit.com/jzaefferer/jquery-validation/1.19.3/dist/jquery.validate.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.rawgit.com/jzaefferer/jquery-validation/1.19.3/dist/jquery.validate.min.js"></script>
     <script src="~/AuthAssets/js/core/popper.min.js"></script>
     <script src="~/AuthAssets/js/core/bootstrap.min.js"></script>
     <script src="~/AuthAssets/js/plugins/perfect-scrollbar.min.js"></script>
@@ -230,11 +263,27 @@
             });
         });
 
+                     document.addEventListener("DOMContentLoaded", function () {
+            const preloader = document.getElementById("preloader");
+            const sidebar = document.querySelector(".sidenav");
+
+            setTimeout(() => {
+                preloader.style.opacity = "0"; // Fade-out effect
+                setTimeout(() => {
+                    preloader.style.display = "none"; // Hide preloader
+                    sidebar.style.opacity = "1"; // Show sidebar
+                    sidebar.style.visibility = "visible";
+                }, 500); // Ensure smooth transition
+            }, 1000); // Adjust delay as needed
+        });
+
+
     </script>
 
     <!-- Github buttons -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
-    <script src="../AuthAssets/js/argon-dashboard.min.js?v=2.1.0"></script>
+    <script src="~/AuthAssets/js/argon-dashboard.min.js?v=2.1.0"></script>
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
 </body>
 </html>

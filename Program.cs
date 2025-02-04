@@ -20,6 +20,7 @@ builder.Services.AddScoped<IAccountRepos, AccountClassRepos>();
 builder.Services.AddScoped<ILoginRepos, LoginClassRepos>();
 builder.Services.AddScoped<ISidebarRepos, SidebarClassRepos>();
 builder.Services.AddScoped<IProjectsRepos, ProjectsClassRepos>();
+builder.Services.AddScoped<IProfileRepos, ProfileClassRepos>();
 
 AppContext.SetSwitch("System.Drawing.EnableUnixSupport", true);
 

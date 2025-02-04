@@ -49,7 +49,7 @@ $(document).ready(function () {
                     success: function (result) {
                         if (result.success) {
                             showToast("success", "Login successful! Redirecting...");
-                            setTimeout(() => { window.location.href = '/Auth/Index'; }, 2000);
+                            setTimeout(() => { window.location.href = '/Dashboard/Dashboard'; }, 2000);
                         } else {
                             showToast("error", result.message);
                         }

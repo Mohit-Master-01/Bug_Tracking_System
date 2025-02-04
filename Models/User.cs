@@ -21,7 +21,7 @@ public partial class User
 
     public DateTime? CreatedDate { get; set; }
 
-    public bool? IsActive { get; set; }
+    public bool IsActive { get; set; }
 
     public string? Otp { get; set; }
 
@@ -35,16 +35,22 @@ public partial class User
 
     public int? ProjectId { get; set; }
 
+   
     public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
 
+   
     public virtual ICollection<Bug> Bugs { get; set; } = new List<Bug>();
 
+    
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
+    [NotMapped]
     public virtual Project? Project { get; set; }
 
+    
     public virtual ICollection<Project> Projects { get; set; } = new List<Project>();
 
+    [NotMapped]
     public virtual Role? Role { get; set; }
 
     public virtual ICollection<TaskAssignment> TaskAssignmentAssignedByNavigations { get; set; } = new List<TaskAssignment>();

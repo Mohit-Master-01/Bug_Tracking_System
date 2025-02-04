@@ -1,7 +1,7 @@
 ﻿using Bug_Tracking_System.Models;
 using Bug_Tracking_System.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Http;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using X.PagedList.Extensions;
 using X.PagedList;
@@ -30,7 +30,8 @@ namespace Bug_Tracking_System.Repositories.ProjectsClasses
                     //Edit Project
                     existingProject.ProjectName = projects.ProjectName;
                     existingProject.Description = projects.Description;
-                    existingProject.IsActive = projects.IsActive;
+                    existingProject.IsActive = true;
+                    existingProject.CreatedDate = DateTime.Now;
                     _dbBug.Projects.Update(existingProject);
                 }
                 else
@@ -38,6 +39,7 @@ namespace Bug_Tracking_System.Repositories.ProjectsClasses
                     //Add new project
                     projects.CreatedDate = DateTime.Now;
                     projects.CreatedBy = 2018;
+                    projects.IsActive = true;
                     _dbBug.Projects.Add(projects);
                 }
 
