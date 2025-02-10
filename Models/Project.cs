@@ -18,10 +18,14 @@ public partial class Project
 
     public bool? IsActive { get; set; }
 
+    public string? Status { get; set; }
+
+    public int? Completion { get; set; }
+
     public virtual ICollection<Bug> Bugs { get; set; } = new List<Bug>();
 
     [JsonIgnore]
-    public virtual User? CreatedByNavigation { get; set; } 
+    public virtual User CreatedByNavigation { get; set; } = null!;
 
     public virtual ICollection<TaskAssignment> TaskAssignments { get; set; } = new List<TaskAssignment>();
 

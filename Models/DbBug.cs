@@ -128,7 +128,7 @@ public partial class DbBug : DbContext
 
         modelBuilder.Entity<Permission>(entity =>
         {
-            entity.HasKey(e => e.Permissionid).HasName("PK__Permissi__D8200EA41AF01E9A");
+            entity.HasKey(e => e.Permissionid).HasName("PK__Permissi__D8200EA449E506EF");
 
             entity.ToTable("Permission");
 
@@ -161,6 +161,7 @@ public partial class DbBug : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.ProjectName).HasMaxLength(100);
+            entity.Property(e => e.Status).HasMaxLength(15);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.Projects)
                 .HasForeignKey(d => d.CreatedBy)

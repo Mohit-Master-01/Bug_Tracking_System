@@ -11,10 +11,11 @@ namespace Bug_Tracking_System.Controllers
         {
             _sidebar = sidebar;
         }
+
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            //int roleId = (int)HttpContext.Session.GetInt32("UserRoleId");
-            int roleId = 4;
+            int roleId = HttpContext.Session.GetInt32("UserRoleId") ?? 0;
+            //int roleId = 4;
             var tabs = _sidebar.GetTabsByRoleIdAsync(roleId).Result; // Sync for simplicity
             ViewBag.SidebarTabs = tabs;
             base.OnActionExecuting(context);

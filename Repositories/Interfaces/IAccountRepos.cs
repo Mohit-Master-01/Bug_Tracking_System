@@ -14,10 +14,13 @@ namespace Bug_Tracking_System.Repositories.Interfaces
 
         Task<object> updateStatus(string Email);
 
-        Task<int?> GetUserIdByEmail(string email);
+        Task<User> GetUserDataByEmail(string email);
 
         string? GenerateDefaultProfileImage(string userName);
 
+        Task<string> fetchEmail(string cred);
+
+        Task<bool> IsVerified(string cred);
         //Task<List<Role>> GetRoles();
     }
 }

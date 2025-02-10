@@ -5,6 +5,7 @@ using MimeKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using static System.Net.WebRequestMethods;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
 namespace Bug_Tracking_System.Repositories.AuthClasses
 {
@@ -121,10 +122,7 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
                                 </style>
                             </head>
                             <body>
-                                <div class='container'>
-                                    <div class='header'>
-                                        <h2>Welcome to Bugify - Your Bug Tracking System</h2>
-                                    </div>
+                                <div class='container'>                                    
                                     <div class='content'>
                                         <p>Dear {body},</p>
                                         <p>Congratulations! Your email has been successfully verified.</p>
@@ -139,9 +137,32 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
                             </body>
                         </html>";
                 }
+                else if (emailType == "NewMemberAdded")
+                {
+                    emailBody = $@"
+                        <html>
+                            <head>
+                                <style>
+                                    body {{ font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; }}
+                                    .container {{ max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }}
+                                    .header {{ text-align: center; margin-bottom: 20px; }}
+                                    .content {{ font-size: 16px; line-height: 1.5; }}
+                                    .info {{ font-size: 18px; font-weight: bold; color: #333; text-align: center; margin: 20px 0; }}
+                                    .footer {{ text-align: center; font-size: 12px; color: #888; margin-top: 20px; }}
+                                </style>
+                            </head>
+                            <body>
+                                <div class='container'>
+                                    <div class='header'>
+                                        <h2>Welcome to Bugify - Bug Tracking System</h2>
+                                    </div>
+                                    {body}
+                            </body>
+                        </html>";
+                }
 
-                message.Body = new TextPart("html") { Text = emailBody };
-
+                var bodyBuilder = new BodyBuilder { HtmlBody = emailBody };
+                message.Body = bodyBuilder.ToMessageBody();
 
                 using (var smtpClient = new SmtpClient())
                 {

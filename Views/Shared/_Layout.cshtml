@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Bug_Tracking_System.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" />
-    <link rel="apple-touch-icon" sizes="76x76" href="../AuthAssets/img/apple-icon.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="~/AuthAssets/img/apple-icon.png">
     <link rel="icon" type="image/png" href="~/AuthAssets/img/Bug.png.png">
     <title>
         Bugify Dashboard
@@ -22,6 +22,9 @@
     <script src="https://kit.fontawesome.com/42d5adcbca.js"></script>
     <!-- CSS Files -->
     <link id="pagestyle" href="~/AuthAssets/css/argon-dashboard.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link id="pagestyle" href="https://cdn.jsdelivr.net/npm/argon-dashboard/assets/css/argon-dashboard.min.css" rel="stylesheet">
+
     @RenderSection("Styles", required: false)
     <style>
 
@@ -184,12 +187,22 @@
                 </div>
             </div>
 
+            <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+                <div class="input-group">
+                    <span class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></span>
+                    <input type="text" id="global-search" class="form-control" placeholder="Search..." autocomplete="off">
+                </div>
+                <div id="search-results" class="search-dropdown bg-white shadow-lg p-2 rounded d-none">
+                    <!-- Search results will appear here -->
+                </div>
+            </div>
+
             <div class="collapse navbar-collapse" id="navbar">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
+                    <li class="nav-item px-0">
                         <a href="~/Profile/Profile" class="nav-link text-white p-0">
                             <i class="fas fa-user"></i> <!-- Fixed: Ensure correct FA class -->
-                            <span class="d-sm-inline d-none">Profile</span>
+                            @* <span class="d-sm-inline d-none">Profile</span> *@
                         </a>
                     </li>
                     <li class="nav-item px-3">
@@ -237,12 +250,23 @@
     @*     </div> *@
     @* </footer> *@
 
+    <!-- Load jQuery First -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
+    <!-- Load jQuery Validation Plugin After jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+
+    <!-- Load Toastr for Notifications -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+
+
+    <script src="https://cdn.jsdelivr.net/npm/argon-dashboard/assets/js/argon-dashboard.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    @* <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script> *@
+    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script> *@
     <script src="https://cdn.rawgit.com/jzaefferer/jquery-validation/1.19.3/dist/jquery.validate.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
@@ -251,6 +275,7 @@
     <script src="~/AuthAssets/js/plugins/perfect-scrollbar.min.js"></script>
     <script src="~/AuthAssets/js/plugins/smooth-scrollbar.min.js"></script>
     <script src="~/AuthAssets/js/plugins/chartjs.min.js"></script>
+    @* <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> *@
     <script>
                 document.addEventListener("DOMContentLoaded", function () {
             document.querySelectorAll(".nav-item.has-submenu > a").forEach((item) => {
@@ -276,8 +301,7 @@
                 }, 500); // Ensure smooth transition
             }, 1000); // Adjust delay as needed
         });
-
-
+                  
     </script>
 
     <!-- Github buttons -->

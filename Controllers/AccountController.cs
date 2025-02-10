@@ -157,6 +157,7 @@ namespace Bug_Tracking_System.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginModel login)
         {
+            string RedirectTo = "Dashboard";
 
             const int maxAttempts = 5; //Maximum allowed attempts
             const int lockoutDurationSeconds = 300; //Lockout duration in seconds
@@ -198,6 +199,43 @@ namespace Bug_Tracking_System.Controllers
                 {
                     Response.Cookies.Delete("RememberMe_Email");
                     Response.Cookies.Delete("RememberMe_Password");
+                }
+
+                //Fetch user details and set session variables
+                string email = await _acc.fetchEmail(login.EmailOrUsername);
+                HttpContext.Session.SetString("UserEmail", email);
+
+                var data = await _acc.GetUserDataByEmail(email);
+                int id = data.UserId;
+                HttpContext.Session.SetInt32("UserId", id);
+                HttpContext.Session.SetInt32("UserRoleId", (int)data.RoleId);
+
+                //Determine redirection based on user verification
+                if(data.RoleId == 4)
+                {
+                    if(await _acc.IsVerified(login.EmailOrUsername))
+                    {
+                        if(data.RoleId == 4)
+                        {
+                            RedirectTo = "Dashboard";
+                        }
+                    }
+                    else
+                    {
+                        RedirectTo = "OtpCheck";
+                    }
+                }
+
+                if(RedirectTo == "OtpCheck")
+                {
+                    var user = await _dbBug.Users.FirstOrDefaultAsync(u => u.Email == email);
+                    if(user != null)
+                    {
+                        user.Otp = _emailSender.GenerateOtp();
+                        user.OtpExpiry = DateTime.Now.AddMinutes(5);
+                        await _emailSender.SendEmailAsync(user.Email, "OTP Verification", user.Otp, "Registration");
+                        await _dbBug.SaveChangesAsync();
+                    }
                 }
 
                 //Reset login attempts after successful login
@@ -258,8 +296,6 @@ namespace Bug_Tracking_System.Controllers
             }
             return Ok(res);
         }
-
-
 
     }
 }

@@ -1,7 +1,9 @@
 using Bug_Tracking_System.Models;
 using Bug_Tracking_System.Repositories;
 using Bug_Tracking_System.Repositories.AuthClasses;
+using Bug_Tracking_System.Repositories.BugsClasses;
 using Bug_Tracking_System.Repositories.Interfaces;
+using Bug_Tracking_System.Repositories.MembersClasses;
 using Bug_Tracking_System.Repositories.ProjectsClasses;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Mail;
@@ -21,6 +23,9 @@ builder.Services.AddScoped<ILoginRepos, LoginClassRepos>();
 builder.Services.AddScoped<ISidebarRepos, SidebarClassRepos>();
 builder.Services.AddScoped<IProjectsRepos, ProjectsClassRepos>();
 builder.Services.AddScoped<IProfileRepos, ProfileClassRepos>();
+builder.Services.AddScoped<IMembersRepos, MemberClassRepos>();
+builder.Services.AddScoped<IBugRepos, BugsClassRepos>();
+
 
 AppContext.SetSwitch("System.Drawing.EnableUnixSupport", true);
 

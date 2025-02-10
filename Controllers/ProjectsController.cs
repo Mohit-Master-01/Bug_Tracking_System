@@ -22,7 +22,7 @@ namespace Bug_Tracking_System.Controllers
             int pageSize = 4; // Number of records per page
             int pageNumber = page ?? 1; // Default to page 1
 
-            ViewBag.PageTitle = "Project List";
+            ViewBag.PageTitle = "Projects List";
             ViewBag.Breadcrumb = "Reports";
             var projects = await _project.GetAllProjects(pageNumber, pageSize);
             return View(projects);

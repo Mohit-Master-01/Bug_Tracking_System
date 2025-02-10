@@ -1,0 +1,97 @@
+﻿@model Bug_Tracking_System.Models.User
+
+@{
+    ViewData["Title"] = Model.UserId == 0 ? "Add a Member" : "Edit Member";
+    string action = Model.UserId == 0 ? "Add" : "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">@ViewData["Title"]</h5>
+                </div>
+                <div class="card-body">
+                    <form role="form" id="memberForm" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        <input type="hidden" asp-for="UserId" />
+
+                        <div class="mb-3">
+                            <label asp-for="UserName" class="form-label fw-bold"></label>
+                            <input asp-for="UserName" class="form-control" placeholder="Enter username" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label fw-bold"></label>
+                            <input asp-for="Email" class="form-control" placeholder="Enter email" required />
+                        </div>
+                                                
+                        <!-- Role Dropdown -->
+                        <div class="mb-3">
+                            <label asp-for="RoleId" class="form-label fw-bold">Role</label>
+                            <select asp-for="RoleId" class="form-control" asp-items="ViewBag.RoleId" id="roleDropdown">
+                                <option value="">Select Role</option>
+                            </select>
+                        </div>
+                                                
+                        <!-- Project Dropdown (Initially Hidden) -->
+                        <div class="mb-3" id="projectContainer" style="display: none;">
+                            <label asp-for="ProjectId" class="form-label fw-bold">Project</label>
+                            <select asp-for="ProjectId" class="form-control" id="projectDropdown">
+                                <option value="">Select Project</option>
+                            </select>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" id="btnMember" class="btn btn-primary btn-lg w-100 shadow-sm">
+                                <span class="spinner-border spinner-border-sm d-none" id="btnLoader" role="status" aria-hidden="true"></span>
+                                @action Member
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="~/js/Members.js"></script>
+
+    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script> *@
+    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script> *@
+    @* <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" /> *@
+     
+
+    @* <script> *@
+    @*     $(document).ready(function () { *@
+    @*                // Show/Hide Project Dropdown based on Role selection *@
+    @*                $('#roleDropdown').change(function () { *@
+    @*                    var selectedRole = $(this).val(); *@
+
+    @*                    if (selectedRole == "1") { // If "Project Manager" is selected *@
+    @*                        $('#projectContainer').show(); *@
+
+    @*                        // Fetch and populate projects *@
+    @*                        $.get('/Members/GetProjects', function (data) { *@
+    @*                            $('#projectDropdown').empty().append('<option value="">Select Project</option>'); *@
+    @*                            $.each(data, function (index, project) { *@
+    @*                                $('#projectDropdown').append('<option value="' + project.projectId + '">' + project.projectName + '</option>'); *@
+    @*                            }); *@
+    @*                        }); *@
+
+    @*                    } else { *@
+    @*                        $('#projectContainer').hide(); *@
+    @*                        $('#projectDropdown').empty().append('<option value="">Select Project</option>'); *@
+    @*                    } *@
+    @*                }); *@
+    @*            }); *@
+    @* </script> *@
+
+}

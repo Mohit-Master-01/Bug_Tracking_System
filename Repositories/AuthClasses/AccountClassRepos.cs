@@ -78,12 +78,19 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
             return relativePath;
         }
 
-        public async Task<int?> GetUserIdByEmail(string email)
+        public async Task<User> GetUserDataByEmail(string email)
         {
             return await _bug.Users
-                .Where(u =>  u.Email == email)
-                .Select(u => (int?)u.UserId)
-                .FirstOrDefaultAsync(); //Retrieves the first match or null
+                .FirstOrDefaultAsync(x=> x.Email == email); //Retrieves the first match or null
+        }
+
+
+        public async Task<string> fetchEmail(string cred)
+        {
+            return await _bug.Users
+                .Where(u => u.Email == cred || u.UserName == cred)
+                .Select(u => u.Email)
+                .FirstOrDefaultAsync();
         }
 
         //public async Task<List<Role>> GetRoles()
@@ -133,6 +140,10 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
             return new { success = false, message = "Email not found" };
         }
 
-
+        public async Task<bool> IsVerified(string cred)
+        {
+            var user = await _bug.Users.FirstOrDefaultAsync(u => u.Email ==  cred || u.UserName == cred);
+            return (bool)user.IsEmailVerified;
+        }
     }
 }
