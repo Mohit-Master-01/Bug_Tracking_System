@@ -20,7 +20,26 @@ namespace Bug_Tracking_System.Controllers
         public async Task<IActionResult> Index()
         {
 
-            var user = await _profile.GetAllUsersData();
+
+            //Get the logged-in user Id from session
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            int? roleId = HttpContext.Session.GetInt32("UserRoleId");
+
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Account"); // Redirect if user is not logged in
+            }
+
+            User users = new User();
+
+            ViewBag.Breadcrumb = "Profile";
+
+            ViewBag.PageTitle = (roleId == 4) ? "Admin Profile" : "Member Profile";
+
+
+            //Fetch user data dynamically
+            var user = await _profile.GetAllUsersData(userId.Value);
+            
             if (user == null)
             {
                 return RedirectToAction("Login", "Account"); // Redirect if user is not logged in
@@ -39,18 +58,41 @@ namespace Bug_Tracking_System.Controllers
         [HttpGet]
         public async Task<IActionResult> EditProfile(int id)
         {
+            int? roleId = HttpContext.Session.GetInt32("UserRoleId");
+
+            ViewBag.Breadcrumb = "Profile";
+
+            ViewBag.PageTitle = (roleId == 4) ? "Edit Admin Profile" : "Edit Member Profile";
+
+            int? userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
             User user = new User();
             if(id > 0)
             {
                 user = await _dbBug.Users.FirstOrDefaultAsync(u => u.UserId == id);
             }
+
             return View(user);
         }
 
         [HttpPost]
         public async Task<IActionResult> EditProfile(User users, IFormFile? ImageFile)
         {
-            _profile.EditProfile(users, ImageFile);
+            int? userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            users.UserId = userId.Value; //Ensure correct user Id is used 
+
+            await _profile.EditProfile(users, ImageFile);
             return RedirectToAction("Profile");
         }
     }

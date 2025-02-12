@@ -35,6 +35,20 @@ public partial class User
 
     public int? ProjectId { get; set; }
 
+    public string? FirstName { get; set; }
+
+    public string? LastName { get; set; }
+
+    public string? PhoneNumber { get; set; }
+
+    public string? LinkedInProfile { get; set; }
+
+    public string? GitHubProfile { get; set; }
+
+    public string? Bio { get; set; }
+
+    public string? Skills { get; set; }
+
     public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
 
     public virtual ICollection<Bug> Bugs { get; set; } = new List<Bug>();

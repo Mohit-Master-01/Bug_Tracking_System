@@ -35,6 +35,39 @@ namespace Bug_Tracking_System.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> ProjectManagersList(int? page)
+        {
+            int pageSize = 4;
+            int pageNumber = page ?? 1;
+            ViewBag.PageTitle = "Project Managers List";
+            ViewBag.Breadcrumb = "Reports";
+            var ProjectManagers = await _member.GetAllProjectManagers(pageNumber, pageSize);
+            return View(ProjectManagers);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DevelopersList(int? page)
+        {
+            int pageSize = 4;
+            int pageNumber = page ?? 1;
+            ViewBag.PageTitle = "Developers List";
+            ViewBag.Breadcrumb = "Reports";
+            var Developers = await _member.GetAllDevelopers(pageNumber, pageSize);
+            return View(Developers);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> TestersList(int? page)
+        {
+            int pageSize = 4;
+            int pageNumber = page ?? 1;
+            ViewBag.PageTitle = "Tester List";
+            ViewBag.Breadcrumb = "Reports";
+            var Testers = await _member.GetAllTesters(pageNumber, pageSize);
+            return View(Testers);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
             User member = _dbBug.Users.FirstOrDefault(m => m.UserId == id);

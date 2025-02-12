@@ -23,7 +23,7 @@
                         <th class="text-white">Email</th>
                         <th class="text-white">Role</th>
                         <th class="text-white">Joining Date</th>
-                        <th class="text-white">Status</th>                        
+                        <th class="text-white">Status</th>
                         <th class="text-white">Actions</th>
                     </tr>
                 </thead>
@@ -42,7 +42,7 @@
                                 <span class="badge @((bool)item.IsActive ? "bg-success" : "bg-danger")">
                                     @((bool)item.IsActive ? "Active" : "Inactive")
                                 </span>
-                            </td>                           
+                            </td>
                             <td>
                                 <a asp-action="SaveMember" asp-route-id="@item.UserId" class="btn btn-warning btn-sm">
                                     <i class="fas fa-edit"></i>

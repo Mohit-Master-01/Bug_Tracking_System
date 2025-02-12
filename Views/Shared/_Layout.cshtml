@@ -105,6 +105,40 @@
         height: auto;
         }
 
+        html, body {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            flex: 1; /* Pushes the footer down */
+        }
+
+        footer {
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            background-color: #f8f9fa; /* Adjust as needed */
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #f8f9fa;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        main {
+            min-height: calc(100vh - 100px); /* Adjust 100px based on your header/footer size */
+            padding-bottom: 60px; /* Space for the footer */
+        }
+
+
     </style>
 </head>
 <body class="g-sidenav-show bg-gray-100">
@@ -218,6 +252,11 @@
                             <li><a class="dropdown-item" href="#">No new notifications</a></li>
                         </ul>
                     </li>
+                    <li class="nav-item px-3">
+                        <a href="~/Account/Login" class="nav-link text-white p-0">
+                            <i class="fa fa-sign-out"></i>
+                        </a>
+                    </li>
                 </ul>
             </div>
 
@@ -260,15 +299,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
 
+    <!-- Add this in your layout file -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
+
+    @* <script src="~/js/Members.js"></script> *@
     <script src="https://cdn.jsdelivr.net/npm/argon-dashboard/assets/js/argon-dashboard.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     @* <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script> *@
     @* <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script> *@
     <script src="https://cdn.rawgit.com/jzaefferer/jquery-validation/1.19.3/dist/jquery.validate.min.js"></script>
+
+
     @await RenderSectionAsync("Scripts", required: false)
+
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
     <script src="~/AuthAssets/js/core/popper.min.js"></script>
     <script src="~/AuthAssets/js/core/bootstrap.min.js"></script>
@@ -276,6 +326,7 @@
     <script src="~/AuthAssets/js/plugins/smooth-scrollbar.min.js"></script>
     <script src="~/AuthAssets/js/plugins/chartjs.min.js"></script>
     @* <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> *@
+
     <script>
                 document.addEventListener("DOMContentLoaded", function () {
             document.querySelectorAll(".nav-item.has-submenu > a").forEach((item) => {

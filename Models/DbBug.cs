@@ -235,19 +235,26 @@ public partial class DbBug : DbContext
 
             entity.HasIndex(e => e.Email, "UQ__Users__A9D1053446426178").IsUnique();
 
+            entity.Property(e => e.Bio).HasMaxLength(1000);
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Email).HasMaxLength(100);
+            entity.Property(e => e.FirstName).HasMaxLength(100);
+            entity.Property(e => e.GitHubProfile).HasMaxLength(255);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.IsAdmin).HasDefaultValue(false);
             entity.Property(e => e.IsEmailVerified).HasDefaultValue(false);
+            entity.Property(e => e.LastName).HasMaxLength(100);
+            entity.Property(e => e.LinkedInProfile).HasMaxLength(255);
             entity.Property(e => e.Otp)
                 .HasMaxLength(6)
                 .IsUnicode(false);
             entity.Property(e => e.OtpExpiry).HasColumnType("datetime");
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
+            entity.Property(e => e.PhoneNumber).HasMaxLength(15);
             entity.Property(e => e.ProfileImage).HasMaxLength(1000);
+            entity.Property(e => e.Skills).HasMaxLength(1000);
             entity.Property(e => e.UserName).HasMaxLength(100);
 
             entity.HasOne(d => d.Project).WithMany(p => p.Users)

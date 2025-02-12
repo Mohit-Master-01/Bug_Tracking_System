@@ -7,26 +7,23 @@
 
 @if (Model != null)
 {
-    <div class="container-fluid py-4">
-        <div class="row">
+    <div class="container py-5">
+        <div class="row justify-content-center">
             <!-- Profile Card -->
-            <div class="col-lg-4">
-                <div class="card shadow-lg border-0">
-                    <div class="card-body text-center">
-                        <div class="avatar avatar-xl position-relative">
-                            <img src="@Model.ProfileImage" alt="profile_image" class="w-100 border-radius-lg shadow-sm">
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow border-0 text-center">
+                    <div class="card-body">
+                        <div class="avatar rounded-circle overflow-hidden mx-auto border" style="width: 130px; height: 130px;">
+                            <img src="@Model.ProfileImage" alt="profile_image" class="img-fluid rounded-circle">
                         </div>
-                        <h5 class="mt-3">@Model.UserName</h5>
-                        <p class="mb-1 text-muted">@Model.Email</p>
-                        @* <span class="badge @((bool)Model.IsActive ? "bg-success" : "bg-danger")"> *@
-                        @*     @((bool)Model.IsActive ? "Active" : "Inactive") *@
-                        @* </span> *@
-                        <span class="badge @(Model.IsActive == true ? "bg-success" : "bg-danger")">
-                            @(Model.IsActive == true ? "Active" : "Inactive")
+                        <h5 class="mt-3 text-dark fw-bold">@Model.FirstName @Model.LastName</h5>
+                        <p class="text-muted">@Model.UserName</p>
+                        <p class="text-muted">@Model.Email</p>
+                        <span class="badge rounded-pill @((bool)Model.IsActive ? "bg-success" : "bg-danger")">
+                            @((bool)Model.IsActive ? "Active" : "Inactive")
                         </span>
-
                         <div class="mt-3">
-                            <a asp-action="EditProfile" class="btn btn-primary btn-sm">Edit Profile</a>
+                            <a asp-action="EditProfile" asp-route-id="@Model.UserId" class="btn btn-outline-primary btn-sm px-4">Edit Profile</a>
                         </div>
                     </div>
                 </div>
@@ -34,53 +31,76 @@
 
             <!-- Profile Details -->
             <div class="col-lg-8">
-                <div class="card shadow-lg border-0">
-                    <div class="card-header bg-dark text-white">
-                        <h5 class="mb-0">Profile Details</h5>
+                <div class="card shadow border-0">
+                    <div class="card-header">
+                        <h5 class="mb-0 fw-bold">Profile Details</h5>
                     </div>
                     <div class="card-body">
-                        <div class="row">
-                            <!-- User Info -->
+                        <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Username</label>
+                                <label class="form-label fw-bold text-dark">First Name</label>
+                                <p class="text-muted">@Model.FirstName</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-dark">Last Name</label>
+                                <p class="text-muted">@Model.LastName</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-dark">Username</label>
                                 <p class="text-muted">@Model.UserName</p>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Email</label>
+                                <label class="form-label fw-bold text-dark">Email</label>
                                 <p class="text-muted">@Model.Email</p>
                             </div>
-
-                            <!-- Account Info -->
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Created Date</label>
-                                <p class="text-muted">@Model.CreatedDate?.ToString("dd-MM-yyyy HH:mm")</p>
+                                <label class="form-label fw-bold text-dark">Phone Number</label>
+                                <p class="text-muted">@Model.PhoneNumber</p>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Email Verified</label>
-                                @* <p class="text-muted">@((bool)Model.IsEmailVerified ? "Yes" : "No")</p> *@
-                                <p class="text-muted">@((Model.IsEmailVerified == true) ? "Yes" : "No")</p>
+                                <label class="form-label fw-bold text-dark">Joining Date</label>
+                                <p class="text-muted">@Model.CreatedDate?.ToString("dd-MM-yyyy | HH:mm")</p>
                             </div>
-
-                            <!-- Role & Project -->
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Role</label>
-                                @* <p class="text-muted">@Model.Role.RoleName</p> *@
+                                <label class="form-label fw-bold text-dark">Email Verified</label>
+                                <p class="text-muted">@((bool)Model.IsEmailVerified ? "Yes" : "No")</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-dark">Role</label>
                                 <p class="text-muted">@(Model.Role != null ? Model.Role.RoleName : "Not Assigned")</p>
-
                             </div>
 
-                            <!-- Assigned Projects (Only for Project Managers & Developers) -->
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold text-dark">Bio</label>
+                                <p class="text-muted">@Model.Bio</p>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold text-dark">Skills</label>
+                                <p class="text-muted">@Model.Skills</p>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-dark">LinkedIn Profile</label>
+                                <p class="text-muted"><a href="@Model.LinkedInProfile" target="_blank">@Model.LinkedInProfile</a></p>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-dark">GitHub Profile</label>
+                                <p class="text-muted"><a href="@Model.GitHubProfile" target="_blank">@Model.GitHubProfile</a></p>
+                            </div>
+
                             @if (Model.Role?.RoleName == "Project Manager" || Model.Role?.RoleName == "Developer")
                             {
                                 <div class="col-md-12">
-                                    <label class="form-label fw-bold">Assigned Projects</label>
+                                    <label class="form-label fw-bold text-dark">Assigned Projects</label>
                                     @if (Model.Projects != null && Model.Projects.Any())
                                     {
-                                        <ul class="list-group">
+                                        <ul class="list-group shadow-sm">
                                             @foreach (var project in Model.Projects)
                                             {
                                                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                    <span>@project.ProjectName</span>
+                                                    <span class="fw-semibold">@project.ProjectName</span>
                                                     <span class="badge bg-primary">Active</span>
                                                 </li>
                                             }
@@ -92,7 +112,6 @@
                                     }
                                 </div>
                             }
-
                         </div>
                     </div>
                 </div>
@@ -102,7 +121,7 @@
 }
 else
 {
-    <p class="text-danger">Error: User data could not be loaded.</p>
+    <p class="text-danger text-center">Error: User data could not be loaded.</p>
 }
 
 @section Scripts {

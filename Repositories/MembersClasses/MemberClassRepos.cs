@@ -73,6 +73,40 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
                 .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
+        public async Task<IPagedList<User>> GetAllDevelopers(int pageNumber, int pageSize)
+        {
+            var members = await(
+                    from Users in _dbBug.Users
+                    join Roles in _dbBug.Roles on Users.RoleId equals Roles.RoleId
+                    where Users.RoleId == 2 // Exclude Admins
+                    select new User
+                    {
+                        UserId = Users.UserId,
+                        UserName = Users.UserName,
+                        Email = Users.Email,
+                        RoleId = Users.RoleId,
+                        CreatedDate = Users.CreatedDate,
+                        IsActive = Users.IsActive,
+                        ProfileImage = Users.ProfileImage,
+                        ProjectId = Users.ProjectId,
+                        Role = new Role
+                        {
+                            RoleId = Roles.RoleId,
+                            RoleName = Roles.RoleName
+                        },
+                        Projects = _dbBug.Projects
+                                    .Where(p => p.Users.Any(au => au.UserId == Users.UserId))
+                                    .Select(p => new Project
+                                    {
+                                        ProjectId = p.ProjectId,
+                                        ProjectName = p.ProjectName
+                                    }).ToList()
+                    }
+                ).OrderByDescending(m => m.CreatedDate).ToListAsync();
+
+            return members.ToPagedList(pageNumber, pageSize);
+        }
+
         public async Task<IPagedList<User>> GetAllMembers(int pageNumber, int pageSize)
         {
             var members = await (
@@ -146,9 +180,77 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
 
         }
 
+        public async Task<IPagedList<User>> GetAllProjectManagers(int pageNumber, int pageSize)
+        {
+            var members = await(
+                    from Users in _dbBug.Users
+                    join Roles in _dbBug.Roles on Users.RoleId equals Roles.RoleId
+                    where Users.RoleId == 1 // Include Project managers
+                    select new User
+                    {
+                        UserId = Users.UserId,
+                        UserName = Users.UserName,
+                        Email = Users.Email,
+                        RoleId = Users.RoleId,
+                        CreatedDate = Users.CreatedDate,
+                        IsActive = Users.IsActive,
+                        ProfileImage = Users.ProfileImage,
+                        ProjectId = Users.ProjectId,
+                        Role = new Role
+                        {
+                            RoleId = Roles.RoleId,
+                            RoleName = Roles.RoleName
+                        },
+                        Projects = _dbBug.Projects
+                                    .Where(p => p.Users.Any(au => au.UserId == Users.UserId))
+                                    .Select(p => new Project
+                                    {
+                                        ProjectId = p.ProjectId,
+                                        ProjectName = p.ProjectName
+                                    }).ToList()
+                    }
+                ).OrderByDescending(m => m.CreatedDate).ToListAsync();
+
+            return members.ToPagedList(pageNumber, pageSize);
+        }
+
         public async Task<List<Role>> GetAllRoles()
         {
             return await _dbBug.Roles.ToListAsync();
+        }
+
+        public async Task<IPagedList<User>> GetAllTesters(int pageNumber, int pageSize)
+        {
+            var members = await(
+                    from Users in _dbBug.Users
+                    join Roles in _dbBug.Roles on Users.RoleId equals Roles.RoleId
+                    where Users.RoleId == 3 // Exclude Admins
+                    select new User
+                    {
+                        UserId = Users.UserId,
+                        UserName = Users.UserName,
+                        Email = Users.Email,
+                        RoleId = Users.RoleId,
+                        CreatedDate = Users.CreatedDate,
+                        IsActive = Users.IsActive,
+                        ProfileImage = Users.ProfileImage,
+                        ProjectId = Users.ProjectId,
+                        Role = new Role
+                        {
+                            RoleId = Roles.RoleId,
+                            RoleName = Roles.RoleName
+                        },
+                        Projects = _dbBug.Projects
+                                    .Where(p => p.Users.Any(au => au.UserId == Users.UserId))
+                                    .Select(p => new Project
+                                    {
+                                        ProjectId = p.ProjectId,
+                                        ProjectName = p.ProjectName
+                                    }).ToList()
+                    }
+                ).OrderByDescending(m => m.CreatedDate).ToListAsync();
+
+            return members.ToPagedList(pageNumber, pageSize);
         }
 
         public async Task<object> SaveMember(User member, IFormFile? ImageFile)

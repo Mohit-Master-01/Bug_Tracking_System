@@ -62,36 +62,11 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
+    <!-- Ensure jQuery is loaded first -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <!-- Include Members.js here -->
     <script src="~/js/Members.js"></script>
-
-    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script> *@
-    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script> *@
-    @* <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" /> *@
-     
-
-    @* <script> *@
-    @*     $(document).ready(function () { *@
-    @*                // Show/Hide Project Dropdown based on Role selection *@
-    @*                $('#roleDropdown').change(function () { *@
-    @*                    var selectedRole = $(this).val(); *@
-
-    @*                    if (selectedRole == "1") { // If "Project Manager" is selected *@
-    @*                        $('#projectContainer').show(); *@
-
-    @*                        // Fetch and populate projects *@
-    @*                        $.get('/Members/GetProjects', function (data) { *@
-    @*                            $('#projectDropdown').empty().append('<option value="">Select Project</option>'); *@
-    @*                            $.each(data, function (index, project) { *@
-    @*                                $('#projectDropdown').append('<option value="' + project.projectId + '">' + project.projectName + '</option>'); *@
-    @*                            }); *@
-    @*                        }); *@
-
-    @*                    } else { *@
-    @*                        $('#projectContainer').hide(); *@
-    @*                        $('#projectDropdown').empty().append('<option value="">Select Project</option>'); *@
-    @*                    } *@
-    @*                }); *@
-    @*            }); *@
-    @* </script> *@
-
 }

@@ -175,7 +175,7 @@ namespace Bug_Tracking_System.Controllers
 
             //Authenticate the user
             var result = await _login.AuthenticateUser(login.EmailOrUsername, login.Password);
-
+                      
             //Set session if login was successful
             if (((dynamic)result).success)
             {
