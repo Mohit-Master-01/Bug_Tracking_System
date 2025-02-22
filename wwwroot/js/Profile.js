@@ -1,7 +1,5 @@
 ﻿$(document).ready(function () {
-
-
-    
+       
     
         // Profile Image Preview
         $("#ProfileImage").change(function (event) {
@@ -116,6 +114,49 @@
     
 
 
+    $("#Verification").validate({
+        submitHandler: function (form, event) {
+            event.preventDefault();
+
+            const btnUpdateEmail = $("#btnUpdateEmail");
+            const btnLoader = $("#btnLoader");
+
+            btnUpdateEmail.prop("disabled", true);
+            btnLoader.removeClass("d-none");
+
+            let email = document.getElementById("VerifyEmailHere").textContent;
+
+            //const email = ("#").val(); // Fetch email from Razor Model
+            console.log("Sending email for verification:", email);
+
+            $.ajax({
+                url: '/Profile/UpdateEmailVerification',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ Email: email }), // Send correct format
+                success: function (result) {
+                    if (result.success) {
+                        showToast("success", "OTP sent to email!");
+
+                        // Ensure redirection works properly
+                        setTimeout(() => {
+                            window.location.href = '/Profile/ProfileOTP';
+                        }, 2000);
+                    } else {
+                        showToast("error", result.message);
+                    }
+                },
+                error: function (xhr) {
+                    showToast("error", "An error occurred: " + xhr.responseText);
+                },
+                complete: function () {
+                    btnUpdateEmail.prop("disabled", false);
+                    btnLoader.addClass("d-none");
+                }
+            });
+        }
+    });
+
 
     const phoneInputField = document.querySelector("#PhoneNumber");
     phoneInput = window.intlTelInput(phoneInputField, {
@@ -128,4 +169,14 @@
         },
         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
     });
+
 });
+function showToast(type, message) {
+    if (type === "success") {
+        toastr.success(message);
+    } else if (type === "error") {
+        toastr.error(message);
+    } else {
+        console.warn("Unknown toast type:", type);
+    }
+}

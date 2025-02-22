@@ -211,11 +211,11 @@ namespace Bug_Tracking_System.Controllers
                 HttpContext.Session.SetInt32("UserRoleId", (int)data.RoleId);
 
                 //Determine redirection based on user verification
-                if(data.RoleId == 4)
+                if(data.RoleId != 4)
                 {
                     if(await _acc.IsVerified(login.EmailOrUsername))
                     {
-                        if(data.RoleId == 4)
+                        if(data.RoleId != 4)
                         {
                             RedirectTo = "Dashboard";
                         }

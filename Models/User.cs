@@ -10,7 +10,7 @@ public partial class User
 
     public string? UserName { get; set; }
 
-    public string? Email { get; set; }
+    public string Email { get; set; }
 
     public string? PasswordHash { get; set; }
 
@@ -21,13 +21,14 @@ public partial class User
 
     public DateTime? CreatedDate { get; set; }
 
-    public bool? IsActive { get; set; }
+    public bool IsActive { get; set; }
 
     public string? Otp { get; set; }
 
     public DateTime? OtpExpiry { get; set; }
 
-    public bool? IsEmailVerified { get; set; }
+    [Column("IsEmailVerified")]
+    public bool IsEmailVerified { get; set; } = false;
 
     public string? ProfileImage { get; set; }
 

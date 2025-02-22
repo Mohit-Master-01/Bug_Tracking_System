@@ -52,8 +52,15 @@ namespace Bug_Tracking_System.Controllers
             int pageNumber = page ?? 1;
             ViewBag.PageTitle = "Developers List";
             ViewBag.Breadcrumb = "Reports";
-            var Developers = await _member.GetAllDevelopers(pageNumber, pageSize);
-            return View(Developers);
+
+            var developers = await _member.GetAllDevelopers(pageNumber, pageSize);
+
+            if (developers == null || !developers.Any())
+            {
+                ViewBag.Message = "No developers found.";
+            }
+
+            return View(developers);
         }
 
         [HttpGet]
@@ -64,6 +71,11 @@ namespace Bug_Tracking_System.Controllers
             ViewBag.PageTitle = "Tester List";
             ViewBag.Breadcrumb = "Reports";
             var Testers = await _member.GetAllTesters(pageNumber, pageSize);
+
+            if (Testers == null || !Testers.Any())
+            {
+                ViewBag.Message = "No developers found.";
+            }
             return View(Testers);
         }
 

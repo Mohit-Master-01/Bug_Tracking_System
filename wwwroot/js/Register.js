@@ -50,8 +50,6 @@
     });
 
 
-
-
 // Toggle visibility of the Password field
 document.getElementById('togglePasswordHash').addEventListener('click', function () {
     const passwordField = document.getElementById('PasswordHash');

@@ -60,7 +60,7 @@ namespace Bug_Tracking_System.Controllers
             return Json(new { success, message = success ? "Bug status updated!" : "Failed to update status." });
         }
 
-        // 🟢 Delete Bug
+        
         [HttpPost]
         public async Task<IActionResult> Delete(int bugId)
         {

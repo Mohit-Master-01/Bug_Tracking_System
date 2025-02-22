@@ -7,6 +7,12 @@ namespace Bug_Tracking_System.Repositories.Interfaces
         Task<User> GetAllUsersData(int userId);
 
         Task<object> EditProfile(User user, IFormFile? ImageFile);
-        
+
+        Task<object> UpdateEmailVerification(User users);
+
+        Task<bool> OtpVerification(string Otp);
+
+        Task<object> updateStatus(string Email);
+
     }
 }

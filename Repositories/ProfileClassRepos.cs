@@ -8,11 +8,13 @@ namespace Bug_Tracking_System.Repositories
     {
         private readonly DbBug _dbBug;
         private readonly IAccountRepos _acc;
+        private readonly IEmailSenderRepos _emailSender;
 
-        public ProfileClassRepos(DbBug dbBug, IAccountRepos acc)
+        public ProfileClassRepos(DbBug dbBug, IAccountRepos acc, IEmailSenderRepos emailSender)
         {
             _dbBug = dbBug;            
             _acc = acc;
+            _emailSender = emailSender;
         }
 
         public async Task<object> EditProfile(User user, IFormFile? ImageFile)
@@ -165,10 +167,10 @@ namespace Bug_Tracking_System.Repositories
                            PasswordHash = Users.PasswordHash,
                            RoleId = Roles.RoleId,
                            CreatedDate = Users.CreatedDate,
-                           IsActive = true,
-                           IsEmailVerified = true,
+                           IsActive = Users.IsActive,
+                           IsEmailVerified = Users.IsEmailVerified,
                            ProfileImage = Users.ProfileImage,
-                           IsAdmin = true,
+                           IsAdmin = Users.IsAdmin,
                            ProjectId = Users.ProjectId,
                            Role = new Role
                            {
@@ -186,6 +188,65 @@ namespace Bug_Tracking_System.Repositories
 
             return user;
 
+        }
+               
+
+        public async Task<object> UpdateEmailVerification(User users)
+        {
+            // Fetch the existing user from the database based on email
+            var existingUser = await _dbBug.Users.FirstOrDefaultAsync(u => u.Email == users.Email);
+
+            // Check if the user exists
+            if (existingUser == null)
+            {
+                return new { success = false, message = "User not found" };
+            }
+
+            // Update OTP-related fields
+            existingUser.Otp = _emailSender.GenerateOtp();
+            existingUser.OtpExpiry = DateTime.Now.AddMinutes(5);
+            existingUser.IsEmailVerified = false;
+
+            string subj = "OTP Verification!!!";
+            await _emailSender.SendEmailAsync(existingUser.Email, subj, existingUser.Otp, "Registration");
+
+            // Save changes
+            await _dbBug.SaveChangesAsync();
+
+            return new { success = true, message = "Check your email for the OTP verification" };
+
+        }
+
+        public async Task<bool> OtpVerification(string Otp)
+        {
+            return await _dbBug.Users.AnyAsync(u => u.Otp == Otp && u.OtpExpiry > DateTime.Now);
+        }
+
+        public async Task<object> updateStatus(string Email)
+        {
+            var user = await _dbBug.Users.FirstOrDefaultAsync(u => u.Email == Email);
+            if (user != null)
+            {
+                user.IsEmailVerified = true;
+                await _dbBug.SaveChangesAsync();
+
+                if ((bool)user.IsEmailVerified)
+                {
+
+                    // Send a success email to the user
+                    string subject = "Email Verification Successful!";
+
+                    await _emailSender.SendEmailAsync(user.Email, subject, $"{user.UserName}", "VerificationSuccess");
+
+                    return new { success = true, message = "Your email has been verified successfully, and a confirmation email has been sent." };
+                }
+                else
+                {
+                    return new { success = false, message = "Email is already verified." };
+                }
+            }
+
+            return new { success = false, message = "Email not found" };
         }
 
         //public async Task<User> GetAllUsersData()

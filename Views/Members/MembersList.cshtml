@@ -37,7 +37,7 @@
                             <td>@item.UserName</td>
                             <td>@item.Email</td>
                             <td>@(item.Role?.RoleName ?? "Not Assigned")</td>
-                            <td>@item.CreatedDate?.ToString("dd-MM-yyyy HH:mm")</td>
+                            <td>@item.CreatedDate?.ToString("dd-MM-yyyy | HH:mm")</td>
                             <td>
                                 <span class="badge @((bool)item.IsActive ? "bg-success" : "bg-danger")">
                                     @((bool)item.IsActive ? "Active" : "Inactive")
