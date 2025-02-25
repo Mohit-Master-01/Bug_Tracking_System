@@ -1,10 +1,11 @@
 ﻿using Bug_Tracking_System.Models;
+using X.PagedList;
 
 namespace Bug_Tracking_System.Repositories.Interfaces
 {
     public interface IBugRepos
     {
-        Task<List<Bug>> GetAllBugsData();
+        Task<IPagedList<Bug>> GetAllBugsData(int pageNumber, int pageSize);
         
         Task<Bug> GetBugById(int bugId);
 

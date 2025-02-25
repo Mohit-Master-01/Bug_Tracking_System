@@ -29,7 +29,7 @@ public partial class Bug
 
     public virtual Project? Project { get; set; }
 
-    public virtual BugStatus Status { get; set; } = null!;
+    public virtual BugStatus? Status { get; set; } 
 
     public virtual ICollection<TaskAssignment> TaskAssignments { get; set; } = new List<TaskAssignment>();
 }

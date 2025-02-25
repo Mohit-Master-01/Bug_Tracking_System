@@ -20,6 +20,8 @@ namespace Bug_Tracking_System.Repositories.Interfaces
 
         Task<string> fetchEmail(string cred);
 
+        Task<string> fetchUsername(string cred);
+
         Task<bool> IsVerified(string cred);
         //Task<List<Role>> GetRoles();
     }

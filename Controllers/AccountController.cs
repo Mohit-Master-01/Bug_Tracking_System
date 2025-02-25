@@ -205,10 +205,13 @@ namespace Bug_Tracking_System.Controllers
                 string email = await _acc.fetchEmail(login.EmailOrUsername);
                 HttpContext.Session.SetString("UserEmail", email);
 
+                
+
                 var data = await _acc.GetUserDataByEmail(email);
                 int id = data.UserId;
                 HttpContext.Session.SetInt32("UserId", id);
                 HttpContext.Session.SetInt32("UserRoleId", (int)data.RoleId);
+                HttpContext.Session.SetString("UserName", data.UserName);
 
                 //Determine redirection based on user verification
                 if(data.RoleId != 4)

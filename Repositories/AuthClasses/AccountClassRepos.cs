@@ -92,6 +92,8 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
                 .FirstOrDefaultAsync();
         }
 
+
+
         //public async Task<List<Role>> GetRoles()
         //{
         //    return await _bug.Roles.ToListAsync();
@@ -143,6 +145,14 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
         {
             var user = await _bug.Users.FirstOrDefaultAsync(u => u.Email ==  cred || u.UserName == cred);
             return user.IsEmailVerified;
+        }
+
+        public async Task<string> fetchUsername(string cred)
+        {
+            return await _bug.Users
+                .Where(u => u.Email == cred || u.UserName == cred)
+                .Select(u => u.UserName)
+                .FirstOrDefaultAsync();
         }
     }
 }

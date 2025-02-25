@@ -1,6 +1,9 @@
 ﻿using Bug_Tracking_System.Models;
 using Bug_Tracking_System.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using X.PagedList;
+using X.PagedList.Extensions;
+
 
 namespace Bug_Tracking_System.Repositories.BugsClasses
 {
@@ -28,13 +31,35 @@ namespace Bug_Tracking_System.Repositories.BugsClasses
         }
 
         
-        public async Task<List<Bug>> GetAllBugsData()
+        public async Task<IPagedList<Bug>> GetAllBugsData(int pageNumber, int pageSize)
         {
-            return await _dbBug.Bugs
-                .Include(b => b.Attachments)
-                .Include(b => b.CreatedByNavigation)
-                .Include(b => b.Project)
+            if (_dbBug == null)
+            {
+                throw new InvalidOperationException("Database context (_dbBug) is not initialized.");
+            }
+
+            var bugs = await _dbBug.Bugs
+                .Include(b => b.Attachments)  // Include attachments for images
+                .Include(b => b.CreatedByNavigation) // Ensure CreatedByNavigation is loaded
+                .Include(b => b.Project)  // Ensure Project is loaded
+                .Include(b => b.Status)  // Ensure Status is loaded
+                .Select(b => new Bug
+                {
+                    BugId = b.BugId,
+                    Title = b.Title,
+                    Description = b.Description, // Ensure description is fetched
+                    CreatedDate = b.CreatedDate,
+                    Priority = b.Priority,
+                    Severity = b.Severity,
+                    Status = b.Status,
+                    CreatedByNavigation = b.CreatedByNavigation,
+                    Project = b.Project,
+                    Attachments = b.Attachments
+                })
                 .ToListAsync();
+
+            return bugs.ToPagedList(pageNumber, pageSize);
+
         }
 
         public async Task<Bug> GetBugById(int bugId)
@@ -48,30 +73,51 @@ namespace Bug_Tracking_System.Repositories.BugsClasses
 
         public async Task<bool> SaveBug(Bug bug, List<IFormFile> attachments)
         {
-            if(bug.BugId == 0)
+            var existingBug = await _dbBug.Bugs
+                .Include(b => b.Attachments) // Ensure attachments are included
+                .FirstOrDefaultAsync(b => b.BugId == bug.BugId);
+
+            if (existingBug != null)
             {
-                await _dbBug.Bugs .AddAsync(bug);
+                // Update existing bug details
+                existingBug.Title = bug.Title;
+                existingBug.Description = bug.Description;
+                existingBug.Severity = bug.Severity;
+                existingBug.Priority = bug.Priority;
+                existingBug.StatusId = bug.StatusId;
+
+                // Track changes properly
+                _dbBug.Entry(existingBug).State = EntityState.Modified;
             }
             else
             {
-                var existingBug = await _dbBug.Bugs.FindAsync(bug.BugId);
-                if (existingBug != null)
-                {
-                    existingBug.Title = bug.Title;
-                    existingBug.Description = bug.Description;
-                    existingBug.Severity = bug.Severity;
-                    existingBug.Priority = bug.Priority;
-                    existingBug.StatusId = bug.StatusId;
-                }
+                _dbBug.Bugs.Add(bug);
             }
 
             await _dbBug.SaveChangesAsync();
 
-            if(attachments?.Count > 0)
+            // ✅ Attachments Handling (Edit & Add)
+            if (attachments?.Count > 0)
             {
                 string uploadPath = Path.Combine(_env.WebRootPath, "Attachments");
                 Directory.CreateDirectory(uploadPath);
 
+                // ✅ Remove old attachments (Only if editing)
+                if (existingBug != null)
+                {
+                    var oldAttachments = _dbBug.Attachments.Where(a => a.BugId == existingBug.BugId).ToList();
+                    foreach (var oldAttachment in oldAttachments)
+                    {
+                        string oldFilePath = Path.Combine(_env.WebRootPath, oldAttachment.FilePath.TrimStart('/'));
+                        if (System.IO.File.Exists(oldFilePath))
+                        {
+                            System.IO.File.Delete(oldFilePath);
+                        }
+                    }
+                    _dbBug.Attachments.RemoveRange(oldAttachments);
+                }
+
+                // ✅ Add new attachments
                 foreach (var file in attachments)
                 {
                     string fileExtension = Path.GetExtension(file.FileName).ToLower();
@@ -92,7 +138,7 @@ namespace Bug_Tracking_System.Repositories.BugsClasses
 
                     var bugAttachment = new Attachment
                     {
-                        BugId = bug.BugId,
+                        BugId = existingBug != null ? existingBug.BugId : bug.BugId, // Ensure correct BugId
                         FilePath = "/Attachments/" + uniqueFileName
                     };
 

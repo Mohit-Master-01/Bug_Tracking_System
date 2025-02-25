@@ -33,6 +33,8 @@ AppContext.SetSwitch("System.Drawing.EnableUnixSupport", true);
 builder.Services.AddDbContext<DbBug>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddDistributedMemoryCache(); // Required for session storage
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout
@@ -40,6 +42,7 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true; // Ensures cookie is essential
 });
 builder.Services.AddHttpContextAccessor();
+
 
 var app = builder.Build();
 

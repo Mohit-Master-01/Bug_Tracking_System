@@ -1,6 +1,202 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model X.PagedList.IPagedList<Bug_Tracking_System.Models.Bug>
+@using X.PagedList.Mvc.Core
+
 @{
+    ViewData["Title"] = "Bug List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
-hey there!
+
+
+<style>
+
+    /* Severity Colors */
+    [data-severity="Critical"]::before {
+        content: "Critical";
+        background: #dc3545;
+    }
+
+    [data-severity="Major"]::before {
+        content: "Major";
+        background: #ffc107;
+    }
+
+    [data-severity="Minor"]::before {
+        content: "Minor";
+        background: #007bff;
+    }
+
+    [data-severity="Low"]::before {
+        content: "Low";
+        background: #28a745;
+    }
+
+    /* Priority Colors */
+    [data-priority="Highest"]::before {
+        content: "Highest";
+        background: #dc3545;
+    }
+
+    [data-priority="High"]::before {
+        content: "High";
+        background: #ffc107;
+    }
+
+    [data-priority="Medium"]::before {
+        content: "Medium";
+        background: #007bff;
+    }
+
+    [data-priority="Low"]::before {
+        content: "Low";
+        background: #28a745;
+    }
+
+    [data-priority="Lowest"]::before {
+        content: "Lowest";
+        background: #6c757d;
+    }
+
+    /* Status Colors */
+    [data-status="Assigned"]::before {
+        content: "Assigned";
+        background: #00d0e1;
+    }
+
+    [data-status="Design Issue"]::before {
+        content: "Design Issue";
+        background: #a94200
+    }
+
+    [data-status="Discuss"]::before {
+        content: "Discuss";
+        background: #ff0000;
+    }
+
+    [data-status="Fixed"]::before {
+        content: "Fixed";
+        background: #28a745;
+    }
+
+    [data-status="New"]::before {
+        content: "New";
+        background: #03037a;
+    }
+
+    [data-status="Not a bug"]::before {
+        content: "Not a bug";
+        background: #f3ff36;
+    }
+
+    /* Badge Styling */
+    [data-severity]::before, [data-priority]::before, [data-status]::before {
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+    
+
+    .table th, .table td {
+        text-align: center; /* Align text to center */
+        vertical-align: middle; /* Align items vertically */
+        padding: 10px; /* Add consistent padding */
+    }
+
+    td[data-severity], td[data-priority], td[data-status] {
+        min-width: 100px; /* Ensure uniform column width */
+    }
+
+    td:last-child div {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+
+</style>
+
+<div class="container-fluid py-4" style="font-size: small">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Bug List</h3>
+
+                </div>
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table align-items-center table-flush">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>Severity</th>
+                                    <th>Priority</th>
+                                    <th>Created Date</th>
+                                    <th>Created By</th>
+                                    @* <th>Project</th> *@
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.Title</td>
+                                        <td style="padding-top: 29px;">@Html.Raw(item.Description)</td>
+                                        <td data-severity="@item.Severity"></td>
+                                        <td data-priority="@item.Priority"></td>
+                                        <td>@item.CreatedDate?.ToString("dd-MM-yyyy | HH:mm")</td>
+                                        <td>@(item.CreatedByNavigation?.UserName ?? "N/A")</td>
+                                        <td data-status="@item.Status?.StatusName"></td>
+                                        <td style="margin-top: 8px;">
+                                            <div style="display: flex; gap: 10px; align-items: center;">
+                                                <a asp-action="SaveBug" asp-route-id="@item.BugId" class="btn btn-warning btn-sm"
+                                                   style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
+                                                    <i class="fas fa-edit" style="font-size: 16px;"></i>
+                                                </a>
+
+                                                <a asp-action="Details" asp-route-id="@item.BugId" class="btn btn-info btn-sm"
+                                                   style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
+                                                    <i class="fas fa-eye" style="font-size: 16px;"></i>
+                                                </a>
+
+                                                <a asp-action="Delete" asp-route-id="@item.BugId" class="btn btn-danger btn-sm"
+                                                   style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
+                                                    <i class="fas fa-trash" style="font-size: 16px;"></i>
+                                                </a>
+                                            </div>
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+
+                        </table>
+
+                        <!-- Pagination UI -->
+                        <div class="d-flex justify-content-center">
+                            @Html.PagedListPager(Model, page => Url.Action("BugList", new { page }),
+                                     new PagedListRenderOptions
+                            {
+                                Display = PagedListDisplayMode.IfNeeded,
+                                UlElementClasses = new[] { "pagination", "justify-content-center" },
+                                LiElementClasses = new[] { "page-item" },
+                                PageClasses = new[] { "page-link" }
+                            })
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/Bugs.js"></script>
+}
