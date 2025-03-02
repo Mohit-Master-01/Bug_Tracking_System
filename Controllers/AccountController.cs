@@ -212,9 +212,10 @@ namespace Bug_Tracking_System.Controllers
                 HttpContext.Session.SetInt32("UserId", id);
                 HttpContext.Session.SetInt32("UserRoleId", (int)data.RoleId);
                 HttpContext.Session.SetString("UserName", data.UserName);
+                HttpContext.Session.SetString("UserImage", data.ProfileImage); // Assuming ProfileImage is a filename
 
                 //Determine redirection based on user verification
-                if(data.RoleId != 4)
+                if (data.RoleId != 4)
                 {
                     if(await _acc.IsVerified(login.EmailOrUsername))
                     {

@@ -1,0 +1,51 @@
+﻿@model Bug_Tracking_System.Models.Project
+
+@{
+    ViewData["Title"] = "Assign Project";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header text-white">
+                    <h5 class="mb-0">Assign Project: @Model.ProjectName</h5>
+                </div>
+                <div class="card-body">
+                    <form id="assignProjectForm">
+                        <input type="hidden" name="ProjectId" value="@Model.ProjectId" />
+
+                        <div class="form-group">
+                            <label for="developerId" class="form-control-label">Assign to Developer:</label>
+                            <select name="developerId" id="developerId" class="form-control">
+                                <option value="">-- Select Developer --</option>
+                                @foreach (var dev in ViewBag.Developers)
+                                {
+                                    <option value="@dev.Value">@dev.Text</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success mt-3">
+                                <i class="ni ni-send"></i> Assign Project
+                            </button>
+                            <a asp-action="UnassignProjectList" class="btn btn-secondary mt-3">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Toastify CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <!-- Toastify JS -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script src="~/js/Projects.js"></script>
+}
+

@@ -98,5 +98,67 @@ namespace Bug_Tracking_System.Controllers
 
             return Json(new { success = false, message = "Project not found." });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateCompletion(int projectId, int completion)
+        {
+            var project = await _dbBug.Projects.FindAsync(projectId);
+            if (project == null)
+            {
+                return Json(new { success = false, message = "Project not found" });
+            }
+
+            project.Completion = completion;
+            await _dbBug.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Completion updated successfully", newCompletion = completion });
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> UnassignProjectList(int? page)
+        {
+            int pageSize = 4;
+            int pageNumber = page ?? 1;
+
+            ViewBag.Breadcrumb = "Manage Projects";
+            ViewBag.PageTitle = "Unassigned Projects";
+
+            var bugs = await _project.GetUnassignedProjects(pageNumber, pageSize);
+            return View(bugs);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AssignProject(int id)
+        {
+            ViewBag.PageTitle = "Assign Project";
+            ViewBag.Breadcrumb = "Manage Projects";
+
+            ViewBag.Developers = await _dbBug.Users
+                    .Where(u => u.Role.RoleName == "Developer") // Ensure this filters only developers
+                    .Select(u => new
+                    {
+                        Value = u.UserId, // Ensure UserId is mapped correctly
+                        Text = u.UserName  // Ensure FullName or UserName exists in the User model
+                    })
+                    .ToListAsync();
+
+            var bug = await _project.GetProjectById(id);
+            return View(bug);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AssignProject(int projectId, int developerId)
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userId == null)
+            {
+                return Json(new { success = false, message = "User session expired. Please log in again." });
+            }
+
+            var success = await _project.AssignProjectToDeveloper(projectId, developerId, userId.Value);
+            return Json(new { success, message = success ? "Project assigned successfully!" : "Failed to assign Project." });
+        }
     }
 }

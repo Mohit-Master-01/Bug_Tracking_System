@@ -71,38 +71,67 @@
                             </select>
                         </div>
 
-                        <!-- File Upload -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Attachments</label>
-                            <input type="file" name="attachments" multiple class="form-control shadow-sm" />
-                            <small class="text-muted">Allowed: JPG, PNG, PDF, DOCX (Max: 5MB each)</small>
-                        </div>
+                        <!-- File Upload -->  
+                          <div class="mb-3">  
+                              <label class="form-label fw-bold">Attachments</label>  
+                              <input type="file" name="attachments" multiple class="form-control shadow-sm" />  
+                              <small class="text-muted">Allowed: JPG, PNG, PDF, DOCX (Max: 5MB each)</small>  
+                          </div>  
 
-                        @if (Model.Attachments != null && Model.Attachments.Any())
-                        {
-                            <div class="form-group m-3">
-                                <label>Current Attachments</label>
-                                <div class="d-flex flex-wrap">
-                                    <!-- Keeps images side by side -->
-                                    @foreach (var attachment in Model.Attachments)
-                                    {
-                                        <div class="position-relative m-2" style="display: inline-block;">
-                                            <img src="@attachment.FilePath" alt="Bug Attachment" class="image-preview"
-                                                 style="width: 120px; height: 120px; object-fit: cover; border-radius: 5px; border: 1px solid #ddd;" />
+                          @if (Model.Attachments != null && Model.Attachments.Any())  
+                          {  
+                              <div class="form-group m-3">  
+                                  <label>Current Attachments</label>  
+                                  <div class="d-flex flex-wrap">  
+                                      <!-- Keeps images side by side -->  
+                                      @foreach (var attachment in Model.Attachments)  
+                                      {  
+                                          <div class="position-relative m-2" style="display: inline-block;">  
+                                              <img src="@attachment.FilePath" alt="Bug Attachment" class="image-preview"  
+                                                   style="width: 120px; height: 120px; object-fit: cover; border-radius: 5px; border: 1px solid #ddd;" />  
 
-                                            <!-- Updated Remove Button -->
-                                            <button type="button" class="btn btn-sm remove-attachment"
-                                                    data-attachment-id="@attachment.AttachmentId"
-                                                    style="position: absolute; top: 5px; right: 5px; width: 25px; height: 25px;
-                                   line-height: 15px; font-size: 14px; padding: 0; text-align: center;
-                                   border-radius: 50%; display: flex; justify-content: center; align-items: center; background: floralwhite">
-                                                <i class="fa-solid fa-xmark" style="color: black"></i>
-                                            </button>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
+                                              <!-- Updated Remove Button -->  
+                                              <button type="button" class="btn btn-sm remove-attachment"  
+                                                      data-attachment-id="@attachment.AttachmentId"  
+                                                      style="position: absolute; top: 5px; right: 5px; width: 25px; height: 25px;  
+                                     line-height: 15px; font-size: 14px; padding: 0; text-align: center;  
+                                     border-radius: 50%; display: flex; justify-content: center; align-items: center; background: floralwhite">  
+                                                  <i class="fa-solid fa-xmark" style="color: black"></i>  
+                                              </button>  
+                                          </div>  
+                                      }  
+                                  </div>  
+                             </div> 
                         }
+
+                          @* <!-- File Upload --> *@
+                          @* <div class="mb-3">   *@
+                          @*     <label class="form-label fw-bold">Attachments</label>   *@
+                          @*     <div id="dropzone" class="dropzone"></div>   *@
+                          @* </div>   *@
+
+                          @* <!-- Existing Attachments -->   *@
+                          @* @if (Model.Attachments != null && Model.Attachments.Any())   *@
+                          @* {   *@
+                          @*     <div class="mb-3">   *@
+                          @*         <label class="form-label fw-bold">Existing Attachments</label>   *@
+                          @*         <div class="d-flex flex-wrap">   *@
+                          @*             @foreach (var attachment in Model.Attachments)   *@
+                          @*             {   *@
+                          @*                 <div class="position-relative m-2">   *@
+                          @*                     <img src="@attachment.FilePath" alt="Bug Attachment"   *@
+                          @*                          class="image-preview"   *@
+                          @*                          style="width: 120px; height: 120px; object-fit: cover; border-radius: 5px; border: 1px solid #ddd;" />   *@
+
+                          @*                     <button type="button" class="btn btn-sm remove-attachment"   *@
+                          @*                             data-attachment-id="@attachment.AttachmentId">   *@
+                          @*                         <i class="fa-solid fa-xmark" style="color: black"></i>   *@
+                          @*                     </button>   *@
+                          @*                 </div>   *@
+                          @*             }   *@
+                          @*         </div>   *@
+                          @*     </div>   *@
+                          @* }   *@
 
 
                         <!-- Submit Button -->
@@ -134,7 +163,68 @@
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <script src="~/js/Bugs.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
 
+    <script>
+        Dropzone.autoDiscover = false;
+
+        var dropzone = new Dropzone("#dropzone", {
+            url: "/Bugs/SaveBug",
+            autoProcessQueue: false,
+            uploadMultiple: true,
+            parallelUploads: 10,
+            maxFilesize: 5,
+            acceptedFiles: ".jpg,.jpeg,.png,.pdf,.docx",
+            addRemoveLinks: true,
+            paramName: "attachments",
+            dictRemoveFile: "Remove",
+            init: function () {
+                var myDropzone = this;
+
+                $("#BugForm").submit(function (e) {
+                    e.preventDefault();
+
+                    var formData = new FormData(this);
+
+                    myDropzone.files.forEach((file) => {
+                        formData.append("attachments", file, file.name);
+                    });
+
+                    $.ajax({
+                        url: "/Bugs/SaveBug",
+                        type: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        beforeSend: function () {
+                            $("#btnBug").prop("disabled", true);
+                        },
+                        success: function (response) {
+                            if (response.success) {
+                                alert("Bug saved successfully!");
+                                window.location.href = "/Bugs/BugList";
+                            } else {
+                                alert("Error saving bug.");
+                                $("#btnBug").prop("disabled", false);
+                            }
+                        },
+                        error: function () {
+                            alert("Server error occurred.");
+                            $("#btnBug").prop("disabled", false);
+                        }
+                    });
+                });
+
+                this.on("addedfile", function (file) {
+                    console.log("File added:", file.name);
+                });
+
+                this.on("removedfile", function (file) {
+                    console.log("File removed:", file.name);
+                });
+            }
+        });
+    </script>
+
+    
 }
-
-

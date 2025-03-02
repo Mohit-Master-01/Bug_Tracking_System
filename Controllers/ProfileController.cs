@@ -132,7 +132,6 @@ namespace Bug_Tracking_System.Controllers
             }
         }
 
-
         [HttpGet, ActionName("ProfileOTP")]
         public async Task<IActionResult> OtpCheck()
         {

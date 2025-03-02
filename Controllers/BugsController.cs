@@ -28,7 +28,7 @@ namespace Bug_Tracking_System.Controllers
                 int pageNumber = page ?? 1;
 
                 ViewBag.PageTitle = "Bug List";
-                ViewBag.Breadcrumb = "Manage";
+                ViewBag.Breadcrumb = "Manage Bugs";
 
                 var bugs = await _bug?.GetAllBugsData(pageNumber,pageSize);
 
@@ -36,6 +36,9 @@ namespace Bug_Tracking_System.Controllers
                 {
                     return View(new List<Bug>()); // Return empty list if null
                 }
+
+                ViewBag.StatusList = new SelectList(await _dbBug.BugStatuses.ToListAsync(), "StatusId", "StatusName");
+
 
                 return View(bugs);
             }
@@ -51,12 +54,18 @@ namespace Bug_Tracking_System.Controllers
         [HttpGet]
         public async Task<IActionResult> BugDetails(int id)
         {
+            ViewBag.PageTitle = "Bug Details";
+            ViewBag.Breadcrumb = "Manage Bugs";
 
             var bug = await _bug.GetBugById(id);
+
             if(bug == null)
             {
                 return NotFound();
             }
+
+            ViewBag.StatusList = new SelectList(await _dbBug.BugStatuses.ToListAsync(), "StatusId", "StatusName");
+
             return View(bug);
         }
 
@@ -135,11 +144,25 @@ namespace Bug_Tracking_System.Controllers
             return RedirectToAction("BugList");
         }
 
+
         [HttpPost]
         public async Task<IActionResult> UpdateStatus(int bugId, int statusId)
         {
-            var success = await _bug.UpdateBugStatus(bugId, statusId);
-            return Json(new { success, message = success ? "Bug status updated!" : "Failed to update status." });
+            var bug = await _dbBug.Bugs.FindAsync(bugId);
+            if (bug == null)
+            {
+                return Json(new { success = false, message = "Bug not found" });
+            }
+
+            bug.StatusId = statusId;
+            await _dbBug.SaveChangesAsync();
+
+            var updatedStatus = await _dbBug.BugStatuses
+                .Where(s => s.StatusId == statusId)
+                .Select(s => s.StatusName)
+                .FirstOrDefaultAsync();
+
+            return Json(new { success = true, message = "Status updated successfully", newStatus = updatedStatus });
         }
 
         
@@ -164,6 +187,52 @@ namespace Bug_Tracking_System.Controllers
             await _dbBug.SaveChangesAsync();
 
             return Json(new { success = true });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UnassignBugList(int? page)
+        {
+            int pageSize = 4;
+            int pageNumber = page ?? 1;
+
+            ViewBag.Breadcrumb = "Manage Bugs";
+            ViewBag.PageTitle = "Unassigned Bugs";
+
+            var bugs = await _bug.GetUnassignedBugs(pageNumber, pageSize);
+            return View(bugs);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AssignBug(int id)
+        {
+            ViewBag.PageTitle = "Assign Bug";
+            ViewBag.Breadcrumb = "Manage Bugs";
+
+            ViewBag.Developers = await _dbBug.Users
+                    .Where(u => u.Role.RoleName == "Developer") // Ensure this filters only developers
+                    .Select(u => new 
+                    {
+                        Value = u.UserId, // Ensure UserId is mapped correctly
+                        Text = u.UserName  // Ensure FullName or UserName exists in the User model
+                    })
+                    .ToListAsync();
+
+            var bug = await _bug.GetBugById(id);
+            return View(bug);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AssignBug(int bugId, int developerId)
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+
+            if(userId == null)
+            {
+                return Json(new { success = false, message = "User session expired. Please log in again." });
+            }
+
+            var success = await _bug.AssignBugToDeveloper(bugId, developerId, userId.Value);
+            return Json(new { success, message = success ? "Bug assigned successfully!" : "Failed to assign bug." });
         }
 
     }

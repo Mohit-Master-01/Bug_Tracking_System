@@ -261,5 +261,65 @@ namespace Bug_Tracking_System.Controllers
 
             return Json(new { success = true, message = "Member status updated" });
         }
+
+        [HttpPost]
+        public IActionResult DeleteMember(int id)
+        {
+            var user = _dbBug.Users.Find(id);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            _dbBug.Users.Remove(user);
+            _dbBug.SaveChanges();
+
+            return Ok(new { message = "User deleted successfully" });
+        }
+
+        [HttpPost]
+        public IActionResult DeleteProjectManager(int id)
+        {
+            var user = _dbBug.Users.Find(id);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            _dbBug.Users.Remove(user);
+            _dbBug.SaveChanges();
+
+            return Ok(new { message = "User deleted successfully" });
+        }
+
+        [HttpPost]
+        public IActionResult DeleteDeveloper(int id)
+        {
+            var user = _dbBug.Users.Find(id);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            _dbBug.Users.Remove(user);
+            _dbBug.SaveChanges();
+
+            return Ok(new { message = "User deleted successfully" });
+        }
+
+        [HttpPost]
+        public IActionResult DeleteTester(int id)
+        {
+            var user = _dbBug.Users.Find(id);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            _dbBug.Users.Remove(user);
+            _dbBug.SaveChanges();
+
+            return Ok(new { message = "User deleted successfully" });
+        }
     }
 }

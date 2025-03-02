@@ -33,3 +33,4 @@ public partial class Bug
 
     public virtual ICollection<TaskAssignment> TaskAssignments { get; set; } = new List<TaskAssignment>();
 }
+ 

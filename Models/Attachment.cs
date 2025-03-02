@@ -13,5 +13,6 @@ public partial class Attachment
 
     public DateTime? UploadedDate { get; set; }
 
+
     public virtual Bug Bug { get; set; } = null!;
 }

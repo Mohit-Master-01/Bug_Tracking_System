@@ -62,8 +62,8 @@
         background: #00d0e1;
     }
 
-    [data-status="Design Issue"]::before {
-        content: "Design Issue";
+    [data-status="Design issue"]::before {
+        content: "Design issue";
         background: #a94200
     }
 
@@ -151,7 +151,26 @@
                                         <td data-priority="@item.Priority"></td>
                                         <td>@item.CreatedDate?.ToString("dd-MM-yyyy | HH:mm")</td>
                                         <td>@(item.CreatedByNavigation?.UserName ?? "N/A")</td>
-                                        <td data-status="@item.Status?.StatusName"></td>
+
+
+                                        <!-- Status with Dropdown -->
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm dropdown-toggle status-btn" data-id="@item.BugId" data-status="@item.Status?.StatusId" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    @item.Status?.StatusName
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    @foreach (var status in ViewBag.StatusList)
+                                                    {
+                                                        <li>
+                                                            <a class="dropdown-item change-status" href="#" data-bug-id="@item.BugId" data-status-id="@status.Value">@status.Text</a>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                        </td>
+
+
                                         <td style="margin-top: 8px;">
                                             <div style="display: flex; gap: 10px; align-items: center;">
                                                 <a asp-action="SaveBug" asp-route-id="@item.BugId" class="btn btn-warning btn-sm"
@@ -159,7 +178,7 @@
                                                     <i class="fas fa-edit" style="font-size: 16px;"></i>
                                                 </a>
 
-                                                <a asp-action="Details" asp-route-id="@item.BugId" class="btn btn-info btn-sm"
+                                                <a asp-action="BugDetails" asp-route-id="@item.BugId" class="btn btn-info btn-sm"
                                                    style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
                                                     <i class="fas fa-eye" style="font-size: 16px;"></i>
                                                 </a>
@@ -198,5 +217,54 @@
 </div>
 
 @section Scripts {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
     <script src="~/js/Bugs.js"></script>
+    <script>
+            $(".change-status").click(function (e) {
+            e.preventDefault();
+
+            var bugId = $(this).data("bug-id");
+            var statusId = $(this).data("status-id");
+            var button = $(".status-btn[data-id='" + bugId + "']");
+
+            $.ajax({
+                type: "POST",
+                url: "/Bugs/UpdateStatus",
+                data: { bugId: bugId, statusId: statusId },
+                dataType: "json",
+                success: function (response) {
+                    if (response.success) {
+                        button.text(response.newStatus);
+                        Toastify({
+                            text: response.message,
+                            duration: 3000,
+                            gravity: "top",
+                            position: "right",
+                            backgroundColor: "#28a745"
+                        }).showToast();
+                    } else {
+                        Toastify({
+                            text: "Failed to update status",
+                            duration: 3000,
+                            gravity: "top",
+                            position: "right",
+                            backgroundColor: "#dc3545"
+                        }).showToast();
+                    }
+                },
+                error: function () {
+                    Toastify({
+                        text: "Server error. Please try again.",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#dc3545"
+                    }).showToast();
+                }
+            });
+        });
+    </script>
+        
 }

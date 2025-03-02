@@ -1,0 +1,51 @@
+﻿@model Bug_Tracking_System.Models.Bug
+
+@{
+    ViewData["Title"] = "Assign Bug";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header text-white">
+                    <h5 class="mb-0">Assign Bug: @Model.Title</h5>
+                </div>
+                <div class="card-body">
+                    <form id="assignBugForm">
+                        <input type="hidden" name="bugId" value="@Model.BugId" />
+
+                        <div class="form-group">
+                            <label for="developerId" class="form-control-label">Assign to Developer:</label>
+                            <select name="developerId" id="developerId" class="form-control">
+                                <option value="">-- Select Developer --</option>
+                                @foreach (var dev in ViewBag.Developers)
+                                {
+                                    <option value="@dev.Value">@dev.Text</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success mt-3">
+                                <i class="ni ni-send"></i> Assign Bug
+                            </button>
+                            <a asp-action="UnassignBugList" class="btn btn-secondary mt-3">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Toastify CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <!-- Toastify JS -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script src="~/js/AssignBug.js"></script>
+}
+

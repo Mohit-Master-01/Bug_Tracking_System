@@ -14,5 +14,13 @@ namespace Bug_Tracking_System.Repositories.Interfaces
         Task<object> AddOrEditProject(Project projects);
 
         Task<bool> DeleteProject(int projectId);
+
+        Task<IPagedList<Project>> GetUnassignedProjects(int pageNumber, int pageSize);  // ✅ Get all unassigned (new) bugs
+        
+        Task<List<User>> GetDevelopers();  // ✅ Get list of developers
+        
+        Task<bool> AssignProjectToDeveloper(int projectId, int developerId, int assignedBy);
+
+        Task<Project> GetProjectById(int projectId);
     }
 }

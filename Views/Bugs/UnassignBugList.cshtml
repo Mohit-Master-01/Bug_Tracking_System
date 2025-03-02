@@ -1,0 +1,178 @@
+﻿@model X.PagedList.IPagedList<Bug_Tracking_System.Models.Bug>
+@using X.PagedList.Mvc.Core
+
+@{
+    ViewData["Title"] = "Unassigned Bugs";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+
+    /* Severity Colors */
+    [data-severity="Critical"]::before {
+        content: "Critical";
+        background: #dc3545;
+    }
+
+    [data-severity="Major"]::before {
+        content: "Major";
+        background: #ffc107;
+    }
+
+    [data-severity="Minor"]::before {
+        content: "Minor";
+        background: #007bff;
+    }
+
+    [data-severity="Low"]::before {
+        content: "Low";
+        background: #28a745;
+    }
+
+    /* Priority Colors */
+    [data-priority="Highest"]::before {
+        content: "Highest";
+        background: #dc3545;
+    }
+
+    [data-priority="High"]::before {
+        content: "High";
+        background: #ffc107;
+    }
+
+    [data-priority="Medium"]::before {
+        content: "Medium";
+        background: #007bff;
+    }
+
+    [data-priority="Low"]::before {
+        content: "Low";
+        background: #28a745;
+    }
+
+    [data-priority="Lowest"]::before {
+        content: "Lowest";
+        background: #6c757d;
+    }
+
+    /* Status Colors */
+    [data-status="Assigned"]::before {
+        content: "Assigned";
+        background: #00d0e1;
+    }
+
+    [data-status="Design issue"]::before {
+        content: "Design issue";
+        background: #a94200
+    }
+
+    [data-status="Discuss"]::before {
+        content: "Discuss";
+        background: #ff0000;
+    }
+
+    [data-status="Fixed"]::before {
+        content: "Fixed";
+        background: #28a745;
+    }
+
+    [data-status="New"]::before {
+        content: "New";
+        background: #03037a;
+    }
+
+    [data-status="Not a bug"]::before {
+        content: "Not a bug";
+        background: #f3ff36;
+    }
+
+    /* Badge Styling */
+    [data-severity]::before, [data-priority]::before, [data-status]::before {
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+
+
+    .table th, .table td {
+        text-align: center; /* Align text to center */
+        vertical-align: middle; /* Align items vertically */
+        padding: 10px; /* Add consistent padding */
+    }
+
+    td[data-severity], td[data-priority], td[data-status] {
+        min-width: 100px; /* Ensure uniform column width */
+    }
+
+    td:last-child div {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+
+</style>
+
+<div class="container-fluid" style="font-size: small">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <div class="card-header text-white">
+                    <h3 class="mb-0">Unassigned Bugs</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table align-items-center table-flush">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>Severity</th>
+                                    <th>Priority</th>
+                                    <th>Project</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.Title</td>
+                                        <td style="padding-top: 29px;">@Html.Raw(item.Description)</td>
+
+                                        <td data-severity="@item.Severity"></td>
+                                        <td data-priority="@item.Priority"></td>                                      
+                                     
+                                        <td>@item.Project?.ProjectName</td>
+                                        <td data-status="@item.Status?.StatusName"></td>
+                                        
+                                        <td>
+                                            <a asp-action="AssignBug" asp-route-id="@item.BugId" class="btn btn-sm btn-primary">
+                                                <i class="ni ni-send"></i> Assign Bug
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pagination UI -->
+                <div class="d-flex justify-content-center">
+                    @Html.PagedListPager(Model, page => Url.Action("UnassignBugList", new { page }),
+                             new PagedListRenderOptions
+                    {
+                        Display = PagedListDisplayMode.IfNeeded,
+                        UlElementClasses = new[] { "pagination", "justify-content-center" },
+                        LiElementClasses = new[] { "page-item" },
+                        PageClasses = new[] { "page-link" }
+                    })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

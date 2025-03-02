@@ -1,5 +1,7 @@
 ﻿$(document).ready(function () {
 
+    
+
     // Initialize Quill Editor
     var quill = new Quill('#editor', {
         theme: 'snow',
@@ -137,5 +139,7 @@
             backgroundColor: toastColor,
         }).showToast();
     }
+
+    
 
 });

@@ -1,15 +1,71 @@
-﻿@* @model IEnumerable<Bug_Tracking_System.Models.Project> *@
-@model X.PagedList.IPagedList<Bug_Tracking_System.Models.Project>
+﻿@model X.PagedList.IPagedList<Bug_Tracking_System.Models.Project>
 @using X.PagedList.Mvc.Core
-
-
 
 @{
     ViewData["Title"] = "Project List";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid py-4">
+<style>
+
+    /* Status Colors */
+    [data-status="Assigned"]::before {
+        content: "Assigned";
+        background: #00d0e1;
+    }
+
+    [data-status="New"]::before {
+        content: "New";
+        background: #03037a;
+    }
+
+    /* Badge Styling */
+    [data-status]::before {
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+
+
+    .table th, .table td {
+        text-align: center; /* Align text to center */
+        vertical-align: middle; /* Align items vertically */
+        padding: 10px; /* Add consistent padding */
+    }
+
+    td[data-status] {
+        min-width: 100px; /* Ensure uniform column width */
+    }
+
+    td:last-child div {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .progress {
+        background-color: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        transition: width 0.5s ease-in-out;
+    }
+
+    .completion-text {
+        font-size: 14px;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+
+
+</style>
+
+<div class="container-fluid py-4" style="font-size: smaller">
     <div class="card shadow-lg border-0">
         <div class="card-header text-white d-flex justify-content-between align-items-center">
             <h4 class="mb-0">Project List</h4>
@@ -26,6 +82,7 @@
                         <th class="text-white">Created Date</th>
                         <th class="text-white">Status</th>
                         <th class="text-white">Created By</th>
+                        <th class="text-white">Completion</th>
                         <th class="text-white">Actions</th>
                     </tr>
                 </thead>
@@ -35,13 +92,24 @@
                         <tr>
                             <td>@item.ProjectName</td>
                             <td>@item.Description</td>
-                            <td>@item.CreatedDate?.ToString("dd-MM-yyyy HH:mm")</td>
-                            <td>
-                                <span class="badge @((bool)item.IsActive ? "bg-success" : "bg-danger")">
-                                    @((bool)item.IsActive ? "Active" : "Inactive")
-                                </span>
-                            </td>
+                            <td>@item.CreatedDate?.ToString("dd-MM-yyyy | HH:mm")</td>
+                            <td data-status="@item.Status"></td>
                             <td>@item.CreatedByNavigation?.UserName</td>
+
+                            <!-- Completion Progress Bar -->
+                            <td>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar @(item.Completion == 100 ? "bg-success" : "bg-primary")"
+                                         role="progressbar"
+                                         style="width: @item.Completion%;"
+                                         aria-valuenow="@item.Completion"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <span class="completion-text">@item.Completion%</span>
+                            </td>
+
                             <td>
                                 <a asp-action="AddOrEditProject" asp-route-id="@item.ProjectId" class="btn btn-warning btn-sm">
                                     <i class="fas fa-edit"></i>
@@ -49,6 +117,9 @@
                                 <a href="~/Projects/Delete" id="@item.ProjectId" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
+                                <button class="btn btn-primary btn-sm update-completion" data-project-id="@item.ProjectId" data-completion="@item.Completion">
+                                    <i class="fas fa-bars"></i>
+                                </button>
                                 @* <a asp-action="Delete" asp-route-id="@item.ProjectId" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')"> *@
                                 @*     <i class="fas fa-trash-alt"></i> *@
                                 @* </a> *@
@@ -76,5 +147,64 @@
 
 @section Scripts {
     <script src="~/js/Projects.js"></script>
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+            $(".update-completion").click(function () {
+            var projectId = $(this).data("project-id");
+            var currentCompletion = $(this).data("completion");
+
+            Swal.fire({
+                title: "Update Completion",
+                input: "number",
+                inputAttributes: {
+                    min: 0,
+                    max: 100,
+                    step: 1
+                },
+                inputValue: currentCompletion,
+                showCancelButton: true,
+                confirmButtonText: "Update",
+                cancelButtonText: "Cancel",
+                icon: "info",
+                inputValidator: (value) => {
+                    if (!value || value < 0 || value > 100) {
+                        return "Please enter a valid percentage (0-100)";
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var newCompletion = parseInt(result.value);
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/Projects/UpdateCompletion",
+                        data: { projectId: projectId, completion: newCompletion },
+                        dataType: "json",
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    title: "Updated!",
+                                    text: "Completion updated successfully.",
+                                    icon: "success",
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload(); // Refresh the page to reflect changes
+                                });
+                            } else {
+                                Swal.fire("Error", response.message, "error");
+                            }
+                        },
+                        error: function () {
+                            Swal.fire("Error", "Error updating completion. Please try again.", "error");
+                        }
+                    });
+                }
+            });
+        });
+    </script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 }

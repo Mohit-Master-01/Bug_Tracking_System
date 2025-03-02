@@ -112,8 +112,10 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
             var members = await (
         from Users in _dbBug.Users
         join Roles in _dbBug.Roles on Users.RoleId equals Roles.RoleId
-        join Projects in _dbBug.Projects on Users.ProjectId equals Projects.ProjectId
-        where Users.RoleId != 4 // Exclude Admins
+        join Projects in _dbBug.Projects on Users.ProjectId equals Projects.ProjectId into projGroup
+                    from project in projGroup.DefaultIfEmpty() // Left Join to include users without projects
+
+        where Users.RoleId != 4
         select new User
         {
             UserId = Users.UserId,
@@ -129,11 +131,11 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
                 RoleId = Roles.RoleId,
                 RoleName = Roles.RoleName
             },
-            Project = new Project
+            Project = project != null ? new Project
             {
-                ProjectId = Projects.ProjectId,
-                ProjectName = Projects.ProjectName,
-            }
+                ProjectId = project.ProjectId,
+                ProjectName = project.ProjectName
+            } : null
         }
     ).OrderByDescending(m => m.CreatedDate).ToListAsync();
 

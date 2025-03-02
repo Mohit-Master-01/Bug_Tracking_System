@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using X.PagedList.Extensions;
 using X.PagedList;
+using System;
 
 namespace Bug_Tracking_System.Repositories.ProjectsClasses
 {
@@ -40,6 +41,8 @@ namespace Bug_Tracking_System.Repositories.ProjectsClasses
                     projects.CreatedDate = DateTime.Now;
                     projects.CreatedBy = 2018;
                     projects.IsActive = true;
+                    projects.Status = "New";
+                    projects.Completion = 0;
                     _dbBug.Projects.Add(projects);
                 }
 
@@ -51,6 +54,22 @@ namespace Bug_Tracking_System.Repositories.ProjectsClasses
             {
                 return new { success = false, message = ex.Message };
             }
+        }
+
+        public async Task<bool> AssignProjectToDeveloper(int projectId, int developerId, int assignedBy)
+        {
+            var project = await _dbBug.Projects.FindAsync(projectId);
+            if (project == null) return false;
+
+            // Update project Status
+                        
+            project.Status = "Assigned";
+            
+
+            await _dbBug.SaveChangesAsync();
+            return true;
+
+
         }
 
         public Project checkExistance(string ProjectName, int ProjectId)
@@ -73,6 +92,42 @@ namespace Bug_Tracking_System.Repositories.ProjectsClasses
         public async Task<IPagedList<Project>> GetAllProjects(int pageNumber, int pageSize)
         {
             var project =  await _dbBug.Projects.Include(p => p.CreatedByNavigation).Where(p => (bool)p.IsActive).OrderByDescending(p => p.CreatedDate).ToListAsync();
+
+            return project.ToPagedList(pageNumber, pageSize);
+        }
+
+        public async Task<List<User>> GetDevelopers()
+        {
+            return await _dbBug.Users
+                        .Where(u => u.RoleId == 2) // ✅ Adjust based on your user roles
+                        .ToListAsync();
+        }
+
+        public async Task<Project> GetProjectById(int projectId)
+        {
+            var project = await _dbBug.Projects                    
+                    .FirstOrDefaultAsync(p => p.ProjectId == projectId);
+
+           
+                return new Project
+                {
+                    ProjectId = project.ProjectId,
+                    ProjectName = project.ProjectName,
+                    Description = project.Description,
+                    
+                    CreatedDate = project.CreatedDate,
+                    
+                    Status = project.Status,
+                    Completion = project.Completion,
+                    
+                };
+            
+            
+        }
+
+        public async Task<IPagedList<Project>> GetUnassignedProjects(int pageNumber, int pageSize)
+        {
+            var project = await _dbBug.Projects.Include(p => p.CreatedByNavigation).Where(p => (bool)p.IsActive).Where(p => p.Status == "New").OrderByDescending(p => p.CreatedDate).ToListAsync();
 
             return project.ToPagedList(pageNumber, pageSize);
         }

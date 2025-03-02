@@ -1,0 +1,140 @@
+﻿@model X.PagedList.IPagedList<Bug_Tracking_System.Models.Project>
+@using X.PagedList.Mvc.Core
+
+@{
+    ViewData["Title"] = "Unassigned Projects";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+
+        /* Status Colors */
+    [data-status="Assigned"]::before {
+        content: "Assigned";
+        background: #00d0e1;
+    }
+        
+
+    [data-status="New"]::before {
+        content: "New";
+        background: #03037a;
+    }
+
+    
+
+    /* Badge Styling */
+    [data-status]::before {
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+
+
+    .table th, .table td {
+        text-align: center; /* Align text to center */
+        vertical-align: middle; /* Align items vertically */
+        padding: 10px; /* Add consistent padding */
+    }
+
+    td[data-status] {
+        min-width: 100px; /* Ensure uniform column width */
+    }
+
+    td:last-child div {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .progress {
+        background-color: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        transition: width 0.5s ease-in-out;
+    }
+
+    .completion-text {
+        font-size: 14px;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+
+</style>
+
+<div class="container-fluid" style="font-size: small">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <div class="card-header text-white">
+                    <h3 class="mb-0">Unassigned Bugs</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table align-items-center table-flush">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Project Name</th>
+                                    <th>Description</th>
+                                    <th>Created Date</th>
+                                    <th>Status</th>
+                                    <th>Completion</th>                                    
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.ProjectName</td>
+                                        <td style="padding-top: 29px;">@Html.Raw(item.Description)</td>
+                                        <td>@item.CreatedDate?.ToString("dd-MM-yyyy HH:mm")</td>
+                                        
+                                        <td data-status="@item.Status"></td>
+
+                                        <!-- Completion Progress Bar -->
+                                        <td>
+                                            <div class="progress" style="height: 8px; margin-left: 55px;">
+                                                <div class="progress-bar @(item.Completion == 100 ? "bg-success" : "bg-primary")"
+                                                     role="progressbar"
+                                                     style="width: @item.Completion%;"
+                                                     aria-valuenow="@item.Completion"
+                                                     aria-valuemin="0"
+                                                     aria-valuemax="100">
+                                                </div>
+                                            </div>
+                                            <span class="completion-text">@item.Completion%</span>
+                                        </td>
+
+                                        <td>
+                                            <a asp-action="AssignProject" asp-route-id="@item.ProjectId" class="btn btn-sm btn-primary">
+                                                <i class="ni ni-send"></i> Assign Project
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pagination UI -->
+                <div class="d-flex justify-content-center">
+                    @Html.PagedListPager(Model, page => Url.Action("UnassignBugList", new { page }),
+                             new PagedListRenderOptions
+                    {
+                        Display = PagedListDisplayMode.IfNeeded,
+                        UlElementClasses = new[] { "pagination", "justify-content-center" },
+                        LiElementClasses = new[] { "page-item" },
+                        PageClasses = new[] { "page-link" }
+                    })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
