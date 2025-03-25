@@ -160,6 +160,78 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
                             </body>
                         </html>";
                 }
+                else if(emailType == "AssignProject")
+                {
+                    emailBody = $@"
+    <html>
+        <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; }}
+                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }}
+                .header {{ text-align: center; margin-bottom: 20px; }}
+                .content {{ font-size: 16px; line-height: 1.5; }}
+                .info {{ font-size: 18px; font-weight: bold; color: #333; text-align: center; margin: 20px 0; }}
+                .footer {{ text-align: center; font-size: 12px; color: #888; margin-top: 20px; }}
+            </style>
+        </head>
+        <body>
+            <div class='container'>
+                <div class='header'>
+                    <h2>New Project Assignment - Bugify</h2>
+                </div>
+                <div class='content'>
+                    <p>Dear Developer,</p>
+                    <p>You have been assigned a new project in <b>Bugify</b>. Below are the project details:</p>
+                    <div class='info'>
+                        {body}
+                    </div>
+                    <p>Please log in to your Bugify account to review the project details and start working on it.</p>
+                    <p>If you have any questions, please contact your project manager.</p>
+                    <p>Thank you!</p>
+                </div>
+                <div class='footer'>
+                    &copy; {DateTime.Now.Year} Bugify. All rights reserved.
+                </div>
+            </div>
+        </body>
+    </html>";
+                }
+                else if(emailType == "AssignBug")
+                {
+                    emailBody = $@"
+    <html>
+        <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; }}
+                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }}
+                .header {{ text-align: center; margin-bottom: 20px; }}
+                .content {{ font-size: 16px; line-height: 1.5; }}
+                .info {{ font-size: 18px; font-weight: bold; color: #333; text-align: center; margin: 20px 0; }}
+                .footer {{ text-align: center; font-size: 12px; color: #888; margin-top: 20px; }}
+            </style>
+        </head>
+        <body>
+            <div class='container'>
+                <div class='header'>
+                    <h2>New Bug Assignment - Bugify</h2>
+                </div>
+                <div class='content'>
+                    <p>Dear Developer,</p>
+                    <p>You have been assigned a new bug in <b>Bugify</b>. Below are the bug's details:</p>
+                    <div class='info'>
+                        {body}
+                    </div>
+                    <p>Please log in to your Bugify account to review the bug details and start working on it.</p>
+                    <p>If you have any questions, please contact your project manager.</p>
+                    <p>Thank you!</p>
+                </div>
+                <div class='footer'>
+                    &copy; {DateTime.Now.Year} Bugify. All rights reserved.
+                </div>
+            </div>
+        </body>
+    </html>";
+                }
 
                 var bodyBuilder = new BodyBuilder { HtmlBody = emailBody };
                 message.Body = bodyBuilder.ToMessageBody();

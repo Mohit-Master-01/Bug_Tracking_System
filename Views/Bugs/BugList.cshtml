@@ -95,8 +95,7 @@
         font-weight: bold;
         display: inline-block;
     }
-
-    
+       
 
     .table th, .table td {
         text-align: center; /* Align text to center */
@@ -126,6 +125,7 @@
                 </div>
 
                 <div class="card-body">
+                    @* <button id="exportBtn" class="btn btn-primary"><i class="fas fa-file-excel"></i></button> *@
                     <div class="table-responsive">
                         <table class="table align-items-center table-flush">
                             <thead class="thead-light">
@@ -183,9 +183,8 @@
                                                     <i class="fas fa-eye" style="font-size: 16px;"></i>
                                                 </a>
 
-                                                <a asp-action="Delete" asp-route-id="@item.BugId" class="btn btn-danger btn-sm"
-                                                   style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
-                                                    <i class="fas fa-trash" style="font-size: 16px;"></i>
+                                                <a href="#" class="btn btn-danger btn-sm delete-bug" data-bugid="@item.BugId" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
+                                                    <i class="fas fa-trash-alt"></i>
                                                 </a>
                                             </div>
 
@@ -219,6 +218,9 @@
 @section Scripts {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <!-- Include SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script src="~/js/Bugs.js"></script>
     <script>
@@ -265,6 +267,64 @@
                 }
             });
         });
+
+            $(document).ready(function () {
+            $(".delete-bug").click(function (e) {
+                e.preventDefault();
+
+                var bugId = $(this).data("bugid"); // Get Bug ID from button
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "This action cannot be undone!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#6c757d",
+                    confirmButtonText: "Yes, delete it!",
+                    cancelButtonText: "Cancel"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/Bugs/DeleteBug", // Adjust the controller and action
+                            data: { bugId: bugId },
+                            success: function (response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        title: "Deleted!",
+                                        text: response.message,
+                                        icon: "success",
+                                        timer: 2000,
+                                        showConfirmButton: false
+                                    });
+
+                                    // Remove the deleted row from the table
+                                    $("a[data-bugid='" + bugId + "']").closest("tr").fadeOut(500, function () {
+                                        $(this).remove();
+                                    });
+
+                                } else {
+                                    Swal.fire({
+                                        title: "Error!",
+                                        text: "Failed to delete bug.",
+                                        icon: "error"
+                                    });
+                                }
+                            },
+                            error: function () {
+                                Swal.fire({
+                                    title: "Error!",
+                                    text: "Server error. Please try again.",
+                                    icon: "error"
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+        });
+        
     </script>
         
 }

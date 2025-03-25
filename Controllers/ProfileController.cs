@@ -58,6 +58,41 @@ namespace Bug_Tracking_System.Controllers
             //return View(user);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> GenerateDefaultProfile()
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userId == null)
+            {
+                return Json(new { success = false, message = "Session expired. Please login again." });
+            }
+
+            var user = await _dbBug.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+            if (user == null)
+            {
+                return Json(new { success = false, message = "User not found." });
+            }
+
+            string relativePath = _acc.GenerateDefaultProfileImage(user.UserName);
+
+            // Remove old profile image if exists
+            if (!string.IsNullOrEmpty(user.ProfileImage))
+            {
+                string oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", user.ProfileImage.TrimStart('/'));
+                if (System.IO.File.Exists(oldImagePath))
+                {
+                    System.IO.File.Delete(oldImagePath);
+                }
+            }
+
+            user.ProfileImage = relativePath;
+            await _dbBug.SaveChangesAsync();
+
+            return Json(new { success = true, imagePath = relativePath });
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> EditProfile(int id)
         {
@@ -90,14 +125,76 @@ namespace Bug_Tracking_System.Controllers
 
             if (userId == null)
             {
-                return RedirectToAction("Login", "Account");
+                return Json(new { success = false, message = "User session expired. Please login again." });
             }
 
-            users.UserId = userId.Value; //Ensure correct user Id is used 
+            users.UserId = userId.Value; // Ensure correct user ID is used 
 
-            await _profile.EditProfile(users, ImageFile);
-            return RedirectToAction("Profile");
+            try
+            {
+                var updatedUser = await _profile.EditProfile(users, ImageFile);
+
+                if (updatedUser == null)
+                {
+                    return Json(new { success = false, message = "User not found!" });
+                }
+
+                // ✅ Update Session Values after Profile Update
+                HttpContext.Session.SetString("UserName", updatedUser.UserName ?? "");
+                string userImagePath = string.IsNullOrEmpty(updatedUser.ProfileImage) ? "/assets/default-user.png" : updatedUser.ProfileImage;
+                HttpContext.Session.SetString("UserImage", userImagePath);
+
+                return Json(new { success = true, message = "Profile updated successfully!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error while updating profile. " + ex.Message });
+            }
         }
+
+
+        //[HttpPost]
+        //public async Task<IActionResult> EditProfile(User users, IFormFile? ImageFile)
+        //{
+        //    int? userId = HttpContext.Session.GetInt32("UserId");
+
+        //    if (userId == null)
+        //    {
+        //        return Json(new { success = false, message = "User session expired. Please login again." });
+        //    }
+
+        //    users.UserId = userId.Value; // Ensure correct user ID is used 
+
+        //    try
+        //    {
+        //        await _profile.EditProfile(users, ImageFile);
+        //        // Update session after successful image change
+
+
+        //        return Json(new { success = true, message = "Profile updated successfully!" });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Json(new { success = false, message = "Error while updating profile. " + ex.Message });
+        //    }
+        //}
+
+
+        //[HttpPost]
+        //public async Task<IActionResult> EditProfile(User users, IFormFile? ImageFile)
+        //{
+        //    int? userId = HttpContext.Session.GetInt32("UserId");
+
+        //    if (userId == null)
+        //    {
+        //        return RedirectToAction("Login", "Account");
+        //    }
+
+        //    users.UserId = userId.Value; //Ensure correct user Id is used 
+
+        //    await _profile.EditProfile(users, ImageFile);
+        //    return RedirectToAction("Profile");
+        //}
 
         [HttpPost]
         public async Task<IActionResult> UpdateEmailVerification([FromBody] User users)

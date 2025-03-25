@@ -1,0 +1,228 @@
+﻿@using Newtonsoft.Json
+@model IEnumerable<Bug_Tracking_System.Models.AuditLog>
+
+@{
+    ViewData["Title"] = "Audit Logs";
+
+    // Group module usage data for the Chart
+    var moduleUsage = Model
+        .GroupBy(x => x.ModuleName)
+        .Select(g => new { ModuleName = g.Key, Count = g.Count() })
+        .ToList();
+
+    var moduleLabels = moduleUsage.Select(m => m.ModuleName).ToList();
+    var moduleData = moduleUsage.Select(m => m.Count).ToList();
+
+}
+
+<style>
+    .dataTables_length select {
+        padding-right: 25px !important;
+        width: 80px;  /* Optional */
+    }
+</style>
+
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h6>Audit Logs</h6>
+                    <button class="btn btn-danger btn-sm" onclick="clearLogs()">Clear Logs</button>
+                </div>
+                <div class="card-body px-3 py-3">
+                    <div class="table-responsive">
+                        <table id="auditLogTable" class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xs font-weight-bolder ">User</th>
+                                    <th class="text-uppercase text-secondary text-xs font-weight-bolder ">Action</th>
+                                    <th class="text-uppercase text-secondary text-xs font-weight-bolder ">Module</th>
+                                    <th class="text-uppercase text-secondary text-xs font-weight-bolder ">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var log in Model)
+                                {
+                                    <tr>
+                                        <td class="align-middle text-sm">
+                                            <span class="text-xs font-weight-bold">@log.User.UserName</span>
+                                        </td>
+                                        <td class="align-middle text-sm">
+                                            <span class="text-xs">@log.Action</span>
+                                        </td>
+                                        <td class="align-middle text-sm">
+                                            <span class="text-xs">@log.ModuleName</span>
+                                        </td>
+                                        <td class="align-middle text-sm">
+                                            <span class="text-xs text-secondary">@log.ActionDate.ToString("yyyy-MM-dd | HH:mm:ss")</span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pie Chart Section -->
+<div class="row mt-4">
+    <div class="col-lg-6 mx-auto">
+        <div class="card">
+            <div class="card-header pb-0">
+                <h6 class="mb-0">Module Usage (Pie Chart)</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="modulePieChart" style="width:100%; height:300px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Required JS libraries -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- DataTables -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<!-- SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Argon Dashboard JS (correct path) -->
+<script src="~/assets/js/argon-dashboard.min.js"></script>
+
+
+
+<script>
+
+    
+
+     // Module Data for Chart
+    var moduleLabels = @Html.Raw(JsonConvert.SerializeObject(moduleLabels));
+    var moduleData = @Html.Raw(JsonConvert.SerializeObject(moduleData));
+
+    // Render Pie Chart
+    var ctx = document.getElementById('modulePieChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: moduleLabels,
+            datasets: [{
+                label: 'Module Usage',
+                data: moduleData,
+                backgroundColor: [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                    '#FF9F40', '#E7E9ED', '#00A36C', '#E34234', '#3D9970'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#344767',
+                        font: { size: 12 }
+                    }
+                }
+            }
+        }
+    });
+    
+
+                    function clearLogs() {
+        Swal.fire({
+            title: 'Enter Password to Clear Logs',
+            input: 'password',
+            inputLabel: 'Confirm your password',
+            inputPlaceholder: 'Enter your password',
+            inputAttributes: {
+                autocapitalize: 'off',
+                autocomplete: 'off'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Clear Logs',
+            showLoaderOnConfirm: true,
+            preConfirm: (password) => {
+                if (!password) {
+                    Swal.showValidationMessage('Password is required!');
+                    return false;
+                }
+
+                // Fetch CSRF token if available
+                const csrfToken = $('input[name="__RequestVerificationToken"]').val() || '';
+
+                return fetch('/AuditLogs/ClearLogs', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(csrfToken && { 'X-CSRF-TOKEN': csrfToken })
+                    },
+                    body: JSON.stringify({ confirmPassword: password })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.success) {
+                        throw new Error(data.message);
+                    }
+                    return data;
+                })
+                .catch(error => {
+                    Swal.showValidationMessage(`Error: ${error.message}`);
+                });
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: result.value.message,
+                    icon: 'success'
+                }).then(() => {
+                    location.reload(); // Refresh after success
+                });
+            } else {
+                // If user cancels or any error occurs, reload the page
+                location.reload();
+            }
+        });
+    }
+
+    // $('#auditLogTable').DataTable({
+    //         "order": [[3, "desc"]],
+    //         "paging": true,
+    //         "searching": true,
+
+    //     });
+
+        
+        $('#auditLogTable').DataTable({
+            "order": [[3, "desc"]],
+            "paging": true,
+            "searching": true,
+            "language": {
+                "paginate": {
+                    "previous": "<",
+                    "next": ">"
+                }
+            }
+        });
+   
+
+</script>

@@ -22,5 +22,6 @@ namespace Bug_Tracking_System.Repositories.Interfaces
         Task<bool> AssignProjectToDeveloper(int projectId, int developerId, int assignedBy);
 
         Task<Project> GetProjectById(int projectId);
+
     }
 }

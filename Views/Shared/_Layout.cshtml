@@ -3,7 +3,9 @@
 @{
     var userId = HttpContextAccessor.HttpContext?.Session.GetInt32("UserId");
     var userName = HttpContextAccessor.HttpContext?.Session.GetString("UserName");
-    var userImage = HttpContextAccessor.HttpContext?.Session.GetString("UserImage");
+    // var userImage = HttpContextAccessor.HttpContext?.Session.GetString("UserImage");
+    var userImage = Context.Session.GetString("UserImage") ?? "/assets/default-user.png"; // Fallback to default image if null
+
 
     Console.WriteLine("Profile" + userImage);
 }
@@ -19,7 +21,7 @@
     <link rel="stylesheet" href="~/Bug_Tracking_System.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" />
     <link rel="apple-touch-icon" sizes="76x76" href="~/AuthAssets/img/apple-icon.png">
-    <link rel="icon" type="image/png" href="~/AuthAssets/img/Bug.png.png">
+    <link rel="icon" type="image/png" href="~/images/ladybug_2820811.png">
     <title>
         Bugify Dashboard
     </title>
@@ -171,7 +173,8 @@
         <div class="sidenav-header">
             <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
             <a class="navbar-brand" href="/Dashboard/Dashboard" target="_blank">
-                <img src="~/AuthAssets/img/Bug.png.png" width="50" height="100" class="navbar-brand-img h-100" alt="main_logo">
+                <img src="~/images/ladybug_2820811.png" width="30" height="30" class="navbar-brand-img h-100" alt="main_logo">
+                @* <img src="~/AuthAssets/img/Bug.png.png" width="50" height="100" class="navbar-brand-img h-100" alt="main_logo"> *@
                 <span class="font-weight-bold">Bugify</span>
             </a>
         </div>
@@ -266,14 +269,18 @@
                             <i class="fas fa-cog"></i> <!-- Fixed: Corrected FA class -->
                         </a>
                     </li>
-                    <li class="nav-item dropdown" style="margin-top: 4px">
-                        <a href="#" class="nav-link text-white p-0" id="dropdownMenuButton" data-bs-toggle="dropdown">
-                            <i class="fas fa-bell cursor-pointer"></i> <!-- Fixed: Corrected FA class -->
+
+                    <li class="nav-item dropdown" style="margin-top: 4px; position: relative;">
+                        <a href="#" class="nav-link text-white p-0" id="notificationDropdown" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell cursor-pointer"></i>
+                            <span id="notificationCount" class="badge bg-danger" style="display: none; position: absolute; top: -5px; right: -5px;">0</span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#">No new notifications</a></li>
+                        <ul class="dropdown-menu dropdown-menu-end" id="notificationList">
+                            <li><a class="dropdown-item text-center" href="#">No new notifications</a></li>
                         </ul>
                     </li>
+
+
                     <li class="nav-item px-3" style="margin-top: 4px">
                         <a href="~/Account/Login" class="nav-link text-white p-0">
                             <i class="fa fa-sign-out"></i>
@@ -310,6 +317,8 @@
     @*         &copy; 2025 - Bug_Tracking_System - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a> *@
     @*     </div> *@
     @* </footer> *@
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 
     <!-- Load jQuery First -->
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -379,6 +388,7 @@
                 }, 500); // Ensure smooth transition
             }, 1000); // Adjust delay as needed
         });
+
                   
     </script>
 

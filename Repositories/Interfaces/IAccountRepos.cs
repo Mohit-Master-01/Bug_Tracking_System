@@ -23,6 +23,8 @@ namespace Bug_Tracking_System.Repositories.Interfaces
         Task<string> fetchUsername(string cred);
 
         Task<bool> IsVerified(string cred);
+
+        Task<User> GetUserById(int userId);
         //Task<List<Role>> GetRoles();
     }
 }

@@ -1,0 +1,80 @@
+﻿@model Bug_Tracking_System.Models.Project
+
+@{
+    ViewData["Title"] = "Project Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4" style="font-size: smaller">
+    <div class="card shadow">
+        <div class="card-header text-white">
+            <h3 class="mb-0">Project Details</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <strong>Project Name:</strong>
+                    <p class="text-muted">@Model.ProjectName</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong>Description:</strong>
+                    <p class="text-muted">@Model.Description</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong>Created Date:</strong>
+                    <p class="text-muted">@Model.CreatedDate?.ToString("dd MMM yyyy")</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong>Is Active:</strong>
+                    <p class="text-muted">@(Model.IsActive == true ? "Yes" : "No")</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong>Status:</strong>
+                    <p class="text-muted">@Model.Status</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong>Completion:</strong>
+                    <p class="text-muted">@Model.Completion %</p>
+                </div>
+                
+            </div>
+
+            <hr class="my-4">
+
+            <h4 class="mb-3">Assigned Members</h4>
+            @if (Model.Users != null && Model.Users.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Member Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var dev in Model.Users)
+                            {
+                                <tr>
+                                    <td>@dev.UserName</td>
+                                    <td>@dev.Email</td>
+                                    <td>@(dev.Role != null ? dev.Role.RoleName : "N/A")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">No developers assigned to this project.</p>
+            }
+        </div>
+
+        <div class="card-footer d-flex justify-content-between">
+            <a class="btn btn-primary" asp-action="AddOrEditProject" asp-route-id="@Model?.ProjectId">Edit Project</a>
+            <a class="btn btn-secondary" asp-action="ProjectList">Back to List</a>
+        </div>
+    </div>
+</div>

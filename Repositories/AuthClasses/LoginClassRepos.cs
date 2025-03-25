@@ -11,12 +11,14 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
         private readonly DbBug _dbBug;
         private readonly IEmailSenderRepos _emailSender;
         private readonly IMemoryCache _memoryCache;
+        private readonly IAuditLogsRepos _auditLogs;
 
-        public LoginClassRepos(DbBug dbBug, IEmailSenderRepos emailSender, IMemoryCache memoryCache)
+        public LoginClassRepos(DbBug dbBug, IAuditLogsRepos auditLogs, IEmailSenderRepos emailSender, IMemoryCache memoryCache)
         {
             _dbBug = dbBug;
             _emailSender = emailSender;
             _memoryCache = memoryCache;
+            _auditLogs = auditLogs;
         }
 
         public async Task<object> AuthenticateUser(string EmailOrUsername, string Password)
@@ -34,6 +36,7 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
             
             if (user == null)
             {
+                await _auditLogs.AddAuditLogAsync(0, $"Failed login attempt for non-existent user {EmailOrUsername}.", "Login");
                 return new { success = false, message = "User not found" };
             }
 
@@ -49,6 +52,7 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
             if(_memoryCache.TryGetValue(lockoutKey, out DateTime lockoutEndTime) && lockoutEndTime > DateTime.Now)
             {
                 var remainingTime = (int)(lockoutEndTime - DateTime.Now).TotalSeconds;
+                await _auditLogs.AddAuditLogAsync(user.UserId, $"Account locked for {EmailOrUsername}. Remaining time: {remainingTime} sec.", "Login");
                 return new { success = false, message = $"Account is locked. Try again in {remainingTime} seconds." };
             }
 
@@ -66,10 +70,13 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
             {
                 _memoryCache.Set(lockoutKey, DateTime.Now.AddSeconds(lockoutDurationSeconds), TimeSpan.FromSeconds(lockoutDurationSeconds));
                 _memoryCache.Remove(attemptKey); //Reset attempts after lockout
+
+                await _auditLogs.AddAuditLogAsync(user.UserId, $"Account locked after {maxAttempts} failed attempts.", "Login");
                 return new { success = false, message = $"Account is locked. Try again in {lockoutDurationSeconds} seconds." };
 
             }
 
+            await _auditLogs.AddAuditLogAsync(user.UserId, $"Failed login attempt {attempts}/{maxAttempts} for {EmailOrUsername}.", "Login");
             return new { success = false, message = $"Invalid credentials. You have {maxAttempts - attempts} attempts left." };
         }
 

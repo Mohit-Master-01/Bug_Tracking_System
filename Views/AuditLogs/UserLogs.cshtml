@@ -1,0 +1,24 @@
+﻿@model IEnumerable<Bug_Tracking_System.Models.AuditLog>
+
+<h3>All Audit Logs</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Action</th>
+            <th>Module</th>
+            <th>Action Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model)
+        {
+            <tr>
+                <td>@log.User?.UserName</td>
+                <td>@log.Action</td>
+                <td>@log.ModuleName</td>
+                <td>@log.ActionDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+            </tr>
+        }
+    </tbody>
+</table>

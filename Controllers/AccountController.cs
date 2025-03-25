@@ -17,8 +17,9 @@ namespace Bug_Tracking_System.Controllers
         private readonly IEmailSenderRepos _emailSender;
         private readonly ILoginRepos _login;
         private readonly IMemoryCache _memoryCache;
+        private readonly IAuditLogsRepos _auditLogs;
 
-        public AccountController(IAccountRepos acc,ILogger<AccountController> logger, DbBug dbBug, IEmailSenderRepos emailSender, ILoginRepos login,IMemoryCache memoryCache, ISidebarRepos sidebar) : base(sidebar)
+        public AccountController(IAccountRepos acc,ILogger<AccountController> logger, DbBug dbBug, IEmailSenderRepos emailSender, ILoginRepos login,IMemoryCache memoryCache, IAuditLogsRepos auditLogs, ISidebarRepos sidebar) : base(sidebar)
         {
             _acc = acc;
             _logger = logger;
@@ -26,6 +27,7 @@ namespace Bug_Tracking_System.Controllers
             _emailSender = emailSender;
             _login = login;
             _memoryCache = memoryCache;
+            _auditLogs = auditLogs;
         }
 
         public async Task<IActionResult> Index()
@@ -170,6 +172,10 @@ namespace Bug_Tracking_System.Controllers
             if(_memoryCache.TryGetValue(lockoutKey, out DateTime lockoutEndTime) && lockoutEndTime > DateTime.Now)
             {
                 var remainingTime = (int)(lockoutEndTime - DateTime.Now).TotalSeconds;
+
+                // ✅ Log lockout event
+                await _auditLogs.AddAuditLogAsync(0, $"Account locked for {login.EmailOrUsername}. Try again in {remainingTime} seconds.","Login");
+
                 return Json(new { success = false, message = $"Account is locked. Try again in {remainingTime} seconds." });
             }
 
@@ -214,6 +220,9 @@ namespace Bug_Tracking_System.Controllers
                 HttpContext.Session.SetString("UserName", data.UserName);
                 HttpContext.Session.SetString("UserImage", data.ProfileImage); // Assuming ProfileImage is a filename
 
+                // ✅ Log successful login
+                await _auditLogs.AddAuditLogAsync(id, $"User {data.UserName} logged in successfully.","Login");
+
                 //Determine redirection based on user verification
                 if (data.RoleId != 4)
                 {
@@ -250,8 +259,7 @@ namespace Bug_Tracking_System.Controllers
 
             else
             {
-                // If not successful, return the message from result
-                return Json(new { success = false, message = ((dynamic)result).message });
+                 return Json(new { success = false, message = ((dynamic)result).message });
             }
 
         }

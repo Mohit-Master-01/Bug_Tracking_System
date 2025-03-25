@@ -17,14 +17,14 @@
                         <input type="hidden" name="ProjectId" value="@Model.ProjectId" />
 
                         <div class="form-group">
-                            <label for="developerId" class="form-control-label">Assign to Developer:</label>
-                            <select name="developerId" id="developerId" class="form-control">
-                                <option value="">-- Select Developer --</option>
+                            <label for="developerIds" class="form-control-label">Assign to Developer(s):</label>
+                            <select name="developerIds" id="developerIds" class="form-control" multiple size="6">
                                 @foreach (var dev in ViewBag.Developers)
                                 {
                                     <option value="@dev.Value">@dev.Text</option>
                                 }
                             </select>
+                            <small class="text-muted">Hold Ctrl (Windows) / Command (Mac) to select multiple</small>
                         </div>
 
                         <div class="text-center">
@@ -41,11 +41,28 @@
 </div>
 
 @section Scripts {
-    <!-- Toastify CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    <!-- Toastify JS -->
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    @* <script src="~/js/Projects.js"></script> *@
 
-    <script src="~/js/Projects.js"></script>
+     <script> 
+         $("#assignProjectForm").submit(function (e) { 
+             e.preventDefault(); 
+
+             var projectId = $("input[name='ProjectId']").val(); 
+             var developerIds = $("#developerIds").val(); // Returns array of selected dev IDs 
+
+             $.ajax({ 
+                 url: '/Projects/AssignProject', 
+                 type: 'POST', 
+                 data: { projectId: projectId, developerIds: developerIds }, 
+                 traditional: true, // Important to send array 
+                 success: function (response) { 
+                     Toastify({ text: response.message, duration: 3000, style: { background: "green" } }).showToast(); 
+                     if (response.success) { 
+                         setTimeout(() => window.location.href = '/Projects/UnassignProjectList', 1500); 
+                     } 
+                 } 
+             }); 
+         }); 
+     </script> 
 }
-

@@ -113,8 +113,7 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
         from Users in _dbBug.Users
         join Roles in _dbBug.Roles on Users.RoleId equals Roles.RoleId
         join Projects in _dbBug.Projects on Users.ProjectId equals Projects.ProjectId into projGroup
-                    from project in projGroup.DefaultIfEmpty() // Left Join to include users without projects
-
+        from project in projGroup.DefaultIfEmpty() // Left Join to include users without projects
         where Users.RoleId != 4
         select new User
         {
@@ -253,43 +252,70 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
             return members.ToPagedList(pageNumber, pageSize);
         }
 
-        public async Task<object> SaveMember(User member, IFormFile? ImageFile)
+        public async Task<object> SaveMember(User member, IFormFile? ImageFile, List<int>? ProjectIds)
         {
             try
             {
-                var existingMember = await _dbBug.Users.FirstOrDefaultAsync(u => u.UserId == member.UserId);
-                bool isNewMember = existingMember == null; // Check if adding or editing
+                var existingMember = await _dbBug.Users
+                    .Include(u => u.UserProjects)
+                    .FirstOrDefaultAsync(u => u.UserId == member.UserId);
 
+                bool isNewMember = existingMember == null;
                 string tempPassword = "";
 
-                // Assign default profile image only when adding a new member
                 if (isNewMember)
                 {
                     member.ProfileImage = GenerateDefaultProfileImage(member.UserName);
-
-                    // Hash password only for new members
                     tempPassword = GenerateRandomPassword();
-                    member.PasswordHash = BCrypt.Net.BCrypt.HashPassword(tempPassword); // Hash the password
+                    member.PasswordHash = BCrypt.Net.BCrypt.HashPassword(tempPassword);
                 }
-                               
-               
-                // Set default values
+
                 member.IsAdmin = false;
                 member.IsActive = true;
 
                 if (isNewMember)
                 {
                     await _dbBug.Users.AddAsync(member);
+                    await _dbBug.SaveChangesAsync();  // Save here to get UserId for UserProjects mapping
                 }
                 else
                 {
-                    // Update existing member fields (excluding ProfileImage)
+                    // Update user basic fields
                     existingMember.UserName = member.UserName;
                     existingMember.Email = member.Email;
-                    existingMember.ProjectId = member.ProjectId;
+                    existingMember.RoleId = member.RoleId;
+                    existingMember.FirstName = member.FirstName;
+                    existingMember.LastName = member.LastName;
+                    existingMember.PhoneNumber = member.PhoneNumber;
+                    existingMember.LinkedInProfile = member.LinkedInProfile;
+                    existingMember.GitHubProfile = member.GitHubProfile;
+                    existingMember.Skills = member.Skills;
+                    existingMember.Bio = member.Bio;
+                    await _dbBug.SaveChangesAsync();
                 }
 
-                await _dbBug.SaveChangesAsync();
+                // ✅ Handle UserProject mapping
+                int userId = isNewMember ? member.UserId : existingMember.UserId;
+
+                if (ProjectIds != null && ProjectIds.Any())
+                {
+                    // Remove old mappings
+                    var oldMappings = _dbBug.UserProjects.Where(up => up.UserId == userId);
+                    _dbBug.UserProjects.RemoveRange(oldMappings);
+                    await _dbBug.SaveChangesAsync();
+
+                    // Add new mappings
+                    foreach (var projectId in ProjectIds)
+                    {
+                        var userProject = new UserProject
+                        {
+                            UserId = userId,
+                            ProjectId = projectId
+                        };
+                        await _dbBug.UserProjects.AddAsync(userProject);
+                    }
+                    await _dbBug.SaveChangesAsync();
+                }
 
                 return new { success = true, message = isNewMember ? "New member added successfully" : "Member data updated successfully", tempPassword };
             }
@@ -297,8 +323,55 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
             {
                 return new { success = false, message = "An error occurred: " + ex.Message };
             }
-
         }
+
+
+        //public async Task<object> SaveMember(User member, IFormFile? ImageFile)
+        //{
+        //    try
+        //    {
+        //        var existingMember = await _dbBug.Users.FirstOrDefaultAsync(u => u.UserId == member.UserId);
+        //        bool isNewMember = existingMember == null; // Check if adding or editing
+
+        //        string tempPassword = "";
+
+        //        // Assign default profile image only when adding a new member
+        //        if (isNewMember)
+        //        {
+        //            member.ProfileImage = GenerateDefaultProfileImage(member.UserName);
+
+        //            // Hash password only for new members
+        //            tempPassword = GenerateRandomPassword();
+        //            member.PasswordHash = BCrypt.Net.BCrypt.HashPassword(tempPassword); // Hash the password
+        //        }
+
+
+        //        // Set default values
+        //        member.IsAdmin = false;
+        //        member.IsActive = true;
+
+        //        if (isNewMember)
+        //        {
+        //            await _dbBug.Users.AddAsync(member);
+        //        }
+        //        else
+        //        {
+        //            // Update existing member fields (excluding ProfileImage)
+        //            existingMember.UserName = member.UserName;
+        //            existingMember.Email = member.Email;
+        //            existingMember.ProjectId = member.ProjectId;
+        //        }
+
+        //        await _dbBug.SaveChangesAsync();
+
+        //        return new { success = true, message = isNewMember ? "New member added successfully" : "Member data updated successfully", tempPassword };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new { success = false, message = "An error occurred: " + ex.Message };
+        //    }
+
+        //}
 
     }
 }

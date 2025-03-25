@@ -35,14 +35,25 @@
                                 <option value="">Select Role</option>
                             </select>
                         </div>
-                                                
-                        <!-- Project Dropdown (Initially Hidden) -->
+
+                        <!-- Project Dropdown (Multi-Select) -->
                         <div class="mb-3" id="projectContainer" style="display: none;">
-                            <label asp-for="ProjectId" class="form-label fw-bold">Project</label>
-                            <select asp-for="ProjectId" class="form-control" id="projectDropdown">
-                                <option value="">Select Project</option>
+                            <label class="form-label fw-bold">Project(s)</label>
+                            <select class="form-control" id="projectDropdown" name="ProjectIds" multiple>
+                                <!-- Options dynamically added via JS -->
                             </select>
+                            <small class="text-muted">Hold CTRL to select multiple projects.</small>
                         </div>
+
+
+                                                                        
+                        @* <!-- Project Dropdown (Initially Hidden) --> *@
+                        @* <div class="mb-3" id="projectContainer" style="display: none;"> *@
+                        @*     <label asp-for="ProjectId" class="form-label fw-bold">Project</label> *@
+                        @*     <select asp-for="ProjectId" class="form-control" id="projectDropdown"> *@
+                        @*         <option value="">Select Project</option> *@
+                        @*     </select> *@
+                        @* </div> *@
 
                         <div class="text-center">
                             <button type="submit" id="btnMember" class="btn btn-primary btn-lg w-100 shadow-sm">

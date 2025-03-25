@@ -9,11 +9,15 @@ namespace Bug_Tracking_System.Controllers
     {
         private readonly DbBug _dbBug;
         private readonly IProjectsRepos _project;
+        private readonly IEmailSenderRepos _emailsender;
+        private readonly IAccountRepos _acc;
 
-        public ProjectsController(IProjectsRepos project, DbBug Bug, ISidebarRepos sidebar) : base(sidebar)
+        public ProjectsController(IAccountRepos acc, IEmailSenderRepos emailsender, IProjectsRepos project, DbBug Bug, ISidebarRepos sidebar) : base(sidebar)
         {
             _dbBug = Bug;
             _project = project;
+            _emailsender = emailsender;
+            _acc = acc;
         }
 
         [HttpGet, ActionName("ProjectList")]
@@ -147,18 +151,170 @@ namespace Bug_Tracking_System.Controllers
             return View(bug);
         }
 
+        //[HttpPost]
+        //public async Task<IActionResult> AssignProject(int projectId, int developerId)
+        //{
+
+        //    int? userId = HttpContext.Session.GetInt32("UserId");
+
+        //    if (userId == null)
+        //    {
+        //        return Json(new { success = false, message = "User session expired. Please log in again." });
+        //    }
+
+        //    var success = await _project.AssignProjectToDeveloper(projectId, developerId, userId.Value);
+
+        //    if (success)
+        //    {
+        //        var project = await _project.GetProjectById(projectId);
+        //        var developer = await _acc.GetUserById(developerId);
+        //        var manager = await _acc.GetUserById(userId.Value);
+
+        //        if (project != null && developer != null && manager != null)
+        //        {
+        //            string emailBody = $@"
+        //                <p><b>Project Name:</b> {project.ProjectName}</p>
+        //                <p><b>Assigned By:</b> {manager.UserName}</p>
+        //                <p><b>Created Date:</b> {project.CreatedDate:yyyy-MM-dd}</p>
+        //                <p><b>Description:</b> {project.Description}</p>
+        //            ";
+
+        //            await _emailsender.SendEmailAsync(developer.Email, "New Project Assigned - Bugify", emailBody, "AssignProject");
+        //        }
+        //    }
+        //    return Json(new { success = true, message = "Project assigned successfully!" });
+        //}
+
         [HttpPost]
-        public async Task<IActionResult> AssignProject(int projectId, int developerId)
+        public async Task<IActionResult> AssignProject(int projectId, List<int> developerIds)
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
-
             if (userId == null)
             {
                 return Json(new { success = false, message = "User session expired. Please log in again." });
             }
 
-            var success = await _project.AssignProjectToDeveloper(projectId, developerId, userId.Value);
-            return Json(new { success, message = success ? "Project assigned successfully!" : "Failed to assign Project." });
+            if (developerIds == null || !developerIds.Any())
+            {
+                return Json(new { success = false, message = "Please select at least one developer." });
+            }
+
+            // ✅ Assign project to multiple developers via UserProject table
+            foreach (var devId in developerIds)
+            {
+                await _project.AssignProjectToDeveloper(projectId, devId, userId.Value);
+            }
+
+            // ✅ Email Notification to All Developers
+            var project = await _project.GetProjectById(projectId);
+            var manager = await _acc.GetUserById(userId.Value);
+
+            if (project != null && manager != null)
+            {
+                string emailBody = $@"
+            <p><b>Project Name:</b> {project.ProjectName}</p>
+            <p><b>Assigned By:</b> {manager.UserName}</p>
+            <p><b>Created Date:</b> {project.CreatedDate:yyyy-MM-dd}</p>
+            <p><b>Description:</b> {project.Description}</p>";
+
+                foreach (var devId in developerIds)
+                {
+                    var developer = await _acc.GetUserById(devId);
+                    if (developer != null)
+                    {
+                        await _emailsender.SendEmailAsync(developer.Email, "New Project Assigned - Bugify", emailBody, "AssignProject");
+                    }
+                }
+            }
+
+            return Json(new { success = true, message = "Project assigned successfully to selected developers!" });
         }
+
+
+
+        [HttpPost]
+        public JsonResult DeleteProject(int projectId, bool forceDelete = false)
+        {
+            try
+            {
+                // Fetch the project along with its related bugs
+                var project = _dbBug.Projects
+                                      .Include(p => p.Bugs) // Load related bugs
+                                      .FirstOrDefault(p => p.ProjectId == projectId);
+
+                if (project == null)
+                {
+                    return Json(new { success = false, message = "Project not found!" });
+                }
+
+                // Get the list of bug IDs for this project
+                var bugIds = project.Bugs.Select(b => b.BugId).ToList();
+
+                // Check if there are any unsolved bugs
+                bool hasUnsolvedBugs = project.Bugs.Any(b => b.StatusId != 3);
+
+                if (hasUnsolvedBugs && !forceDelete)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        requiresConfirmation = true,
+                        message = "There are assigned but unsolved bugs in this project. Do you want to proceed?"
+                    });
+                }
+
+                if (bugIds.Any())
+                {
+                    // Step 1: Unassign Bugs from Users
+                    var usersAssignedToBugs = _dbBug.Users.Where(u => bugIds.Contains((int)u.BugId)).ToList();
+                    foreach (var user in usersAssignedToBugs)
+                    {
+                        user.BugId = null; // Unassign bug
+                    }
+                    _dbBug.SaveChanges(); // Save changes before deleting bugs
+
+                    // Step 2: Delete Attachments linked to these Bugs
+                    var attachmentsToDelete = _dbBug.Attachments.Where(a => bugIds.Contains(a.BugId)).ToList();
+                    _dbBug.Attachments.RemoveRange(attachmentsToDelete);
+                    _dbBug.SaveChanges(); // Save changes after deleting attachments
+
+                    // Step 3: Delete Bugs related to this project
+                    var bugsToDelete = _dbBug.Bugs.Where(b => bugIds.Contains(b.BugId)).ToList();
+                    _dbBug.Bugs.RemoveRange(bugsToDelete);
+                    _dbBug.SaveChanges();
+                }
+
+                // Step 4: Finally, delete the project
+                _dbBug.Projects.Remove(project);
+                int changes = _dbBug.SaveChanges(); // Ensure changes are committed
+
+                return Json(new
+                {
+                    success = changes > 0,
+                    message = changes > 0 ? "Project and its related data were deleted successfully!" : "No changes made."
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error: " + ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ProjectDetails(int id)
+        {
+            ViewBag.PageTitle = "Project Details";
+            ViewBag.Breadcrumb = "Manage Projects";
+
+            var project = await _project.GetProjectById(id);
+            if (project == null)
+            {
+                return NotFound();
+            }
+            return View(project); // Pass the project with assigned developers
+        }
+
+
+
     }
 }

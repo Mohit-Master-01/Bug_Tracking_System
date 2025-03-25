@@ -29,5 +29,7 @@ public partial class Project
 
     public virtual ICollection<TaskAssignment> TaskAssignments { get; set; } = new List<TaskAssignment>();
 
+    public virtual ICollection<UserProject> UserProjects { get; set; } = new List<UserProject>();
+
     public virtual ICollection<User> Users { get; set; } = new List<User>();
 }

@@ -143,109 +143,191 @@ namespace Bug_Tracking_System.Controllers
             return View(user);
         }
 
-        public async Task<IActionResult> SaveMember(User member, IFormFile? ImageFile)
+        public async Task<IActionResult> SaveMember(User member, IFormFile? ImageFile, List<int>? ProjectIds)
         {
             try
             {
-                if(member.UserId > 0)
+                if (member.UserId > 0)
                 {
                     User resData = _member.checkExistence(member.UserName, member.Email, member.UserId);
-                    if(resData != null)
+                    if (resData != null)
                     {
                         if (resData.Email == member.Email)
-                        {
                             return Json(new { success = false, message = "Email already exists" });
-                        }
                         if (resData.UserName == member.UserName)
-                        {
                             return Json(new { success = false, message = "Username already exists" });
-                        }
                     }
                 }
                 else
                 {
                     if (await _acc.IsUsernameExist(member.UserName))
-                    {
-                        return Json(new { success = false, message = "Username already exists - edit" });
-                    }
+                        return Json(new { success = false, message = "Username already exists" });
                     if (await _acc.IsEmailExist(member.Email))
-                    {
-                        return Json(new { success = false, message = "Email already exists - edit" });
-                    }
+                        return Json(new { success = false, message = "Email already exists" });
                 }
-                string username = member.UserName;
-                //// **Generate a Temporary Password for New User**
-                //string tempPassword = GenerateRandomPassword();
-                ////member.PasswordHash = BCrypt.Net.BCrypt.HashPassword(tempPassword);
-                //string password = tempPassword;
-                string email = member.Email;
-                int id = member.UserId;
 
-                int ResId = (int)HttpContext.Session.GetInt32("UserId");
-
-                var res = await _member.SaveMember(member, ImageFile);
+                var res = await _member.SaveMember(member, ImageFile, ProjectIds);
 
                 if (((dynamic)res).success)
                 {
-                    // ✅ **Fetch Role Name**
+                    // ✅ Fetch Role Name
                     string roleName = await _dbBug.Roles
                         .Where(r => r.RoleId == member.RoleId)
                         .Select(r => r.RoleName)
                         .FirstOrDefaultAsync() ?? "Not Assigned";
 
-                    // ✅ **Fetch Project Name**
-                    string projectName = await _dbBug.Projects
-                        .Where(p => p.ProjectId == member.ProjectId)
-                        .Select(p => p.ProjectName)
-                        .FirstOrDefaultAsync() ?? "Not Assigned";
+                    var projectNames = (ProjectIds != null && ProjectIds.Any())
+                        ? await _dbBug.Projects
+                            .Where(p => ProjectIds.Contains(p.ProjectId))
+                            .Select(p => p.ProjectName)
+                            .ToListAsync()
+                        : new List<string>();
 
-                    // ✅ **Get Temporary Password**
-                    var responseObj = (dynamic)res;
-                    string tempPassword = responseObj.tempPassword ?? "Not Available";
+                    string assignedProjects = projectNames.Any() ? string.Join(", ", projectNames) : "Not Assigned";
+
+
+                    // ✅ Get Temporary Password
+                    string tempPassword = ((dynamic)res).tempPassword ?? "Not Available";
 
                     string subject = "Welcome to Bugify - Your Account is Ready!";
                     string body = $@"
+                <div class='container'>                                    
+                    <div class='content'>
+                        <p>Dear {member.UserName},</p>
+                        <p>We are excited to welcome you to <b>Bugify</b> - our efficient Bug Tracking System.</p>
+                        <p>Your account has been successfully created with the following details:</p>
+                        <div class='info'>
+                            <p><b>Role:</b> {roleName}</p>
+                            <p><b>Assigned Projects:</b> {assignedProjects}</p>
+                            <p><b>Username:</b> {member.UserName}</p>
+                            <p><b>Email:</b> {member.Email}</p>
+                            <p><b>Temporary Password:</b> {tempPassword}</p>
+                        </div>
+                        <p>You can log in using the above credentials and change your password after logging in.</p>
+                        <p>If you have any questions, feel free to contact our support team.</p>
+                        <p>We look forward to your contributions!</p>
+                    </div>
+                    <div class='footer'>
+                        &copy; {DateTime.Now.Year} Bugify. All rights reserved.
+                    </div>
+                </div>";
 
-
-                    <div class='container'>                                    
-                                    <div class='content'>
-                                        <p>Dear {member.UserName},</p>
-                                        <p>We are excited to welcome you to <b>Bugify</b> - our efficient Bug Tracking System.</p>
-                                        <p>Your account has been successfully created with the following details:</p>
-                                        <div class='info'>
-                                            <p><b>Role:</b> {roleName}</p>
-                                            <p><b>Assigned Project:</b> {projectName}</p>
-                                            <p><b>Username:</b> {member.UserName}</p>
-                                            <p><b>Email:</b> {member.Email}</p>
-                                           <p><b>Temporary Password:</b> {tempPassword}</p>
-                                        </div>
-                                        <p>You can log in using the above credentials and change your password after logging in.</p>
-                                        <p>If you have any questions, feel free to contact our support team.</p>
-                                        <p>We look forward to your contributions!</p>
-                                    </div>
-                                    <div class='footer'>
-                                        &copy; {DateTime.Now.Year} Bugify. All rights reserved.
-                                    </div>
-                                </div>";
-
-                    
-                    await _emailSender.SendEmailAsync(
-                        member.Email,
-                        subject,
-                        body,
-                        "NewMemberAdded"
-                        );
+                    await _emailSender.SendEmailAsync(member.Email, subject, body, "NewMemberAdded");
                 }
 
                 return Ok(res);
-
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString);
-                return Json(new { success = false, message = "Unknown error occured" });
+                Console.WriteLine(ex.ToString());
+                return Json(new { success = false, message = "Unknown error occurred" });
             }
         }
+
+
+        //public async Task<IActionResult> SaveMember(User member, IFormFile? ImageFile)
+        //{
+        //    try
+        //    {
+        //        if(member.UserId > 0)
+        //        {
+        //            User resData = _member.checkExistence(member.UserName, member.Email, member.UserId);
+        //            if(resData != null)
+        //            {
+        //                if (resData.Email == member.Email)
+        //                {
+        //                    return Json(new { success = false, message = "Email already exists" });
+        //                }
+        //                if (resData.UserName == member.UserName)
+        //                {
+        //                    return Json(new { success = false, message = "Username already exists" });
+        //                }
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (await _acc.IsUsernameExist(member.UserName))
+        //            {
+        //                return Json(new { success = false, message = "Username already exists - edit" });
+        //            }
+        //            if (await _acc.IsEmailExist(member.Email))
+        //            {
+        //                return Json(new { success = false, message = "Email already exists - edit" });
+        //            }
+        //        }
+        //        string username = member.UserName;
+        //        //// **Generate a Temporary Password for New User**
+        //        //string tempPassword = GenerateRandomPassword();
+        //        ////member.PasswordHash = BCrypt.Net.BCrypt.HashPassword(tempPassword);
+        //        //string password = tempPassword;
+        //        string email = member.Email;
+        //        int id = member.UserId;
+
+        //        int ResId = (int)HttpContext.Session.GetInt32("UserId");
+
+        //        var res = await _member.SaveMember(member, ImageFile);
+
+        //        if (((dynamic)res).success)
+        //        {
+        //            // ✅ **Fetch Role Name**
+        //            string roleName = await _dbBug.Roles
+        //                .Where(r => r.RoleId == member.RoleId)
+        //                .Select(r => r.RoleName)
+        //                .FirstOrDefaultAsync() ?? "Not Assigned";
+
+        //            // ✅ **Fetch Project Name**
+        //            string projectName = await _dbBug.Projects
+        //                .Where(p => p.ProjectId == member.ProjectId)
+        //                .Select(p => p.ProjectName)
+        //                .FirstOrDefaultAsync() ?? "Not Assigned";
+
+        //            // ✅ **Get Temporary Password**
+        //            var responseObj = (dynamic)res;
+        //            string tempPassword = responseObj.tempPassword ?? "Not Available";
+
+        //            string subject = "Welcome to Bugify - Your Account is Ready!";
+        //            string body = $@"
+
+
+        //            <div class='container'>                                    
+        //                            <div class='content'>
+        //                                <p>Dear {member.UserName},</p>
+        //                                <p>We are excited to welcome you to <b>Bugify</b> - our efficient Bug Tracking System.</p>
+        //                                <p>Your account has been successfully created with the following details:</p>
+        //                                <div class='info'>
+        //                                    <p><b>Role:</b> {roleName}</p>
+        //                                    <p><b>Assigned Project:</b> {projectName}</p>
+        //                                    <p><b>Username:</b> {member.UserName}</p>
+        //                                    <p><b>Email:</b> {member.Email}</p>
+        //                                   <p><b>Temporary Password:</b> {tempPassword}</p>
+        //                                </div>
+        //                                <p>You can log in using the above credentials and change your password after logging in.</p>
+        //                                <p>If you have any questions, feel free to contact our support team.</p>
+        //                                <p>We look forward to your contributions!</p>
+        //                            </div>
+        //                            <div class='footer'>
+        //                                &copy; {DateTime.Now.Year} Bugify. All rights reserved.
+        //                            </div>
+        //                        </div>";
+
+
+        //            await _emailSender.SendEmailAsync(
+        //                member.Email,
+        //                subject,
+        //                body,
+        //                "NewMemberAdded"
+        //                );
+        //        }
+
+        //        return Ok(res);
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine(ex.ToString);
+        //        return Json(new { success = false, message = "Unknown error occured" });
+        //    }
+        //}
 
         [HttpPost]
         public async Task<IActionResult> UpdateStatus(int id, bool isActive)

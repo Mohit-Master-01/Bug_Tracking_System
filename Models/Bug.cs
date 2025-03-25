@@ -29,8 +29,9 @@ public partial class Bug
 
     public virtual Project? Project { get; set; }
 
-    public virtual BugStatus? Status { get; set; } 
+    public virtual BugStatus Status { get; set; } = null!;
 
     public virtual ICollection<TaskAssignment> TaskAssignments { get; set; } = new List<TaskAssignment>();
+
+    public virtual ICollection<User> Users { get; set; } = new List<User>();
 }
- 

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Bug_Tracking_System.Models;
 
@@ -11,7 +13,10 @@ public partial class AuditLog
 
     public string Action { get; set; } = null!;
 
-    public DateTime? ActionDate { get; set; }
+    public DateTime ActionDate { get; set; }
 
+    public string? ModuleName { get; set; }
+
+    [NotMapped, JsonIgnore]
     public virtual User User { get; set; } = null!;
 }

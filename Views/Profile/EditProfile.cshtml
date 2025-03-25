@@ -1,32 +1,47 @@
-﻿@model Bug_Tracking_System.Models.User
+﻿@using Microsoft.AspNetCore.Http
+@model Bug_Tracking_System.Models.User
 
 @{
     ViewData["Title"] = "Edit Profile";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1 class="text-center">Edit Profile</h1>
-<hr />
+<h4 class="text-center">Edit Profile</h4>
 
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card shadow border-0">
             <div class="card-body">
-                <form id="editProfileForm" enctype="multipart/form-data" method="post">
+                <form id="editProfileForm" enctype="multipart/form-data" method="post" novalidate>
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <input type="hidden" asp-for="UserId" />
 
                     <!-- Profile Image with Edit Option -->
-                    <div class="text-center mb-4"> 
+                    <div class="text-center mb-4">
                         <div class="position-relative d-inline-block">
-                            <img id="profilePreview" src="@(!string.IsNullOrEmpty(Model.ProfileImage) ? Model.ProfileImage : "/images/default-profile.png")" class="rounded-circle border" style="width: 130px; height: 130px;">
-                            <label for="ProfileImage" class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle p-2" style="cursor: pointer;">
-                                <i class="fas fa-pencil-alt"></i>
-                            </label>
+                            <img id="profilePreview" src="@(!string.IsNullOrEmpty(Model.ProfileImage) ? Model.ProfileImage : "/images/default-profile.png")" class="rounded-circle border" style="width: 130px; height: 130px; object-fit: cover;">
+
+                            <!-- Pencil Icon Trigger for Dropdown -->
+                            <div class="dropdown position-absolute bottom-0 end-0">
+                                <button class="btn btn-primary rounded-circle p-2 dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="openFileUpload()">Choose from Library</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="setDefaultProfile()">Set Default Picture</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
+
+                        <!-- Hidden File Upload -->
                         <input type="file" id="ProfileImage" name="ImageFile" class="d-none" accept="image/*" onchange="previewImage(event)" />
                         <span asp-validation-for="ProfileImage" class="text-danger"></span>
                     </div>
+
                     <!-- First Name & Last Name -->
                     <div class="row mb-3">
                         <div class="col-md-6">
@@ -110,11 +125,13 @@
                     @*     </select> *@
                     @* </div> *@
 
-                    <div class="mb- 3">
+                    <div class="mb-3">
                         <p><a href="~/Account/ForgotPassword" class="hover-a">Want to reset your password?</a></p>
                     </div>
                     <div class="text-center">
-                        <button type="submit" id="saveBtn" class="btn btn-primary">Save</button>
+                        <button type="submit" id="saveBtn" class="btn btn-primary">
+                            <span id="btnSpinner" class="spinner-border spinner-border-sm d-none"></span> Save
+                        </button>
                         <a asp-action="Profile" class="btn btn-secondary">Back to Profile</a>
                     </div>
                 </form>
@@ -137,6 +154,39 @@
                 output.src = reader.result;
             };
             reader.readAsDataURL(event.target.files[0]);
+        }
+
+                // Opens the file upload dialog
+        function openFileUpload() {
+            document.getElementById('ProfileImage').click();
+        }
+
+        // Set Default Picture (You can update this logic to generate initials later)
+        function setDefaultProfile() {
+            const userName = '@Model.UserName'; // Replace or fetch dynamically
+            const firstLetter = userName.charAt(0).toUpperCase();
+            const defaultImageUrl = `/images/default-profile.png`; // Optional: generate initial avatar
+
+            // Optional: Generate dynamic letter-based image if needed
+            document.getElementById('profilePreview').src = defaultImageUrl;
+        }
+
+            function setDefaultProfile() {
+            $.ajax({
+                url: '/Profile/GenerateDefaultProfile',
+                type: 'POST',
+                success: function (response) {
+                    if (response.success) {
+                        $('#profilePreview').attr('src', response.imagePath);
+                        Swal.fire('Default Picture Set!', '', 'success');
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Error', 'Something went wrong.', 'error');
+                }
+            });
         }
 
                 function togglePasswordField() {

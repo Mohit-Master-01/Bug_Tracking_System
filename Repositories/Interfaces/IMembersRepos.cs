@@ -15,7 +15,7 @@ namespace Bug_Tracking_System.Repositories.Interfaces
 
         Task<IPagedList<User>> GetAllTesters(int pageNumber, int pageSize);
 
-        Task<object> SaveMember(User member, IFormFile? ImageFile);
+        Task<object> SaveMember(User member, IFormFile? ImageFile, List<int>? ProjectIds);
 
         Task<List<Role>> GetAllRoles();
 

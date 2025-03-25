@@ -20,7 +20,8 @@ $(document).ready(function () {
 
     });
 
-    $("#loginForm").validate({
+    
+$("#loginForm").validate({
         rules: {
             EmailOrUsername: { required: true },
             Password: { required: true }

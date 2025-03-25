@@ -15,19 +15,24 @@ namespace Bug_Tracking_System.Repositories.BugsClasses
     {
         private readonly DbBug _dbBug;
         private readonly IWebHostEnvironment _env;
+        private readonly INotificationRepos _notification;
 
 
-        public BugsClassRepos(DbBug dbBug, IWebHostEnvironment env)
+        public BugsClassRepos(DbBug dbBug, INotificationRepos notification,  IWebHostEnvironment env)
         {
             _dbBug = dbBug;       
             _env = env;
+            _notification = notification;
         }
 
         
         public async Task<bool> AssignBugToDeveloper(int bugId, int developerId, int assignedBy)
         {
-                var bug = await _dbBug.Bugs.FindAsync(bugId);
-                if (bug == null) return false;
+            var user = await _dbBug.Users.FirstOrDefaultAsync(u => u.UserId == developerId);
+            if (user == null) return false;
+
+            var bug = await _dbBug.Bugs.FindAsync(bugId);
+            if (bug == null) return false;
 
             var assignment = new TaskAssignment
             {
@@ -53,7 +58,18 @@ namespace Bug_Tracking_System.Repositories.BugsClasses
                 bug.StatusId = assignedStatus;
             }
 
+            user.BugId = bugId;
+
             await _dbBug.SaveChangesAsync();
+
+            await _notification.AddNotification(
+            userId: developerId,
+            type: 1,
+            message: "A new bug has been assigned to you!",
+            relatedId: bugId,
+            moduleType: "Bug"
+            );
+
             return true;
         }
 
@@ -181,11 +197,11 @@ namespace Bug_Tracking_System.Repositories.BugsClasses
                     existingBug.Priority = bug.Priority;
                     existingBug.StatusId = bug.StatusId;
                     existingBug.CreatedBy = bug.CreatedBy;
-                    existingBug.CreatedDate = DateTime.UtcNow;
+                    existingBug.CreatedDate = DateTime.Now;
                 }
                 else
                 {
-                    bug.CreatedDate = DateTime.UtcNow;
+                    bug.CreatedDate = DateTime.Now;
                     _dbBug.Bugs.Add(bug);
                 }
 

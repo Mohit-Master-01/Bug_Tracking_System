@@ -37,6 +37,8 @@ public partial class DbBug : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<UserProject> UserProjects { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=localhost;Database=Bug_Tracking_System;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true");
@@ -66,6 +68,7 @@ public partial class DbBug : DbContext
             entity.Property(e => e.ActionDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.ModuleName).HasMaxLength(100);
 
             entity.HasOne(d => d.User).WithMany(p => p.AuditLogs)
                 .HasForeignKey(d => d.UserId)
@@ -116,9 +119,13 @@ public partial class DbBug : DbContext
 
             entity.Property(e => e.IsRead).HasDefaultValue(false);
             entity.Property(e => e.Message).HasMaxLength(500);
+            entity.Property(e => e.ModuleType)
+                .HasMaxLength(50)
+                .IsUnicode(false);
             entity.Property(e => e.NotificationDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.RelatedId).HasColumnName("RelatedID");
 
             entity.HasOne(d => d.User).WithMany(p => p.Notifications)
                 .HasForeignKey(d => d.UserId)
@@ -257,6 +264,10 @@ public partial class DbBug : DbContext
             entity.Property(e => e.Skills).HasMaxLength(1000);
             entity.Property(e => e.UserName).HasMaxLength(100);
 
+            entity.HasOne(d => d.Bug).WithMany(p => p.Users)
+                .HasForeignKey(d => d.BugId)
+                .HasConstraintName("FK_Users_Bug");
+
             entity.HasOne(d => d.Project).WithMany(p => p.Users)
                 .HasForeignKey(d => d.ProjectId)
                 .HasConstraintName("FK_Users_Project");
@@ -264,6 +275,21 @@ public partial class DbBug : DbContext
             entity.HasOne(d => d.Role).WithMany(p => p.Users)
                 .HasForeignKey(d => d.RoleId)
                 .HasConstraintName("FK_Users_Roles");
+        });
+
+        modelBuilder.Entity<UserProject>(entity =>
+        {
+            entity.HasKey(e => e.UserProjectId).HasName("PK__UserProj__5F7DD4974019BF7A");
+
+            entity.ToTable("UserProject");
+
+            entity.HasOne(d => d.Project).WithMany(p => p.UserProjects)
+                .HasForeignKey(d => d.ProjectId)
+                .HasConstraintName("FK_UserProject_Project");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserProjects)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_UserProject_User");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -88,13 +88,13 @@
         if (selectedRole === "1") { // If "Project Manager" is selected
             $("#projectContainer").show();
 
-            // Fetch and populate projects dynamically
             $.get("/Members/GetProjects", function (data) {
-                $("#projectDropdown").empty().append('<option value="">Select Project</option>');
+                $("#projectDropdown").empty();
                 $.each(data, function (index, project) {
                     $("#projectDropdown").append(`<option value="${project.projectId}">${project.projectName}</option>`);
                 });
             });
+
 
         } else {
             $("#projectContainer").hide();

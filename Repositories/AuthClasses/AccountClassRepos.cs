@@ -144,7 +144,7 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
         public async Task<bool> IsVerified(string cred)
         {
             var user = await _bug.Users.FirstOrDefaultAsync(u => u.Email ==  cred || u.UserName == cred);
-            return user.IsEmailVerified;
+            return (bool)user.IsEmailVerified;
         }
 
         public async Task<string> fetchUsername(string cred)
@@ -154,5 +154,13 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
                 .Select(u => u.UserName)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<User> GetUserById(int userId)
+        {
+            return await _bug.Users
+                .Where(u => u.UserId == userId)
+                .FirstOrDefaultAsync();
+        }
+
     }
 }

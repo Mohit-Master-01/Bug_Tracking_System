@@ -15,9 +15,10 @@ namespace Bug_Tracking_System.Controllers
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             int roleId = HttpContext.Session.GetInt32("UserRoleId") ?? 0;
-            //int roleId = 4;
+
             var tabs = _sidebar.GetTabsByRoleIdAsync(roleId).Result; // Sync for simplicity
             ViewBag.SidebarTabs = tabs;
+
             base.OnActionExecuting(context);
         }
     }
