@@ -9,107 +9,107 @@
 
     /* Severity Colors */
     [data-severity="Critical"]::before {
-        content: "Critical";
-        background: #dc3545;
+    content: "Critical";
+    background: #dc3545;
     }
 
     [data-severity="Major"]::before {
-        content: "Major";
-        background: #ffc107;
+    content: "Major";
+    background: #ffc107;
     }
 
     [data-severity="Minor"]::before {
-        content: "Minor";
-        background: #007bff;
+    content: "Minor";
+    background: #007bff;
     }
 
     [data-severity="Low"]::before {
-        content: "Low";
-        background: #28a745;
+    content: "Low";
+    background: #28a745;
     }
 
     /* Priority Colors */
     [data-priority="Highest"]::before {
-        content: "Highest";
-        background: #dc3545;
+    content: "Highest";
+    background: #dc3545;
     }
 
     [data-priority="High"]::before {
-        content: "High";
-        background: #ffc107;
+    content: "High";
+    background: #ffc107;
     }
 
     [data-priority="Medium"]::before {
-        content: "Medium";
-        background: #007bff;
+    content: "Medium";
+    background: #007bff;
     }
 
     [data-priority="Low"]::before {
-        content: "Low";
-        background: #28a745;
+    content: "Low";
+    background: #28a745;
     }
 
     [data-priority="Lowest"]::before {
-        content: "Lowest";
-        background: #6c757d;
+    content: "Lowest";
+    background: #6c757d;
     }
 
     /* Status Colors */
     [data-status="Assigned"]::before {
-        content: "Assigned";
-        background: #00d0e1;
+    content: "Assigned";
+    background: #00d0e1;
     }
 
     [data-status="Design issue"]::before {
-        content: "Design issue";
-        background: #a94200
+    content: "Design issue";
+    background: #a94200
     }
 
     [data-status="Discuss"]::before {
-        content: "Discuss";
-        background: #ff0000;
+    content: "Discuss";
+    background: #ff0000;
     }
 
     [data-status="Fixed"]::before {
-        content: "Fixed";
-        background: #28a745;
+    content: "Fixed";
+    background: #28a745;
     }
 
     [data-status="New"]::before {
-        content: "New";
-        background: #03037a;
+    content: "New";
+    background: #03037a;
     }
 
     [data-status="Not a bug"]::before {
-        content: "Not a bug";
-        background: #f3ff36;
+    content: "Not a bug";
+    background: #f3ff36;
     }
 
     /* Badge Styling */
     [data-severity]::before, [data-priority]::before, [data-status]::before {
-        color: white;
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-weight: bold;
-        display: inline-block;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    display: inline-block;
     }
 
 
 
     .table th, .table td {
-        text-align: center; /* Align text to center */
-        vertical-align: middle; /* Align items vertically */
-        padding: 10px; /* Add consistent padding */
+    text-align: center; /* Align text to center */
+    vertical-align: middle; /* Align items vertically */
+    padding: 10px; /* Add consistent padding */
     }
 
     td[data-severity], td[data-priority], td[data-status] {
-        min-width: 100px; /* Ensure uniform column width */
+    min-width: 100px; /* Ensure uniform column width */
     }
 
     td:last-child div {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
     }
 
 </style>
@@ -130,12 +130,12 @@
 
                     <h6 class="text-muted">Severity</h6>
                     <p data-severity="@(Model.Severity ?? "Not Assigned")" class="text-sm">
-                        
+
                     </p>
 
                     <h6 class="text-muted">Priority</h6>
                     <p data-priority="@(Model.Priority ?? "Not Assigned")" class="text-sm">
-                        
+
                     </p>
                 </div>
                 <div class="col-md-6">
@@ -151,19 +151,24 @@
                     <h6 class="text-muted">Status</h6>
                     <!-- Status with Dropdown -->
                     <td>
-                        <div class="dropdown">
-                            <button class="btn btn-sm dropdown-toggle status-btn" data-id="@Model.BugId" data-status="@Model.Status?.StatusId" data-bs-toggle="dropdown" aria-expanded="false">
-                                @Model.Status?.StatusName
-                            </button>
-                            <ul class="dropdown-menu">
-                                @foreach (var status in ViewBag.StatusList)
-                                {
-                                    <li>
-                                        <a class="dropdown-item change-status" href="#" data-bug-id="@Model.BugId" data-status-id="@status.Value">@status.Text</a>
-                                    </li>
-                                }
-                            </ul>
-                        </div>
+                        @if (ViewBag.PermissionType != "canView")
+                        {
+                            <div class="dropdown">
+                                <button class="btn btn-sm dropdown-toggle status-btn" data-id="@Model.BugId" data-status="@Model.Status?.StatusId" data-bs-toggle="dropdown" aria-expanded="false">
+                                    @Model.Status?.StatusName
+                                </button>
+                                <ul class="dropdown-menu">
+                                    @foreach (var status in ViewBag.StatusList)
+                                    {
+                                        <li>
+                                            <a class="dropdown-item change-status" href="#" data-bug-id="@Model.BugId" data-status-id="@status.Value">@status.Text</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                        
+
                     </td>
                 </div>
             </div>
@@ -188,7 +193,15 @@
             </div>
 
             <div class="mt-3">
-                <a asp-action="SaveBug" asp-route-id="@Model?.BugId" class="btn btn-primary btn-sm">Edit</a>
+
+                @if (ViewBag.PermissionType != "canView")
+                {
+                    <a asp-action="SaveBug" asp-route-id="@Model?.BugId" class="btn btn-primary btn-sm">Edit</a>
+                }
+                else
+                {
+                    <p>------</p>
+                }
                 <a asp-action="BugList" class="btn btn-secondary btn-sm">Back to List</a>
             </div>
         </div>

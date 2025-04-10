@@ -11,41 +11,73 @@ namespace Bug_Tracking_System.Controllers
         private readonly IProjectsRepos _project;
         private readonly IEmailSenderRepos _emailsender;
         private readonly IAccountRepos _acc;
+        private readonly IPermissionHelperRepos _permission;
 
-        public ProjectsController(IAccountRepos acc, IEmailSenderRepos emailsender, IProjectsRepos project, DbBug Bug, ISidebarRepos sidebar) : base(sidebar)
+        public ProjectsController(IAccountRepos acc, IPermissionHelperRepos permission, IEmailSenderRepos emailsender, IProjectsRepos project, DbBug Bug, ISidebarRepos sidebar) : base(sidebar)
         {
             _dbBug = Bug;
             _project = project;
             _emailsender = emailsender;
             _acc = acc;
+            _permission = permission;
+        }
+
+        // Public method to get user permission
+        public string GetUserPermission(string action)
+        {
+            int roleId = HttpContext.Session.GetInt32("UserRoleId").Value;
+            string permissionType = _permission.HasAccess(action, roleId);
+            ViewBag.PermissionType = permissionType;
+
+            return permissionType;
         }
 
         [HttpGet, ActionName("ProjectList")]
         public async Task<IActionResult> Index(int? page)
         {
-            int pageSize = 4; // Number of records per page
-            int pageNumber = page ?? 1; // Default to page 1
+            string permissionType = GetUserPermission("View Projects");
+            if (permissionType
+                == "canView" || permissionType == "canEdit" || permissionType == "fullAccess")
+            {
 
-            ViewBag.PageTitle = "Projects List";
-            ViewBag.Breadcrumb = "Reports";
-            var projects = await _project.GetAllProjects(pageNumber, pageSize);
-            return View(projects);
+                int pageSize = 4; // Number of records per page
+                int pageNumber = page ?? 1; // Default to page 1
+
+                ViewBag.PageTitle = "Projects List";
+                ViewBag.Breadcrumb = "Reports";
+                var projects = await _project.GetAllProjects(pageNumber, pageSize);
+                return View(projects);
+            }
+            else
+            {
+                return RedirectToAction("UnauthorisedAccess", "Error");
+            }
         } 
 
         //Add or Edit project
         [HttpGet]
         public async Task<IActionResult> AddOrEditProject(int? id)
         {
-            ViewBag.PageTitle = id == null ? "Add New Project" : "Edit Project";
-            ViewBag.Breadcrumb = "Manage Projects";
-
-            Project project = new Project();
-            if(id > 0)
+            string permissionType = GetUserPermission("Add Project");
+            if ( permissionType == "canEdit" || permissionType == "fullAccess")
             {
-                project = await _dbBug.Projects.FirstOrDefaultAsync(p => p.ProjectId == id);
-            }
 
-            return View(project);
+                ViewBag.PageTitle = id == null ? "Add New Project" : "Edit Project";
+                ViewBag.Breadcrumb = "Manage Projects";
+
+                Project project = new Project();
+                if (id > 0)
+                {
+                    project = await _dbBug.Projects.FirstOrDefaultAsync(p => p.ProjectId == id);
+                }
+
+                return View(project);
+            }
+            else
+            {
+                return RedirectToAction("UnauthorisedAccess", "Error");
+
+            }
         }
 
         [HttpPost,ActionName("AddOrEditProject")]
@@ -122,33 +154,44 @@ namespace Bug_Tracking_System.Controllers
         [HttpGet]
         public async Task<IActionResult> UnassignProjectList(int? page)
         {
-            int pageSize = 4;
-            int pageNumber = page ?? 1;
 
-            ViewBag.Breadcrumb = "Manage Projects";
-            ViewBag.PageTitle = "Unassigned Projects";
+            string permissionType = GetUserPermission("Assign Project");
+            if (permissionType == "canEdit" || permissionType == "fullAccess")
+            {
+                int pageSize = 4;
+                int pageNumber = page ?? 1;
 
-            var bugs = await _project.GetUnassignedProjects(pageNumber, pageSize);
-            return View(bugs);
+                ViewBag.Breadcrumb = "Manage Projects";
+                ViewBag.PageTitle = "Unassigned Projects";
+
+                var bugs = await _project.GetUnassignedProjects(pageNumber, pageSize);
+                return View(bugs);
+            }
+            else
+            {
+                return RedirectToAction("UnauthorisedAccess", "Error");
+            }
         }
 
         [HttpGet]
         public async Task<IActionResult> AssignProject(int id)
         {
-            ViewBag.PageTitle = "Assign Project";
-            ViewBag.Breadcrumb = "Manage Projects";
 
-            ViewBag.Developers = await _dbBug.Users
-                    .Where(u => u.Role.RoleName == "Developer") // Ensure this filters only developers
-                    .Select(u => new
-                    {
-                        Value = u.UserId, // Ensure UserId is mapped correctly
-                        Text = u.UserName  // Ensure FullName or UserName exists in the User model
-                    })
-                    .ToListAsync();
+                ViewBag.PageTitle = "Assign Project";
+                ViewBag.Breadcrumb = "Manage Projects";
 
-            var bug = await _project.GetProjectById(id);
-            return View(bug);
+                ViewBag.Developers = await _dbBug.Users
+                        .Where(u => u.Role.RoleName == "Developer") // Ensure this filters only developers
+                        .Select(u => new
+                        {
+                            Value = u.UserId, // Ensure UserId is mapped correctly
+                            Text = u.UserName  // Ensure FullName or UserName exists in the User model
+                        })
+                        .ToListAsync();
+
+                var bug = await _project.GetProjectById(id);
+                return View(bug);
+            
         }
 
         //[HttpPost]
@@ -303,15 +346,23 @@ namespace Bug_Tracking_System.Controllers
         [HttpGet]
         public async Task<IActionResult> ProjectDetails(int id)
         {
-            ViewBag.PageTitle = "Project Details";
-            ViewBag.Breadcrumb = "Manage Projects";
-
-            var project = await _project.GetProjectById(id);
-            if (project == null)
+            string permissionType = GetUserPermission("Manage Project");
+            if (permissionType == "canEdit" || permissionType == "fullAccess")
             {
-                return NotFound();
+                ViewBag.PageTitle = "Project Details";
+                ViewBag.Breadcrumb = "Manage Projects";
+
+                var project = await _project.GetProjectById(id);
+                if (project == null)
+                {
+                    return NotFound();
+                }
+                return View(project); // Pass the project with assigned developers
             }
-            return View(project); // Pass the project with assigned developers
+            else
+            {
+                return RedirectToAction("UnauthorisedAccess","Error");
+            }
         }
 
 

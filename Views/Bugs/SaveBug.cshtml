@@ -10,11 +10,19 @@
 
 <div class="container-fluid py-4">
     <div class="row">
-        <div class="col-lg-8 mx-auto">
+        <div class="col-lg-9 mx-auto">
             <div class="card shadow-lg border-0">
-                <div class="card-header text-white">
-                    <h5 class="mb-0">Report a Bug</h5>
+                
+                <div class="card-header text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Report a Bug</h4>
+                    <a class="btn btn-light"
+                       data-bs-toggle="modal"
+                       data-bs-target="#recents">
+                        <i class="fas fa-upload me-1"></i>
+                        Mass Import Bugs
+                    </a>
                 </div>
+
                 <div class="card-body">
                     <form asp-action="SaveBug" id="BugForm" method="post" enctype="multipart/form-data">
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
@@ -148,6 +156,40 @@
     </div>
 </div>
 
+@* Model For Bulk Bugs *@
+<div class="modal fade" id="recents" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Mass Import Bugs</h5>
+                <button type="button"
+                        class="close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <a href="/Bugs/DownloadSampleFile" class="btn btn-primary mb-3">
+                    <i class="fas fa-download"></i> Download Sample File
+                </a>
+
+                <form id="uploadForm" enctype="multipart/form-data" class="p-3 border rounded shadow-sm bg-light">
+                    <label for="excelFile" class="form-label fw-semibold">Upload Excel File</label>
+                    <input type="file" id="excelFile" name="excelFile" class="form-control mb-3" required />
+
+                     <label for="imageZip" class="form-label fw-semibold">Upload Image Zip File</label> 
+                     <input type="file" id="imageZip" name="imageZip" class="form-control mb-3" required /> 
+                     <button type="submit" class="btn btn-success w-100"> 
+                         <i class="fas fa-upload"></i> Submit 
+                     </button> 
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 @section Scripts{
 
     @{
@@ -165,7 +207,61 @@
     <script src="~/js/Bugs.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
 
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
     <script>
+         $("#uploadForm").submit(function (e) {
+            e.preventDefault();
+
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: "/Bugs/ImportBugsWithImages", // Replace with your controller
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Success!",
+                            text: response.message,
+                            showDenyButton: true,
+                            confirmButtonText: "Download File",
+                            denyButtonText: "Close"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Trigger file download
+                                var fileBytes = atob(response.fileData);
+                                var blob = new Blob([new Uint8Array([...fileBytes].map(c => c.charCodeAt(0)))], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+                                var link = document.createElement("a");
+                                link.href = window.URL.createObjectURL(blob);
+                                link.download = response.fileName;
+                                link.click();
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error!",
+                            text: response.message,
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error!",
+                        text: "Something went wrong. Please try again.",
+                    });
+                }
+            });
+        });
+
         Dropzone.autoDiscover = false;
 
         var dropzone = new Dropzone("#dropzone", {

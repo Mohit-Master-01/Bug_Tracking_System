@@ -16,7 +16,7 @@ public partial class Project
 
     public DateTime? CreatedDate { get; set; }
 
-    public bool? IsActive { get; set; }
+    public bool IsActive { get; set; }
 
     public string? Status { get; set; }
 

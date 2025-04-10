@@ -1,0 +1,127 @@
+﻿@model List<Role>
+
+<div class="container-fluid mt--7">
+    <div class="row">
+
+        @if (ViewBag.PermissionType != "canView")
+        {
+            <!-- Left Panel: Role Form -->
+            <div class="col-xl-5 mb-4">
+                <div class="card shadow">
+                    <div class="card-header bg-transparent">
+                        <h3 class="mb-0 text-center">Manage Roles</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="rolesForm">
+                            <input type="hidden" id="RoleId" name="RoleId" />
+
+                            <div class="form-group">
+                                <label class="form-control-label" for="RoleName">Role Name</label>
+                                <input type="text" id="RoleName" name="RoleName" class="form-control" placeholder="Enter Role Name">
+                            </div>
+                                                       
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="IsActive" name="IsActive">
+                                <label class="form-check-label" for="IsActive">Is Active</label>
+                            </div>
+
+                            <div class="text-end">
+                                <button type="submit" id="btnSaveRoles" class="btn btn-primary">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Right Panel: Roles Table -->
+        <div class="col-xl-7 mb-4">
+            <div class="card shadow">
+                <div class="card-header border-0">
+                    <h3 class="mb-0">User Roles</h3>
+                    <p class="text-muted">Manage your user roles below</p>
+                </div>
+                <div class="table-responsive p-3">
+                    <table class="table align-items-center table-flush text-center">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">Sr.No</th>
+                                <th scope="col">Role Name</th>
+                                <th scope="col">Active</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var role in Model.Select((value, index) => new { value, index }))
+                            {
+                                <tr style="vertical-align: middle;">
+                                    <td>@(role.index + 1)</td>
+                                    <td>@role.value.RoleName</td>
+                                    <td>
+                                        <span class="badge bg-@((bool)role.value.IsActive ? "success" : "danger")">
+                                            @((bool)role.value.IsActive ? "Yes" : "No")
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <button class="btn btn-sm btn-warning me-1" onclick="editCategory('@role.value.RoleId', '@role.value.RoleName', '@role.value.IsActive')" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
+                                                <i class="fas fa-edit"></i> 
+                                            </button>
+                                            <a href="@Url.Action("DeleteRoles", "Masters", new { id = role.value.RoleId })"
+                                               class="btn btn-sm btn-danger" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
+                                                <i class="fas fa-trash-alt"></i> 
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    
+    <script>
+        function editCategory(id, name, isActive) {
+            document.getElementById("RoleId").value = id;
+            document.getElementById("RoleName").value = name;
+            document.getElementById("IsActive").checked = isActive === "True";
+        }
+
+        $(document).ready(function () {
+            $("#btnSaveRoles").click(function (e) {
+                e.preventDefault();
+
+                var roleId = $("#RoleId").val();
+                var roleName = $("#RoleName").val();
+                var isActive = $("#IsActive").is(":checked");
+
+                var data = {
+                    RoleId: roleId ? parseInt(roleId) : 0,
+                    RoleName: roleName,
+                    IsActive: isActive
+                };
+
+                $.ajax({
+                    url: '/Masters/SaveRoles',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        alert("Role saved successfully!");
+                        location.reload();
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error:", xhr.responseText);
+                        alert("Something went wrong: " + xhr.status);
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,141 @@
+﻿@model List<Permission>
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header pb-0">
+                    <h4>User Permissions</h4>
+                    <p class="text-sm">Manage your Permissions</p>
+                </div>
+            </div>
+        </div>
+
+        @if (ViewBag.PermissionType != "canView")
+        {
+            <!-- Form Section -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header text-center pb-0">
+                        <h5 class="mb-0">Access Management</h5>
+                        <hr class="my-3">
+                    </div>
+                    <div class="card-body pt-0">
+                        <form id="rolesForm">
+                            <input type="hidden" id="Permissionid" name="Permissionid" value="0">
+
+                            <div class="mb-3">
+                                <label for="RoleId" class="form-label">Roles</label>
+                                <select class="form-select" id="RoleId" name="RoleId">
+                                    <option value="">--Select Role--</option>
+                                    @foreach (var role in ViewBag.Roles)
+                                    {
+                                        <option value="@role.RoleId">@role.RoleName</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Tabs</label>  
+                                <select class="form-select" id="TabId" name="TabId">
+                                    <option value="">--Select Tab--</option>
+                                    @foreach (var tab in ViewBag.Tabs)
+                                    {
+                                        <option value="@tab.TabId">@tab.TabName</option> 
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="PermissionType" class="form-label">Permission Type</label>
+                                <select class="form-select" id="PermissionType" name="PermissionType">
+                                    <option value="">--Select Permission--</option>
+                                    <option value="canView">CanView</option>
+                                    <option value="canEdit">CanEdit</option>
+                                    <option value="fullAccess">FullAccess</option>
+                                </select>
+                            </div>
+
+                            <!-- Argon Toggle Switch -->
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="IsActive" name="IsActive">
+                                <label class="form-check-label" for="IsActive">Active</label>
+                            </div>
+
+                            <p class="text-warning text-sm"><strong>Permission flow:</strong> CanView > CanEdit > FullAccess</p>
+
+                            <div class="text-start">
+                                <button type="submit" id="btnSavePermission" class="btn btn-primary">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Table Section -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header pb-0 text-center">
+                    <h5 class="mb-0">Permissions</h5>
+                    <hr class="my-3">
+                    <input type="text" id="searchPermission" class="form-control" placeholder="Search..." onkeyup="filterTable()">
+                </div>
+                <div class="card-body px-0 pt-0 pb-2">
+                    <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Sr.no</th>
+                                    <th>Tab</th>
+                                    <th>Type</th>
+                                    <th>Active</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="permissionsTable">
+                                @foreach (var permission in Model)
+                                {
+                                    <tr>
+                                        <td>@permission.Permissionid</td>
+                                        <td>@permission.TabName</td>
+                                        <td>@permission.PermissionType</td>
+                                        <td>@(permission.Isactive ? "Yes" : "No")</td>
+                                        @if (ViewBag.PermissionType != "canView")
+                                        {
+                                            <td>                                                
+                                                <button class="btn btn-sm btn-warning">Edit</button>
+                                                <a href="@Url.Action("DeletePermission", "Masters", new { id = permission.Permissionid })" class="btn btn-sm btn-danger">Delete</a>
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                                @if (!Model.Any())
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center">No permissions found.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/js/PermissionMaster.js"></script>
+    <script>
+        function filterTable() {
+            let input = document.getElementById("searchPermission").value.toLowerCase();
+            let tableRows = document.querySelectorAll("#permissionsTable tr");
+
+            tableRows.forEach(row => {
+                let text = row.textContent.toLowerCase();
+                row.style.display = text.includes(input) ? "" : "none";
+            });
+        }
+    </script>
+}

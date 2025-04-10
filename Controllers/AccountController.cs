@@ -8,7 +8,7 @@ using System.Globalization;
 
 namespace Bug_Tracking_System.Controllers
 {
-    public class AccountController : BaseController 
+    public class AccountController : Controller 
     {
 
         private readonly IAccountRepos _acc;
@@ -19,7 +19,7 @@ namespace Bug_Tracking_System.Controllers
         private readonly IMemoryCache _memoryCache;
         private readonly IAuditLogsRepos _auditLogs;
 
-        public AccountController(IAccountRepos acc,ILogger<AccountController> logger, DbBug dbBug, IEmailSenderRepos emailSender, ILoginRepos login,IMemoryCache memoryCache, IAuditLogsRepos auditLogs, ISidebarRepos sidebar) : base(sidebar)
+        public AccountController(IAccountRepos acc,ILogger<AccountController> logger, DbBug dbBug, IEmailSenderRepos emailSender, ILoginRepos login,IMemoryCache memoryCache, IAuditLogsRepos auditLogs)
         {
             _acc = acc;
             _logger = logger;
@@ -81,10 +81,13 @@ namespace Bug_Tracking_System.Controllers
                     Console.WriteLine($"User Email: {email}");
                 }
 
+                               
                 return Json(await _acc.AddUserRegister(users, ImageFile));
             }
             catch (Exception ex)
             {
+                await _auditLogs.AddAuditLogAsync(users.UserId, $"{users.UserName} Failed to Register", "Registration");
+
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -114,6 +117,8 @@ namespace Bug_Tracking_System.Controllers
                     }
                 }
 
+
+
                 return Json(new { success = true, message = "Email not found!" });
             }
             catch (Exception ex)
@@ -136,6 +141,10 @@ namespace Bug_Tracking_System.Controllers
                     user.OtpExpiry = DateTime.Now.AddMinutes(5);
                     await _emailSender.SendEmailAsync(user.Email, "OTP Verification!!", user.Otp,"Registration");
                     await _dbBug.SaveChangesAsync();
+
+                    await _auditLogs.AddAuditLogAsync(user.UserId, $"{user.UserName} has Resent OTP Request", "OTP Verification");
+
+
                     return Json(new { success = true, message = "OTP sent successfully" });
                 }
                 return Json(new { success = false, message = "User not found" });
@@ -275,6 +284,16 @@ namespace Bug_Tracking_System.Controllers
         {
             HttpContext.Session.SetString("ForgotPassEmail", users.Email);
             var res = await _login.TokenSenderViaEmail(users.Email);
+
+            if (((dynamic)res).success)
+            {
+                var user = await _dbBug.Users.FirstOrDefaultAsync(x => x.Email == users.Email);
+                if (user != null)
+                {
+                    await _auditLogs.AddAuditLogAsync(user.UserId, $"{user.UserName} has sent Forgot Password Request", "Password Reset");
+                }
+            }
+
             return Ok(res);
         }
 
@@ -293,6 +312,7 @@ namespace Bug_Tracking_System.Controllers
         [HttpPost,ActionName("ResetPassword")]
         public async Task<IActionResult> ResetPasswordAction(string PasswordHash)
         {
+
             string user = HttpContext.Session.GetString("ForgotPassEmail");
 
             if (string.IsNullOrEmpty(user))
@@ -305,8 +325,15 @@ namespace Bug_Tracking_System.Controllers
             if (((dynamic)res).success)
             {
                 HttpContext.Session.Remove("ForgotPassEmail"); // Clear session after successful reset
+                
             }
             return Ok(res);
+        }
+
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login");
         }
 
     }

@@ -1,0 +1,1529 @@
+﻿@{
+	Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Bugify</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Report, manage, and close bugs faster with Bugasura - a modern bug management tool. Explore AI issue tracker and reporters, integrate with project management tools, manage sprints, and get deeper insights into bugs with automatically generated reports." />
+	<meta name="author" content="Moolya Software Testing Private Limited" />
+	<meta name="keywords" content="bug tracker, bug reporter, defect tracker, bug reporting tool, bug tracking tool, simple bug tracker, website bug tracker, website bug testing, visual bug tracker, bugasura release notes" />
+	<meta name="google-site-verification" content="V07YA8eTC1ikorSXX0zLdfaqK6tz6AKSfTPqnaoOQgE" />
+
+	<meta property="og:title" content="Bugify" />
+	<meta property="og:description" content="Report, manage, and close bugs faster with Bugasura - a modern bug management tool. Explore AI issue tracker and reporters, integrate with project management tools, manage sprints, and get deeper insights into bugs with automatically generated reports." />
+	<meta property="og:url" content="https://bugasura.io" />
+	<meta property="og:site_name" content="Bugify" />
+	<meta property="og:type" content="website" />
+	<meta property="og:image" content="https://bugasura.io/assets/img/web-application/banner/Bugasura Bug management tool for fast moving teams.png" />
+	<meta property="og:image:type" content="image/png">
+	<meta property="og:image:width" content="2048">
+	<meta property="og:image:height" content="1152">
+	<meta property="og:image" content="https://bugasura.io/assets/img/web-application/banner/Bugasura Bug management tool for fast moving teams.png" />
+	<meta property="og:image:type" content="image/png" />
+	<meta property="og:image:width" content="820" />
+	<meta property="og:image:height" content="312" />
+
+	<meta name="twitter:title" content="Bugify - Bug Management Tool" />
+	<meta name="twitter:description" content="Report, manage, and close bugs faster with Bugify - a modern bug management tool. Explore AI issue tracker and reporters, integrate with project management tools, manage sprints, and get deeper insights into bugs with automatically generated reports." />
+	<meta name="twitter:image" content="https://bugasura.io/assets/img/web-application/banner/Bugasura AI-powered bug management tool for fast moving teams.png" />
+	<meta name="twitter:card" content="summary_large_image" />
+
+	<link rel="preconnect" href="https://dvo4xeicz5f3g.cloudfront.net/">
+	<link rel="dns-prefetch" href="https://www.googletagmanager.com/">
+	<link rel="dns-prefetch" href="https://www.google-analytics.com/">
+	<link rel="dns-prefetch" href="https://d10lpsik1i8c69.cloudfront.net/">
+	<link rel="dns-prefetch" href="https://settings.luckyorange.net/">
+
+	<link rel="canonical" href="https://bugasura.io" />
+
+	<link rel="shortcut icon" href="https://bugasura.io/assets/img/web-application/logo/favicon01.png" type="image/x-icon" />
+	<link rel="icon" href="https://bugasura.io/assets/img/web-application/logo/favicon01.png">
+
+	<!-- Google Tag Manager -->
+	<script>
+		(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+				new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+				j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+				'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+				})(window,document,'script','dataLayer','GTM-P44THP6');</script>
+	<!-- End Google Tag Manager -->
+
+	<style>
+		.dropdown-menu {
+			max-height: 250px; /* Limit height */
+			overflow-y: auto; /* Scroll when content overflows */
+			width: 260px; /* Adjust width as needed */
+			padding-right: 8px;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+		}
+
+			/* Optional: WebKit scrollbar customization */
+			.dropdown-menu::-webkit-scrollbar {
+				width: 6px;
+			}
+
+			.dropdown-menu::-webkit-scrollbar-thumb {
+				background-color: #bbb;
+				border-radius: 10px;
+			}
+
+			.dropdown-menu::-webkit-scrollbar-track {
+				background: transparent;
+			}
+
+	</style>
+
+</head>
+
+<body class="web-app-home home-2023">
+
+	<!-- Google Tag Manager (noscript) -->
+	<noscript>
+		<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P44THP6"
+				height="0" width="0" style="display:none;visibility:hidden"></iframe>
+	</noscript>
+	<!-- End Google Tag Manager (noscript) -->
+	<!-- preloader - start -->
+	<div id="web-app-preloader"></div>
+
+	<link rel="stylesheet" media href="https://bugasura.io/assets/css20210225180300/fonts_03112024.min.css">
+	<!-- Using bootstrap CDN for better performance -->
+	<link rel="stylesheet" media href="https://bugasura.io/assets/css20210225180300/bootstrap_15022023.min.css">
+	<link rel="stylesheet" media href="https://bugasura.io/assets/css20210225180300/style_14022025.min.css">
+
+	<!-- Critical CSS -->
+	<link rel="stylesheet" media href="https://bugasura.io/assets/css20210225180300/web-application_02122024.min.css" />
+
+	<!-- Start of header section
+	======================== -->
+	@* <section class="promo-banner-section"> *@
+	@* 	<div class="container"> *@
+	@* 		<div class="promo-banner-div"> *@
+	@* 			<b>🚀 Bugasura Spaces 🎉-</b> *@
+	@* 			An exclusive community for modern tech leaders.<br class="visible-xs"> *@
+	@* 			<a href="https://join.slack.com/t/bugasuraspaces/shared_invite/zt-1zgsj1cxt-zjGy08DwWP2KhnvIJqdq_Q" target="_blank"><u>Join here</u></a> *@
+	@* 		</div> *@
+	@* 	</div> *@
+	@* </section> *@
+	<!-- End of promo banner section
+	============================ -->
+	<!-- Start of header section
+		============================================= -->
+	<header id="web-app-header" class="web-app-main-header">
+		<div class="container">
+			<div class="web-app-main-header-content clearfix">
+				<div class="web-app-brand-logo float-left">
+					<a href="~/Home/LandingPage"><img src="~/Images/ladybug_2820811.png" alt="Bugify - Bug Tracker for Modern Teams" title="Bugify - Bug Tracker for Modern Teams" width="45px" height="37px"></a>
+					<span style="font-size: x-large; font-weight: bolder">Bugify</span>
+				</div>
+				<div class="web-app-main-menu-item float-right">
+					<nav class="web-app-main-navigation clearfix ul-li">
+						<ul id="main-nav" class="navbar-nav text-capitalize">
+							<!-- <li><a class="nav-features" href="https://bugasura.io/features">Features</a></li> -->
+							<li class="dropdown">
+								<a class="nav-features" href="#">Features <i class="custom-arrow arrow-down"></i></a>
+								<ul class="dropdown-menu">
+									<li><a href="#">Dashboard Overview</a></li>
+									<li><a href="#">Issue & Bug Tracker</a></li>
+									<li><a href="#">Role-based Access (Admin, PM, Developer, Tester)</a></li>
+									<li><a href="#">Project Management</a></li>
+									<li><a href="#">Bug Reporting with Attachments</a></li>
+									<li><a href="#">Advanced Bug Search & Filters</a></li>
+									<li><a href="#">Real-time Notifications</a></li>
+									<li><a href="#">Multi-developer Assignment</a></li>
+									<li><a href="#">Audit Logs & Activity Tracking</a></li>
+									<li><a href="#">Performance Monitoring</a></li>
+									<li><a href="#">Interactive Reports & Stats</a></li>
+									<li><a href="#">Excel/ZIP Bulk Bug Import</a></li>
+									<li><a href="#">Project-wise Role Reports</a></li>
+									<li><a href="#">User Management with Email Integration</a></li>
+									<li><a href="#">Excel Export of Reports</a></li>
+									<li><a href="#">Secure Login with Lockout & Attempt Tracking</a></li>
+									<li><a href="#">Chatbot Integration (Upcoming)</a></li>
+								</ul>
+							</li>
+
+						
+							<li><a rel="nofollow" href="~/Account/Login" id="login-btn">Login</a> </li>
+						</ul>
+					</nav>
+					<div class="web-app-header-btn text-center float-right hidden-xs">
+						<a rel="nofollow" href="~/Account/Registration" class="signup_btn new_btn">Start for Free</a>
+					</div>
+				</div>
+
+			</div>
+
+			<!-- Mobile Menu -->
+			<div class="web-app-mobile_menu position-relative">
+				<div class="web-app-mobile_menu_button web-app-open_mobile_menu">
+					<img src="https://bugasura.io/assets/img/web-application/icons/hamburger.png" alt="-" title="hamburger" width="18px" height="18px" />
+				</div>
+				<div class="web-app-mobile_menu_wrap">
+					<div class="mobile_menu_overlay web-app-open_mobile_menu"></div>
+					<div class="web-app-mobile_menu_content">
+						<div class="web-app-mobile_menu_close web-app-open_mobile_menu hidden">
+							<img src="https://bugasura.io/assets/img/web-application/icons/close.png" alt="X" title="close" width="15px" height="20px">
+						</div>
+						<div class="m-brand-logo text-center">
+							<a href="https://bugasura.io"><img src="https://bugasura.io/assets/img/web-application/logo/web_logo.webp" alt="Bugasura - Bug Tracker for Modern Teams" title="Bugasura - Bug Tracker for Modern Teams" width="155px" height="37px"></a>
+						</div>
+						<nav class="web-app-mobile-main-navigation clearfix ul-li">
+							<ul id="m-main-nav" class="navbar-nav text-capitalize clearfix">
+								 <li><a class="nav-features" href="https://bugasura.io/features">Features</a>
+								<li class="dropdown">
+									<a class="nav-features">Features <i class="custom-arrow arrow-down"></i></a>
+									<ul class="dropdown-menu clearfix">
+										<li><a href="#">Dashboard Overview</a></li>
+										<li><a href="#">Issue & Bug Tracker</a></li>
+										<li><a href="#">Role-based Access (Admin, PM, Developer, Tester)</a></li>
+										<li><a href="#">Project Management</a></li>
+										<li><a href="#">Bug Reporting with Attachments</a></li>
+										<li><a href="#">Advanced Bug Search & Filters</a></li>
+										<li><a href="#">Real-time Notifications</a></li>
+										<li><a href="#">Multi-developer Assignment</a></li>
+										<li><a href="#">Audit Logs & Activity Tracking</a></li>
+										<li><a href="#">Performance Monitoring</a></li>
+										<li><a href="#">Interactive Reports & Stats</a></li>
+										<li><a href="#">Excel/ZIP Bulk Bug Import</a></li>
+										<li><a href="#">Project-wise Role Reports</a></li>
+										<li><a href="#">User Management with Email Integration</a></li>
+										<li><a href="#">Excel Export of Reports</a></li>
+										<li><a href="#">Secure Login with Lockout & Attempt Tracking</a></li>
+										<li><a href="#">Chatbot Integration (Upcoming)</a></li>
+									</ul>
+								</li>
+
+
+
+
+								@* <li><a class="nav-pricing" href="https://bugasura.io/pricing">Pricing </a></li> *@
+
+
+								@* <li class="dropdown"> *@
+								@* 	<a>Resources <i class="custom-arrow arrow-down"></i></a> *@
+								@* 	<ul class="dropdown-menu clearfix"> *@
+								@* 		<li><a href="https://bugasura.io/blog/" target="_blank">Blog</a></li> *@
+								@* 		<li><a href="https://bugasura.io/release-notes/" target="_blank">Release Notes</a></li> *@
+								@* 		<li><a href="https://join.slack.com/t/bugasuraspaces/shared_invite/zt-1zgsj1cxt-zjGy08DwWP2KhnvIJqdq_Q" class="spaces-community-link" target="_blank">Bugasura Spaces Community</a></li> *@
+								@* 	</ul> *@
+								@* </li> *@
+
+
+								<li class="login_list"><a rel="nofollow" href="~/Account/Login" id="login-btn">Login</a></li>
+								<li class="signup_list"><a rel="nofollow" href="~/Account/Registration" class="signup_btn new_btn">Start for Free</a></li>
+							</ul>
+						</nav>
+					</div>
+				</div>
+				<!-- /Mobile-Menu -->
+			</div>
+		</div>
+	</header>
+	<!-- End of header section
+	============================================= -->
+	<!-- Start of hero section
+	============================================= -->
+	<section id="hero-section" class="web-sections position-relative">
+		<div class="container">
+			<div class="hero-section-content">
+				<div class="responsive-block">
+					<div class="hero-section-text position-relative">
+						<h1 class="hero-section-heading">
+							Bug management tool for
+							<span class="fast">
+								<span>fast</span>
+								<img class="lazy" src="https://bugasura.io/assets/img/web-application/nlp/svg/thunder.svg" alt="img" width="65px">
+							</span>
+							moving teams
+						</h1>
+						<p class="hero-section-subtext">Report, track, and resolve issues efficiently with bug reporting and issue tracking.</p>
+						<div class="hero-section-btns">
+							<a rel="noreferrer" href="~/Account/Registration" class="position-relative ga-signup try-free-btn tryforfree_btn new_btn">
+								Get it for Free
+							</a>
+							<!-- <br class="visible-xs" />
+							<a rel="noopener" href="https://calendly.com/get-bugasura/45min" class="position-relative try-free-btn tryforfree_btn new_btn play_btn intend-demo" target="_blank">
+								See it in Action
+							</a> -->
+						</div>
+						<div class="image-block">
+							<img class="lazy img-top-left-men" src="https://bugasura.io/assets/img/web-application/nlp/svg/Float_Men_illustration.svg" alt="img" width="70px">
+
+							@* <img class="lazy img-top-left-women" src="https://bugasura.io/assets/img/web-application/nlp/svg/Float_women_Icon.svg" alt="img" width="70px"> *@
+							<div class="hidden-xs status-tag mt-3">
+								<div class="tag">
+									<span>New</span>
+									<span>In Progress</span>
+									<span>Design Issue</span>
+									<span>Discuss</span>
+									<span>Not a bug</span>
+									<span>Assigned</span>
+									<span>Fixed</span>
+								</div>
+							</div>
+							<img class="lazy img-bottom-left" src="https://bugasura.io/assets/img/web-application/nlp/Group3765.png" alt="img" width="100px" height="50px">
+							<div class="img-bottom-right hidden-xs">
+								<img class="lazy position-relative cards" src="https://bugasura.io/assets/img/web-application/nlp/svg/Zoho-card.svg" alt="img" width="60px">
+								<img class="lazy cards" src="https://bugasura.io/assets/img/web-application/nlp/svg/Github.svg" alt="img" width="60px">
+								<img class="lazy cards" src="https://bugasura.io/assets/img/web-application/nlp/svg/Clickup.svg" alt="img" width="60px">
+								<img class="lazy cards" src="https://bugasura.io/assets/img/web-application/nlp/svg/Asana.svg" alt="img" width="60px">
+								<img class="lazy position-relative" src="https://bugasura.io/assets/img/web-application/nlp/svg/Bugasura connect.svg" alt="img" width="160px">
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="banner-vid-block vid-block" data-src='https://bugasura.io/assets/video/homepage-video2.mp4' data-poster='https://bugasura.io/assets/img/web-application/banner/banner-video-thumb.webp' data-mobsrc='https://bugasura.io/assets/video/homepage-video2.mp4' data-mobposter='https://bugasura.io/assets/img/web-application/nlp/thumbnail/HomepageMobile.png'>
+					<link rel="preload" href="https://bugasura.io/assets/img/web-application/nlp/thumbnail/Homepage.webp" as="image">
+					<link rel="preload" href="https://bugasura.io/assets/img/web-application/nlp/thumbnail/HomepageMobile.webp" as="image">
+					<img class="lazy hidden-xs" src="https://bugasura.io/assets/img/web-application/nlp/thumbnail/Homepage.webp" alt="thumbnail" width="938px" height="596px">
+					<img class="lazy visible-xs" src="https://bugasura.io/assets/img/web-application/nlp/thumbnail/HomepageMobile.webp" alt="thumbnail" width="321px" height="181px">
+				</div>
+
+				<!-- <div class="hero-section-btns mt-4 visible-xs hero-xs-btns">
+					<a rel="noreferrer" href="https://my.bugasura.io?go=sign_up" class="position-relative ga-signup try-free-btn tryforfree_btn new_btn">
+					Get it for Free
+					</a>
+					<br class="visible-xs" />
+					<a rel="noopener" href="https://calendly.com/get-bugasura/45min" class="position-relative try-free-btn tryforfree_btn new_btn play_btn intend-demo" target="_blank">
+					See it in Action
+					</a>
+				</div> -->
+
+			</div>
+		</div>
+	</section>
+	<!-- End of hero section
+	============================================= -->
+	<!-- Start of Customers section
+	============================================= -->
+	<section class="customers-section">
+		<div class="row justify-content-center web-app-feature-section">
+			<h2>Used by <span class="green-text">50,000+</span> developers, testers, and product managers to ship quality features in <span class="green-text">25+ countries</span></h2>
+		</div>
+	</section>
+
+	<!-- End of Customers section
+	============================================= -->
+	<!-- Start of customer logos section
+	============================================= -->
+	<section class="homepage position-relative">
+		<div class="customer-logos position-relative brand" style="--time:30s">
+			<!-- <div class="customer-logos position-relative brand"> -->
+			<div class="brand-slider">
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/mysutra.png" alt="mysutra" width="102" height="27" />
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/techstas.png" alt="techstas" width="102" height="25" />
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/gullak.png" alt="gullak" width="102" height="31" />
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/engage.png" alt="engage" width="102" height="20" />
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/tyke.png" alt="tyke" width="102" height="26" />
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/ahg.png" alt="ahg" width="102" height="35" />
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/elevate.png" alt="elevate" width="102" height="24" />
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/simform.png" alt="Simform" width="102" height="20" />
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/delega.png" alt="Delega_logo" width="102" height="21" />
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/divami.png" alt="divami-logo" width="102" height="27" />
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/hooliv.png" alt="hooliv" width="102" height="33" />
+			</div>
+			<div class="brand-slider brand-slider2">
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/mysutra.png" alt="mysutra" width="102" height="27" />
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/techstas.png" alt="techstas" width="102" height="25" />
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/gullak.png" alt="gullak" width="102" height="31" />
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/engage.png" alt="engage" width="102" height="20" />
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/tyke.png" alt="tyke" width="102" height="26" />
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/ahg.png" alt="ahg" width="102" height="35" />
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/elevate.png" alt="elevate" width="102" height="24" />
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/simform.png" alt="Simform" width="102" height="20" />
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/delega.png" alt="Delega_logo" width="102" height="21" />
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/divami.png" alt="divami-logo" width="102" height="27" />
+				<img class="star" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/star.png" alt="star" width="25" height="25" />
+				<img class="logo" draggable="false" src="https://bugasura.io/assets/img/web-application/logo/customer/hooliv.png" alt="hooliv" width="102" height="33" />
+			</div>
+		</div>
+	</section>
+	<!-- End of customer logos section
+	============================================= -->
+	<!-- Start of ai reporter section
+	============================================= -->
+	<section id="main-section">
+		<div class="ai-sub-section web-sections position-relative">
+			<div class="container">
+				<div class="web-section-heading">
+					<h2>Bugs <img class="boxing-img" src="https://bugasura.io/assets/img/web-application/icons/Boxing Gloves.png" alt="Boxing Gloves" width="50px" height="63px">, Meet your match with Bugasura</h2>
+					<p class="web-section-heading-subtext">No more slow, ineffective bug tracking.</p>
+				</div>
+				<div class="sub-section-title">
+					<h3>AI-enabled Issue tracker</h3>
+					<p class="web-section-heading-subtext">With intelligent features designed to streamline your development process, Bugasura empowers your team to tackle<br class="hidden-xs"> the most complex challenges with ease.</p>
+				</div>
+				<div class="row flex-wrap-reverse">
+					<div class="col-md-6 sub-section-feature position-relative">
+						<div class="sub-section-feature-text" data-section="ai-sub-section" data-target="add-issue-img">
+							<img class="lazy icons"
+								 src="https://bugasura.io/assets/img/web-application/nlp/icons/ai-impact.svg"
+								 data-src="https://bugasura.io/assets/img/web-application/nlp/icons/ai-impact.svg"
+								 alt="ai-impact" title="ai-impact" width="60px" height="60px">
+							<div class="sub-section-content">
+								<h4>Generate impact of issues on customers with AI</h4>
+								<p class="sub-section-content-desc">Log bugs faster with AI issue tracker. Upload context document to generate issue description, type, and impact of bugs.</p>
+							</div>
+						</div>
+						<div class="sub-section-feature-text" data-section="ai-sub-section" data-target="custom-workflow-img">
+							<img class="lazy icons"
+								 src="https://bugasura.io/assets/img/web-application/nlp/icons/custom-workflow.svg"
+								 data-src="https://bugasura.io/assets/img/web-application/nlp/icons/custom-workflow.svg"
+								 alt="custom-workflow" title="custom-workflow" width="60px" height="60px">
+							<div class="sub-section-content">
+								<h4>Custom workflows and sprints</h4>
+								<p class="sub-section-content-desc">Automatically assign issues, customize issue fields, attach voice comments, create public projects, and streamline your sprints.</p>
+							</div>
+						</div>
+						<div class="sub-section-feature-text" data-section="ai-sub-section" data-target="easy-export-img">
+							<img class="lazy icons"
+								 src="https://bugasura.io/assets/img/web-application/nlp/icons/easy-export.svg"
+								 data-src="https://bugasura.io/assets/img/web-application/nlp/icons/easy-export.svg"
+								 alt="easy-export" title="easy-export" width="60px" height="60px">
+							<div class="sub-section-content">
+								<h4>Easy exports and imports</h4>
+								<p class="sub-section-content-desc">Export issues from Bugasura in CSV and JSON formats. You can also import issues from google sheets, excel sheets, and even JIRA.</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6 web-app-feature-image">
+						<div class="web-app-about-img-content position-relative">
+							<div class="image-block add-issue-img">
+								<img class="lazy hidden-xs" src="https://bugasura.io/assets/img/web-application/nlp/svg/Add issue popup.webp" data-src="https://bugasura.io/assets/img/web-application/nlp/svg/Add issue popup.webp" alt="Generative AI" title="Generative AI" width="702px" height="420px">
+								<img class="lazy visible-xs" src="https://bugasura.io/assets/img/web-application/nlp/svg/Add issue popup.webp" data-src="https://bugasura.io/assets/img/web-application/nlp/svg/Add issue popup.webp" alt="Generative AI" title="Generative AI" width="363px" height="245px">
+							</div>
+							<div class="image-block custom-workflow-img">
+								<img class="lazy hidden-xs" src="https://bugasura.io/assets/img/web-application/nlp/svg/Custom workflows and sprints.webp" data-src="https://bugasura.io/assets/img/web-application/nlp/svg/Custom workflows and sprints.webp" alt="Custom workflows and sprints" title="Custom workflows and sprints" width="702px" height="420px">
+								<img class="lazy visible-xs" src="https://bugasura.io/assets/img/web-application/nlp/svg/Custom workflows and sprints.webp" data-src="https://bugasura.io/assets/img/web-application/nlp/svg/Custom workflows and sprints.webp" alt="Custom workflows and sprints" title="Custom workflows and sprints" width="363px" height="245px">
+							</div>
+							<div class="image-block easy-export-img">
+								<img class="lazy hidden-xs" src="https://bugasura.io/assets/img/web-application/nlp/svg/Easy Export and Import.webp" data-src="https://bugasura.io/assets/img/web-application/nlp/svg/Easy Export and Import.webp" alt="Export and Import" title="Export and Import" width="702px" height="420px">
+								<img class="lazy visible-xs" src="https://bugasura.io/assets/img/web-application/nlp/svg/Easy Export and Import.webp" data-src="https://bugasura.io/assets/img/web-application/nlp/svg/Easy Export and Import.webp" alt="Export and Import" title="Export and Import" width="363px" height="245px">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="text-center mt-md-4">
+					<a rel="nofollow" href="https://bugasura.io/ai-issue-tracker" class="position-relative try-free-btn tryforfree_btn new_btn play_btn value_cta">
+						Explore AI issue tracker
+					</a>
+				</div>
+			</div>
+		</div>
+
+		<div class="reporter-sub-section web-sections position-relative">
+			<div class="container">
+				<div class="sub-section-title">
+					<h3>Bug reporters for every use-case</h3>
+					<p class="web-section-heading-subtext">For the first time - issue tracking made contextual with integrated issue reporting! Get visual<br class="hidden-xs"> steps to reproduce with Bugasura reporters.</p>
+				</div>
+				<div class="row flex-wrap-reverse">
+					<div class="col-md-6 sub-section-feature position-relative">
+						<div class="sub-section-feature-text position-relative" data-section="reporter-sub-section" data-target="website-feedback-img">
+							<img class="lazy icons"
+								 src="https://bugasura.io/assets/img/web-application/nlp/icons/website-feedback.svg"
+								 data-src="https://bugasura.io/assets/img/web-application/nlp/icons/website-feedback.svg"
+								 alt="website-feedback" title="website-feedback" width="60px" height="60px">
+							<div class="sub-section-content">
+								<h4>Website feedback + frontend testing</h4>
+								<p class="sub-section-content-desc">Best for website feedback and frontend testing. Get annotatable automatic screenshots on every scroll and click. Automatically capture device details and assign issues from extension.</p>
+							</div>
+							<div class="sub-section-plus">
+								<img class="lazy top-right" src="https://bugasura.io/assets/img/web-application/nlp/svg/Plus_icon.svg" alt="Plus_icon" loading="lazy" width="20px" height="20px">
+								<img class="lazy top-left" src="https://bugasura.io/assets/img/web-application/nlp/svg/Plus_icon.svg" alt="Plus_icon" loading="lazy" width="20px" height="20px">
+								<img class="lazy bottom-right" src="https://bugasura.io/assets/img/web-application/nlp/svg/Plus_icon.svg" alt="Plus_icon" loading="lazy" width="20px" height="20px">
+								<img class="lazy bottom-left" src="https://bugasura.io/assets/img/web-application/nlp/svg/Plus_icon.svg" alt="Plus_icon" loading="lazy" width="20px" height="20px">
+							</div>
+						</div>
+						<div class="sub-section-feature-text position-relative" data-section="reporter-sub-section" data-target="widget-img">
+							<img class="lazy icons"
+								 src="https://bugasura.io/assets/img/web-application/nlp/icons/bug-reporting.svg"
+								 data-src="https://bugasura.io/assets/img/web-application/nlp/icons/bug-reporting.svg"
+								 alt="bug-reporting" title="bug-reporting" width="60px" height="60px">
+							<div class="sub-section-content">
+								<h4>In-app bug reporting widget</h4>
+								<p class="sub-section-content-desc">Embed a chat widget in your saas dashboard and get session replays and console messages for the errors. Integrate with existing chatbots as a “report an issue” option.</p>
+							</div>
+							<div class="sub-section-plus">
+								<img class="lazy top-right" src="https://bugasura.io/assets/img/web-application/nlp/svg/Plus_icon.svg" alt="Plus_icon" loading="lazy" width="20px" height="20px">
+								<img class="lazy top-left" src="https://bugasura.io/assets/img/web-application/nlp/svg/Plus_icon.svg" alt="Plus_icon" loading="lazy" width="20px" height="20px">
+								<img class="lazy bottom-right" src="https://bugasura.io/assets/img/web-application/nlp/svg/Plus_icon.svg" alt="Plus_icon" loading="lazy" width="20px" height="20px">
+								<img class="lazy bottom-left" src="https://bugasura.io/assets/img/web-application/nlp/svg/Plus_icon.svg" alt="Plus_icon" loading="lazy" width="20px" height="20px">
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6 web-app-feature-image">
+						<div class="web-app-about-img-content position-relative">
+							<div class="image-block website-feedback-img">
+								<img class="lazy hidden-xs" src="https://bugasura.io/assets/img/web-application/nlp/svg/Annotation.webp" data-src="https://bugasura.io/assets/img/web-application/nlp/svg/Annotation.webp" alt="Website feedback" title="Website feedback" width="702px" height="420px">
+								<img class="lazy visible-xs" src="https://bugasura.io/assets/img/web-application/nlp/svg/Annotation.webp" data-src="https://bugasura.io/assets/img/web-application/nlp/svg/Annotation.webp" alt="Website feedback" title="Website feedback" width="363px" height="245px">
+							</div>
+							<div class="image-block widget-img">
+								<img class="lazy hidden-xs" src="https://bugasura.io/assets/img/web-application/nlp/svg/In app reporting.webp" data-src="https://bugasura.io/assets/img/web-application/nlp/svg/In app reporting.webp" alt="In app reporting" title="In app reporting" width="702px" height="420px">
+								<img class="lazy visible-xs" src="https://bugasura.io/assets/img/web-application/nlp/svg/In app reporting.webp" data-src="https://bugasura.io/assets/img/web-application/nlp/svg/In app reporting.webp" alt="In app reporting" title="In app reporting" width="363px" height="245px">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="text-center mt-md-4">
+					<a rel="nofollow" href="https://bugasura.io/bug-reporters" class="position-relative try-free-btn tryforfree_btn new_btn play_btn value_cta">
+						Explore reporters
+					</a>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- End of ai reporter section
+	============================================= -->
+	<!-- Start of productivity section
+	============================================= -->
+
+	<section id="productivity-section" class="web-sections">
+		<div class="container">
+			<div class="web-section-heading">
+				<h2>Features to give your team productivity ⚡️superpowers</h2>
+			</div>
+			<div class="row productivity-second">
+				<div class="col-md-12">
+					<div class="productivity-section-block productivity-first automatic-dashboard">
+						<div class="productivity-section-content">
+							<h4>Automatic dashboards</h4>
+							<p>Bug reports that pull insights from the tracker to help you focus on things that matter.</p>
+						</div>
+						<div class="image-block">
+							<img class="lazy hidden-xs" src="https://bugasura.io/assets/img/web-application/nlp/svg/Automatic Dashboard.svg"
+								 data-src="https://bugasura.io/assets/img/web-application/nlp/svg/Automatic Dashboard.svg" alt="Automatic Dashboard"
+								 title="Automatic Dashboard" width="702px" height="420px">
+							<img class="lazy visible-xs" src="https://bugasura.io/assets/img/web-application/nlp/svg/Automatic Dashboard.svg"
+								 data-src="https://bugasura.io/assets/img/web-application/nlp/svg/Automatic Dashboard.svg" alt="Automatic Dashboard"
+								 title="Automatic Dashboard" width="363px" height="245px">
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="productivity-section-block seemless-integration">
+						<div class="productivity-section-content">
+							<h4>Seamless integrations</h4>
+							<p>
+								Integrate Bugasura to your flow of work - explore our integrations with popular project management
+								and developer tools like GitHub, JIRA, Slack, and more.
+							</p>
+						</div>
+						<div class="image-block">
+							<img class="lazy hidden-xs" src="https://bugasura.io/assets/img/web-application/nlp/svg/Seemless Integration.svg"
+								 data-src="https://bugasura.io/assets/img/web-application/nlp/svg/Seemless Integration.svg" alt="Seemless Integration"
+								 title="Seemless Integration" width="702px" height="420px">
+							<img class="lazy visible-xs" src="https://bugasura.io/assets/img/web-application/nlp/svg/Seemless Integration.svg"
+								 data-src="https://bugasura.io/assets/img/web-application/nlp/svg/Seemless Integration.svg"
+								 alt="Seemless Integration" title="Seemless Integration" width="363px" height="245px">
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="productivity-section-block unlimited-project">
+						<div class="productivity-section-content">
+							<h4>Unlimited projects</h4>
+							<p>
+								Choose or switch between unlimited private and public projects to make sure everyone on your team
+								finds exactly what they need.
+							</p>
+						</div>
+						<div class="image-block">
+							<img class="lazy hidden-xs" src="https://bugasura.io/assets/img/web-application/nlp/svg/Unlimited Projects.webp"
+								 data-src="https://bugasura.io/assets/img/web-application/nlp/svg/Unlimited Projects.webp"
+								 alt="Unlimited Projects" title="Unlimited Projects" width="702px" height="420px">
+							<img class="lazy visible-xs" src="https://bugasura.io/assets/img/web-application/nlp/svg/Unlimited Projects.webp"
+								 data-src="https://bugasura.io/assets/img/web-application/nlp/svg/Unlimited Projects.webp"
+								 alt="Unlimited Projects" title="Unlimited Projects" width="363px" height="245px">
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="productivity-section-block performance-monitoring">
+						<div class="productivity-section-content">
+							<h4>Performance monitoring</h4>
+							<p>Monitor the performance of your website with Google Core Lighthouse reports being directly pulled into your Bugasura project.</p>
+						</div>
+						<div class="image-block">
+							<img class="lazy hidden-xs"
+								 src="https://bugasura.io/assets/img/web-application/nlp/svg/Performance monitoring page.svg"
+								 data-src="https://bugasura.io/assets/img/web-application/nlp/svg/Performance monitoring page.svg"
+								 alt="Performance monitoring" title="Performance monitoring" width="702px" height="420px">
+							<img class="lazy visible-xs"
+								 src="https://bugasura.io/assets/img/web-application/nlp/svg/Performance monitoring page.svg"
+								 data-src="https://bugasura.io/assets/img/web-application/nlp/svg/Performance monitoring page.svg" alt="Performance monitoring"
+								 title="Performance monitoring" width="363px" height="245px">
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="productivity-section-block advance-filter">
+						<div class="productivity-section-content">
+							<h4>Advanced filters and sorting</h4>
+							<p>
+								Find exactly what you’re looking for with advanced sorting and filtering options in projects. Also
+								search for issues inside projects with global search.
+							</p>
+						</div>
+						<div class="image-block">
+							<img class="lazy hidden-xs"
+								 src="https://bugasura.io/assets/img/web-application/nlp/svg/Advanced filters and sorting.svg"
+								 data-src="https://bugasura.io/assets/img/web-application/nlp/svg/Advanced filters and sorting.svg"
+								 alt="Advanced filters and sorting" title="Advanced filters and sorting" width="702px" height="420px">
+							<img class="lazy visible-xs"
+								 src="https://bugasura.io/assets/img/web-application/nlp/svg/Performance monitoring page.svg"
+								 data-src="https://bugasura.io/assets/img/web-application/nlp/svg/Advanced filters and sorting.svg"
+								 alt="Advanced filters and sorting" title="Advanced filters and sorting" width="363px" height="245px">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- End of productivity section
+	============================================= -->
+	<!-- Start of bug section
+	============================================= -->
+
+	<section id="bug-section" class="web-sections">
+		<div class="container">
+			<div class="web-section-heading">
+				<h2 class="text-center">Close bugs faster at half the 💰 cost and ⌚️time!</h2>
+			</div>
+			<div class="row">
+				<div class="col-md-4">
+					<div class="bug-section-block">
+						<div class="bug-section-title">
+							<img class="lazy icons"
+								 src="https://bugasura.io/assets/img/web-application/pricing/on-premise.svg"
+								 data-src="https://bugasura.io/assets/img/web-application/pricing/on-premise.svg"
+								 alt="cloud-based-tracker" title="cloud-based-tracker" width="60px" height="60px">
+							<h4 class="visible-xs">Cloud-based and On-premise options</h4>
+						</div>
+						<div class="bug-section-content">
+							<h4 class="hidden-xs">Cloud-based and On-premise options</h4>
+							<p> Bugasura issue tracker and reporters offer a cloud based and self-hosted options both making it a flexible choice for organisations of all shapes and sizes.</p>
+						</div>
+						<div class="d-flex justify-content-center">
+							<a rel="nofollow" href="https://my.bugasura.io?go=sign_up"
+							   class="position-relative ga-signup try-free-btn tryforfree_btn new_btn play_btn value_cta">
+								Get started now
+							</a>
+						</div>
+					</div>
+				</div>
+				<!-- <div class="col-md-4">
+					<div class="bug-section-block">
+						<div class="bug-section-title">
+							<img class="lazy icons"
+								src="https://bugasura.io/assets/img/web-application/nlp/icons/cloud-based-tracker.svg"
+								data-src="https://bugasura.io/assets/img/web-application/nlp/icons/cloud-based-tracker.svg"
+								alt="cloud-based-tracker" title="cloud-based-tracker" width="60px" height="60px">
+							<h4 class="visible-xs">Cloud-based trackers and reporters</h4>
+						</div>
+						<div class="bug-section-content">
+							<h4 class="hidden-xs">Cloud-based trackers and reporters</h4>
+							<p>Bugasura issue tracker and reporters are all plug and play and hosted on cloud. Just sign up and get
+								to bug squashing without having to worry about tedious setups.</p>
+						</div>
+						<div class="d-flex justify-content-center">
+							<a rel="nofollow" href="https://my.bugasura.io?go=sign_up"
+								class="position-relative ga-signup try-free-btn tryforfree_btn new_btn play_btn value_cta">
+								Get started now
+							</a>
+						</div>
+					</div>
+				</div> -->
+				<div class="col-md-4">
+					<div class="bug-section-block">
+						<div class="bug-section-title">
+							<img class="lazy icons"
+								 src="https://bugasura.io/assets/img/web-application/nlp/icons/pocket-friendly.svg"
+								 data-src="https://bugasura.io/assets/img/web-application/nlp/icons/pocket-friendly.svg"
+								 alt="pocket-friendly" title="pocket-friendly" width="60px" height="60px">
+							<h4 class="visible-xs">Pocket-friendly pricing for small teams</h4>
+						</div>
+						<div class="bug-section-content">
+							<h4 class="hidden-xs">Pocket-friendly pricing for small teams</h4>
+							<p>
+								Get started for free with 5 team members and pay as you grow! We help you save 40% on monthly JIRA
+								costs and help you reduce tech debt.
+							</p>
+						</div>
+						<div class="d-flex justify-content-center">
+							<a rel="nofollow" href="https://bugasura.io/pricing"
+							   class="position-relative try-free-btn tryforfree_btn new_btn play_btn value_cta">
+								See full pricing
+							</a>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="bug-section-block">
+						<div class="bug-section-title">
+							<img class="lazy icons"
+								 src="https://bugasura.io/assets/img/web-application/nlp/icons/privacy-security.svg"
+								 data-src="https://bugasura.io/assets/img/web-application/nlp/icons/privacy-security.svg"
+								 alt="privacy-security" title="privacy-security" width="60px" height="60px">
+							<h4 class="visible-xs">Privacy and security</h4>
+						</div>
+						<div class="bug-section-content">
+							<h4 class="hidden-xs">Privacy and security</h4>
+							<p>
+								With end-to-end encryption, secure authentication protocols, and regular security checks, we
+								prioritize the confidentiality and integrity of your information highly at Bugasura.
+							</p>
+						</div>
+						<div class="d-flex justify-content-center">
+							<a rel="nofollow" href="https://bugasura.io/security"
+							   class="position-relative try-free-btn tryforfree_btn new_btn play_btn value_cta">
+								See our security policy
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- End of bug section
+	============================================= -->
+	<!-- Start of Customers section
+	============================================= -->
+	<section class="customers-section">
+		<div class="row justify-content-center web-app-feature-section">
+			<h2>See why successful technology companies and forward-thinking technologists love using Bugasura</h2>
+		</div>
+	</section>
+
+	<!-- End of Customers section
+	============================================= -->
+	<!-- Start of testimonial section
+	============================================= -->
+	<section id="testimonial-section" class="web-sections position-relative">
+		<div class="container-block">
+			<!-- Start of testimonial section   ============================================= -->
+			<div id="testimonials" class="owl-carousel position-relative">
+				<div class="item">
+					<div class="row">
+						<div class="col-md-12">
+							<a href="https://www.linkedin.com/posts/shoayb-malek_bugasurajust-launched-a-cool-ai-add-on-into-activity-7063452340208508928-xsDQ?utm_source=share&utm_medium=member_desktop">
+								<div class="testimonial-section-block">
+									<div class="testimonial-section-title position-relative">
+										<img class="section-img"
+											 src="https://bugasura.io/assets/img/web-application/nlp/testimonial/Shoayb Amiruddin Malek.png"
+											 alt="Avatar" loading="lazy" width="55px" height="55px">
+										<div>
+											<strong>Shoayb Amiruddin Malek</strong>
+											<p>
+												Results-Driven Quality Analyst Lead at Doyenhub Software Solution |
+												Driving Excellence in
+											</p>
+										</div>
+										<div class="svg-icon">
+											<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+												 viewBox="0 0 20 20">
+												<path data-name="Path 2102"
+													  d="M20.5,2H3.5A1.5,1.5,0,0,0,2,3.5v17A1.5,1.5,0,0,0,3.5,22h17A1.5,1.5,0,0,0,22,20.5V3.5A1.5,1.5,0,0,0,20.5,2ZM8,19H5V10H8ZM6.5,8.25A1.75,1.75,0,1,1,8.3,6.5,1.78,1.78,0,0,1,6.5,8.25ZM19,19H16V14.26c0-1.42-.6-1.93-1.38-1.93A1.74,1.74,0,0,0,13,14.19a.66.66,0,0,0,0,.14V19H10V10h2.9v1.3a3.11,3.11,0,0,1,2.7-1.4c1.55,0,3.36.86,3.36,3.66Z"
+													  transform="translate(-2 -2)" fill="#0a66c2" />
+											</svg>
+										</div>
+									</div>
+									<div class="testimonial-section-content">
+										<p>
+											Bugasura is back with their Product Hunt Launch! <br><br>The biggest challenge
+											with finding and reporting bugs is to explain how the bug occurred in the first
+											place!<br><br> It’s always a long thread of screenshots or words but with
+											Bugasura’s reporters, there’s always pixel-perfect feedback to give and
+											screenshots, session replays, annotations - everything is taken care of.<br><br>
+											I especially like their widget which you can embed on any web page or dashboard.
+											I would suggest SaaS teams to give this a try for their customers… <span class="read-more">Read more</span>
+										</p>
+									</div>
+									<div class="testimonial-customer-logo">
+										<img class="section-img"
+											 src="https://bugasura.io/assets/img/web-application/nlp/testimonial/Doyenhub.svg"
+											 alt="Logo" loading="lazy" width="55px" height="55px">
+									</div>
+								</div>
+							</a>
+						</div>
+						<div id="ph-review1" class="col-md-12">
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div class="col-md-12">
+							<a href="https://www.linkedin.com/posts/geosley_quality-ai-testing-activity-7061958259405987840-mFJc?utm_source=share&utm_medium=member_desktop">
+								<div class="testimonial-section-block">
+									<div class="testimonial-section-title position-relative">
+										<img class="section-img"
+											 src="https://bugasura.io/assets/img/web-application/nlp/testimonial/Geosley Andrades.png"
+											 alt="Avatar" loading="lazy" width="55px" height="55px">
+										<div>
+											<strong>Geosley Andrades</strong>
+											<p>Technology Leader</p>
+										</div>
+										<div class="svg-icon">
+											<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+												 viewBox="0 0 20 20">
+												<path data-name="Path 2102"
+													  d="M20.5,2H3.5A1.5,1.5,0,0,0,2,3.5v17A1.5,1.5,0,0,0,3.5,22h17A1.5,1.5,0,0,0,22,20.5V3.5A1.5,1.5,0,0,0,20.5,2ZM8,19H5V10H8ZM6.5,8.25A1.75,1.75,0,1,1,8.3,6.5,1.78,1.78,0,0,1,6.5,8.25ZM19,19H16V14.26c0-1.42-.6-1.93-1.38-1.93A1.74,1.74,0,0,0,13,14.19a.66.66,0,0,0,0,.14V19H10V10h2.9v1.3a3.11,3.11,0,0,1,2.7-1.4c1.55,0,3.36.86,3.36,3.66Z"
+													  transform="translate(-2 -2)" fill="#0a66c2" />
+											</svg>
+										</div>
+									</div>
+									<div class="testimonial-section-content">
+										<p>
+											“Innovation is the ability to see change as an opportunity, not a threat” - Steve
+											Jobs.<br><br> Staying on top of innovation is what separates a great product
+											from a mediocre one, and Bugasura has clearly mastered this.<br><br> My friends
+											at Moolya recently launched an AI add-on that has taken the issue tracker to a
+											whole new level of intelligence and speed, with automatic suggestions on the
+											issue description, impact, and behavior. This feature alone can save testers a
+											significant amount of time and effort in identifying and documenting issues.
+											What’s even more impressive is that Bugasura… <span class="read-more">
+												Read
+												more
+											</span>
+										</p>
+									</div>
+									<div class="testimonial-customer-logo">
+										<img class="section-img"
+											 src="https://bugasura.io/assets/img/web-application/nlp/testimonial/accelq.svg" alt="Logo"
+											 loading="lazy" width="55px" height="55px">
+									</div>
+								</div>
+							</a>
+						</div>
+						<div id="ph-review2" class="col-md-12">
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div class="col-md-12">
+							<a href="https://www.linkedin.com/posts/rahul-parwal_bugasuraai-bugtrackingevolved-activity-7061610749600686082-b0nk?utm_source=share&utm_medium=member_desktop">
+								<div class="testimonial-section-block">
+									<div class="testimonial-section-title position-relative">
+										<img class="section-img"
+											 src="https://bugasura.io/assets/img/web-application/nlp/testimonial/Rahul Parwal.png"
+											 alt="Avatar" loading="lazy" width="55px" height="55px">
+										<div>
+											<strong>Rahul Parwal</strong>
+											<p>Specialist | ifm engineering</p>
+										</div>
+										<div class="svg-icon">
+											<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+												 viewBox="0 0 20 20">
+												<path data-name="Path 2102"
+													  d="M20.5,2H3.5A1.5,1.5,0,0,0,2,3.5v17A1.5,1.5,0,0,0,3.5,22h17A1.5,1.5,0,0,0,22,20.5V3.5A1.5,1.5,0,0,0,20.5,2ZM8,19H5V10H8ZM6.5,8.25A1.75,1.75,0,1,1,8.3,6.5,1.78,1.78,0,0,1,6.5,8.25ZM19,19H16V14.26c0-1.42-.6-1.93-1.38-1.93A1.74,1.74,0,0,0,13,14.19a.66.66,0,0,0,0,.14V19H10V10h2.9v1.3a3.11,3.11,0,0,1,2.7-1.4c1.55,0,3.36.86,3.36,3.66Z"
+													  transform="translate(-2 -2)" fill="#0a66c2" />
+											</svg>
+										</div>
+									</div>
+									<div class="testimonial-section-content">
+										<p>
+											🔥 Exciting news, bug hunters! 🐛<br><br> 🔍 Just spotted Bugasura’s mind-blowing
+											AI add-on in their bug tracker! 🚀🤯 <br><br>It’s a game-changer that analyzes
+											bug impact on customers and detects similar issues, saving you precious time and
+											@* effort.<br><br> 😱💪 🌟 Witness the future of bug tracking with @Bugasura’s *@
+											groundbreaking AI launch on Product Hunt! 🚀<br><br>✨ Don’t miss out:
+											https://lnkd.in/dJpvwAgt… <span class="read-more">Read more</span>
+										</p>
+									</div>
+									<div class="testimonial-customer-logo">
+										<img class="section-img"
+											 src="https://bugasura.io/assets/img/web-application/nlp/testimonial/Ifm.svg" alt="Logo"
+											 loading="lazy" width="55px" height="55px">
+									</div>
+								</div>
+							</a>
+						</div>
+						<div id="ph-review3" class="col-md-12">
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div class="col-md-12">
+							<a href="https://www.linkedin.com/posts/talal-anwar_agiletransformation-codequality-efficiency-activity-7127303567714992129-uXBt?utm_source=share&utm_medium=member_desktop">
+								<div class="testimonial-section-block">
+									<div class="testimonial-section-title position-relative">
+										<img class="section-img"
+											 src="https://bugasura.io/assets/img/web-application/nlp/testimonial/Talal Anwar.png"
+											 alt="Avatar" loading="lazy" width="55px" height="55px">
+										<div>
+											<strong>Talal Anwar</strong>
+											<p>Founder & CEO</p>
+										</div>
+										<div class="svg-icon">
+											<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+												 viewBox="0 0 20 20">
+												<path data-name="Path 2102"
+													  d="M20.5,2H3.5A1.5,1.5,0,0,0,2,3.5v17A1.5,1.5,0,0,0,3.5,22h17A1.5,1.5,0,0,0,22,20.5V3.5A1.5,1.5,0,0,0,20.5,2ZM8,19H5V10H8ZM6.5,8.25A1.75,1.75,0,1,1,8.3,6.5,1.78,1.78,0,0,1,6.5,8.25ZM19,19H16V14.26c0-1.42-.6-1.93-1.38-1.93A1.74,1.74,0,0,0,13,14.19a.66.66,0,0,0,0,.14V19H10V10h2.9v1.3a3.11,3.11,0,0,1,2.7-1.4c1.55,0,3.36.86,3.36,3.66Z"
+													  transform="translate(-2 -2)" fill="#0a66c2" />
+											</svg>
+										</div>
+									</div>
+									<div class="testimonial-section-content">
+										<p>
+											As we step into 2024, it's clear that AI has become the game-changer in software
+											development. Teams that have embraced AI aren't just moving forward, they're
+											leaping ahead, with gains in speed of up to 250%. That’s a whole 3 hours in an
+											8-hour day, reinvented.<br><br>🌟 Here are three AI tools revolutionizing our
+											workflow:<br>3. Bugasura - Make bug tracking a breeze. With AI-linking similar
+											bugs, our devs can focus on what truly matters… <span class="read-more">
+												Read
+												more
+											</span>
+										</p>
+									</div>
+									<div class="testimonial-customer-logo">
+										<img class="section-img"
+											 src="https://bugasura.io/assets/img/web-application/nlp/testimonial/S.svg" alt="Logo"
+											 loading="lazy" width="55px" height="55px">
+									</div>
+								</div>
+							</a>
+						</div>
+						<div id="ph-review4" class="col-md-12">
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div class="col-md-12">
+							<a href="https://www.linkedin.com/posts/niranjanbala_bugasura-is-back-with-their-product-hunt-activity-7165996086132699136-Y4ZV?utm_source=share&utm_medium=member_desktop">
+								<div class="testimonial-section-block">
+									<div class="testimonial-section-title position-relative">
+										<img class="section-img"
+											 src="https://bugasura.io/assets/img/web-application/nlp/testimonial/Niranjan Bala.png"
+											 alt="Avatar" loading="lazy" width="55px" height="55px">
+										<div>
+											<strong>Niranjan Bala</strong>
+											<p>Technology Leader</p>
+										</div>
+										<div class="svg-icon">
+											<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+												 viewBox="0 0 20 20">
+												<path data-name="Path 2102"
+													  d="M20.5,2H3.5A1.5,1.5,0,0,0,2,3.5v17A1.5,1.5,0,0,0,3.5,22h17A1.5,1.5,0,0,0,22,20.5V3.5A1.5,1.5,0,0,0,20.5,2ZM8,19H5V10H8ZM6.5,8.25A1.75,1.75,0,1,1,8.3,6.5,1.78,1.78,0,0,1,6.5,8.25ZM19,19H16V14.26c0-1.42-.6-1.93-1.38-1.93A1.74,1.74,0,0,0,13,14.19a.66.66,0,0,0,0,.14V19H10V10h2.9v1.3a3.11,3.11,0,0,1,2.7-1.4c1.55,0,3.36.86,3.36,3.66Z"
+													  transform="translate(-2 -2)" fill="#0a66c2" />
+											</svg>
+										</div>
+									</div>
+									<div class="testimonial-section-content">
+										<p>
+											Bugasura is back with their Product Hunt Launch!<br><br> The biggest challenge
+											with finding and reporting bugs is to explain how the bug occurred in the first
+											place!<br><br> It’s always a long thread of screenshots or words but with
+											Bugasura’s reporters, there’s always pixel-perfect feedback to give and
+											screenshots, session replays, annotations - everything is taken care of.<br><br>
+											I especially like their widget which you can embed on any web page or dashboard.
+											I would suggest SaaS teams to give this a try for their customers… <span class="read-more">Read more</span>
+										</p>
+									</div>
+									<div class="testimonial-customer-logo">
+										<img class="section-img"
+											 src="https://bugasura.io/assets/img/web-application/nlp/testimonial/Upskillist.svg"
+											 alt="Logo" loading="lazy" width="55px" height="55px">
+									</div>
+								</div>
+							</a>
+						</div>
+						<div id="ph-review5" class="col-md-12">
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div class="col-md-12">
+							<a href="https://x.com/RoshanCariappa/status/1760282576827367492">
+								<div class="testimonial-section-block">
+									<div class="testimonial-section-title position-relative">
+										<img class="section-img"
+											 src="https://bugasura.io/assets/img/web-application/nlp/testimonial/RoshanCariappa.png"
+											 alt="Avatar" loading="lazy" width="55px" height="55px">
+										<div>
+											<strong>RoshanCariappa</strong>
+											<p>Vice President Marketing</p>
+										</div>
+										<div class="svg-icon">
+											<svg xmlns="http://www.w3.org/2000/svg" width="21.369" height="20"
+												 viewBox="0 0 21.369 20">
+												<path d="M483.992,356.79l8.25,11.031-8.3,8.969h1.869l7.269-7.852,5.873,7.852h6.359l-8.715-11.651,7.728-8.348h-1.869l-6.694,7.232-5.409-7.232Zm2.748,1.376h2.921l12.9,17.247h-2.921Z"
+													  transform="translate(-483.94 -356.79)" />
+											</svg>
+										</div>
+									</div>
+									<div class="testimonial-section-content">
+										<p>
+											Collaboration shouldn’t be about going back and forth on button sizes or spelling
+											errors.<br><br> Anyone who’s worked with designers and developers closely, know
+											@* it’s the #1 mojo killer!<br><br> Luckily, there’s @bugasura - capture bugs *@
+											contextually & collaborate better with developers.<br><br> <span class="read-more">https://producthunt.com/posts/bugasura-bug-reporters</span>
+										</p>
+									</div>
+									<div class="testimonial-customer-logo">
+										<img class="section-img"
+											 src="https://bugasura.io/assets/img/web-application/nlp/testimonial/Vymo.svg" alt="Logo"
+											 loading="lazy" width="55px" height="55px">
+									</div>
+								</div>
+							</a>
+						</div>
+						<div id="ph-review6" class="col-md-12">
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div class="col-md-12">
+							<a href="https://twitter.com/arslan0644/status/1655880366161555458">
+								<div class="testimonial-section-block">
+									<div class="testimonial-section-title position-relative">
+										<img class="section-img"
+											 src="https://bugasura.io/assets/img/web-application/nlp/testimonial/Arslan Ali.png"
+											 alt="Avatar" loading="lazy" width="55px" height="55px">
+										<div>
+											<strong>Arslan Ali</strong>
+											<p>Technology Leader</p>
+										</div>
+										<div class="svg-icon">
+											<svg xmlns="http://www.w3.org/2000/svg" width="21.369" height="20"
+												 viewBox="0 0 21.369 20">
+												<path d="M483.992,356.79l8.25,11.031-8.3,8.969h1.869l7.269-7.852,5.873,7.852h6.359l-8.715-11.651,7.728-8.348h-1.869l-6.694,7.232-5.409-7.232Zm2.748,1.376h2.921l12.9,17.247h-2.921Z"
+													  transform="translate(-483.94 -356.79)" />
+											</svg>
+										</div>
+									</div>
+									<div class="testimonial-section-content">
+										<p>
+											Our Startup Test Lab team tested over 50 startup apps both on mobile and web
+											formats. We adopted a rapid test approach in a crunch of time, and what did we
+											@* use as the reporting tool?<br><br>The one and only <span class="read-more"></span>@bugasura</span> by <span class="read-more"></span>@moolyatesting</span> *@
+										</p>
+									</div>
+									<div class="testimonial-customer-logo">
+										<img class="section-img"
+											 src="https://bugasura.io/assets/img/web-application/nlp/testimonial/esipick.svg"
+											 alt="Logo" loading="lazy" width="55px" height="55px">
+									</div>
+								</div>
+							</a>
+						</div>
+						<div id="ph-review7" class="col-md-12">
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div id="ph-review8" class="col-md-12">
+						</div>
+						<div id="ph-review9" class="col-md-12">
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div id="ph-review10" class="col-md-12">
+						</div>
+						<div id="ph-review11" class="col-md-12">
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- End of testimonial section
+			============================================= -->
+
+		</div>
+	</section>
+	<!-- End of testimonial section
+	============================================= -->
+	<!-- Start of  Try Free section
+	============================================= -->
+	<section id="community-section" class="web-sections position-relative">
+		<div class="container">
+			<div class="row justify-content-around">
+				<div class="col-md-5">
+					<div class="community-section-title">
+						<h2>Join Bugasura Spaces</h2>
+						<h3>Our exclusive community for CTOs and modern technologists</h3>
+					</div>
+					<div class="community-section-content">
+						<ul class="position-relative">
+							<li><p>For updates on new technology</p></li>
+							<li><p>Meet startup founders, CTOs, engineers, and testers</p></li>
+							<li><p>Access exclusive perks and deals</p></li>
+						</ul>
+					</div>
+					<div class="hidden-xs community-btns position-relative mt-4">
+						<a rel="nofollow" href="https://join.slack.com/t/bugasuraspaces/shared_invite/zt-1zgsj1cxt-zjGy08DwWP2KhnvIJqdq_Q" class="try-free-btn tryforfree_btn new_btn">
+							<img class="lazy section-img" src="https://bugasura.io/assets/img/web-application/nlp/svg/slack.svg" alt="Logo" loading="lazy" width="55px" height="55px">
+							Join on slack
+						</a>
+						<a rel="nofollow" href="http://nas.io/bugasura-spaces" class="try-free-btn tryforfree_btn new_btn">
+							<img class="lazy section-img" src="https://bugasura.io/assets/img/web-application/nlp/svg/Whatsapp.svg" alt="Logo" loading="lazy" width="55px" height="55px">
+							Join on whatsapp
+						</a>
+					</div>
+				</div>
+				<div class="col-md-5 d-flex align-items-center">
+					<img class="lazy section-img" src="https://bugasura.io/assets/img/web-application/nlp/svg/Bugasura Space.svg" alt="Bugasura Space" loading="lazy" width="" height="">
+				</div>
+				<div class="visible-xs community-btns position-relative mt-4">
+					<a rel="nofollow" href="https://join.slack.com/t/bugasuraspaces/shared_invite/zt-1zgsj1cxt-zjGy08DwWP2KhnvIJqdq_Q" class="try-free-btn tryforfree_btn new_btn">
+						<img class="lazy section-img" src="https://bugasura.io/assets/img/web-application/nlp/svg/slack.svg" alt="Logo" loading="lazy" width="55px" height="55px">
+						Join on slack
+					</a>
+					<a rel="nofollow" href="http://nas.io/bugasura-spaces" class="try-free-btn tryforfree_btn new_btn">
+						<img class="lazy section-img" src="https://bugasura.io/assets/img/web-application/nlp/svg/Whatsapp.svg" alt="Logo" loading="lazy" width="55px" height="55px">
+						Join on whatsapp
+					</a>
+				</div>
+			</div>
+	</section>
+	<!-- End of  Try Free section
+	============================================= -->
+	<!-- Page footer -->
+	<!-- Start of Footer section
+	============================================= -->
+	<footer id="web-app-footer" class="web-app-footer-section">
+		<div class="web-app-footer-content">
+			<div class="container">
+				<div class="web-app-footer-wrapper">
+					<div class="row">
+						<div class="col-md-3 footer-logo-desc">
+							<div class="web-app-footer-widget">
+								<div class="web-app-logo-widget pera-content">
+									<div class="web-app-footer-logo">
+										<a href="https://bugasura.io">
+											<img loading="lazy"
+												 src="https://bugasura.io/assets/img/web-application/logo/web_logo.webp"
+												 alt="Bugasura - Bug Tracker for Modern Teams"
+												 width="145px" height="34px" />
+										</a>
+									</div>
+									<p class="web-app-footer-headline">Bugasura is an AI-enabled bug management software built for fast moving, modern technology teams. Track, report, and manage issues easily. Collaborate with teams, vendors & customers to close bugs faster.</p>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6 footer-links">
+							<div class="web-app-footer-widget web-app-headline pera-content">
+								<div class="web-app-footer-menu-widget ul-li-block">
+									<h3 class="widget-title">Quick Access</h3>
+									<ul>
+										<li><a href="https://bugasura.io/features">Features</a></li>
+										<li><a href="https://bugasura.io/pricing">Pricing</a></li>
+										<li><a href="https://my.bugasura.io/bugasura-team/bugasura-product-roadmap">Roadmap</a></li>
+										<li><a href="https://bugasura.io/api/#overview">API and Docs</a></li>
+										<li><a href="https://bugasura.io/release-notes/">Release Notes</a></li>
+									</ul>
+								</div>
+							</div>
+							<div class="web-app-footer-widget web-app-headline pera-content">
+								<div class="web-app-footer-menu-widget ul-li-block">
+									<h3 class="widget-title">Compare</h3>
+									<ul>
+										<li><a href="https://bugasura.io/best-free-jira-alternative">JIRA</a></li>
+										<li><a href="https://bugasura.io/free-linear-alternative-bug-tracking">Linear</a></li>
+										<li><a href="https://bugasura.io/free-clickup-alternative-bug-tracking">Clickup</a></li>
+										<li><a href="https://bugasura.io/open-source-bug-tracker-alternative">Open Source</a></li>
+										<li><a href="https://bugasura.io/free-asana-alternative-bug-tracking">Asana</a></li>
+									</ul>
+								</div>
+							</div>
+							<div class="web-app-footer-widget web-app-headline pera-content hidden-xs">
+								<div class="web-app-footer-menu-widget ul-li-block">
+									<h3 class="widget-title">Company</h3>
+									<ul>
+										<li><a href="https://bugasura.io/privacy">Privacy</a></li>
+										<li><a href="https://bugasura.io/security">Security</a></li>
+										<li><a href="https://bugasura.io/careers">Careers</a></li>
+										<li><a href="https://bugasura.io/terms-of-service">Terms</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-3 web-app-footer-widget web-app-headline web-app-footer-social">
+							<h3 class="widget-title">Social Media</h3>
+							<div class="web-app-footer-contact">
+								<a rel="nofollow noopener noreferrer" href="https://www.facebook.com/bugasura" title="Follow us on Facebook" target="_blank" aria-label="Facebook">
+									<img src="https://bugasura.io/assets/img/web-application/icons/fb_new.png"
+										 alt="Facebook"
+										 width="26px" height="26px" />
+								</a>
+								<a rel="nofollow noopener noreferrer" href="https://www.linkedin.com/company/bugasura" title="Follow us on LinkedIn" target="_blank" aria-label="LinkedIn">
+									<img src="https://bugasura.io/assets/img/web-application/icons/linkedin_new.png"
+										 alt="LinkedIn"
+										 width="21px" height="21px" />
+								</a>
+								<a rel="nofollow noopener noreferrer" href="https://twitter.com/bugasura" title="Follow us on Twitter" target="_blank" aria-label="Twitter">
+									<img src="https://bugasura.io/assets/img/web-application/icons/twitter-x-logo.svg"
+										 alt="Twitter"
+										 width="22px" height="18px" />
+								</a>
+								<a rel="nofollow noopener noreferrer" href="https://www.youtube.com/channel/UCNv2izQR-qmGYIpfSWwGOPQ" title="Follow us on Youtube" target="_blank" aria-label="Youtube">
+									<img src="https://bugasura.io/assets/img/web-application/icons/youtube_new.png"
+										 alt="Youtube"
+										 width="22px" height="23px" />
+								</a>
+								<a rel="nofollow noopener noreferrer" href="https://www.instagram.com/bugasura" title="Follow us on Instagram" target="_blank" aria-label="Instagram">
+									<img src="https://bugasura.io/assets/img/web-application/icons/instagram_new.png"
+										 alt="Instagram"
+										 width="25px" height="26px" />
+								</a>
+							</div>
+							<div class="badges mt-3">
+								<a rel="nofollow noopener noreferrer" title="Bugasura is a leader in Bug Tracking on G2"
+								   href="https://www.g2.com/products/bugasura/reviews?utm_source=rewards-badge" target="_blank">
+									<div class="pl-0 pr-0">
+										<img loading="lazy"
+											 src="https://bugasura.io/assets/img/web-application/noteworthy/winter.webp"
+											 alt="Bugasura is a leader in Bug Tracking on G2"
+											 width="50" height="65" />
+										<img loading="lazy"
+											 src="https://bugasura.io/assets/img/web-application/nlp/badges/software-advice.svg"
+											 alt="Bugasura is a leader in Bug Tracking on G2"
+											 width="70" height="56" />
+										<img loading="lazy"
+											 src="https://bugasura.io/assets/img/web-application/nlp/badges/get-app.svg"
+											 alt="Bugasura is a leader in Bug Tracking on G2"
+											 width="70" height="60" />
+										<img loading="lazy"
+											 src="https://bugasura.io/assets/img/web-application/noteworthy/asia-specific.webp"
+											 alt="Bugasura is a leader in Bug Tracking on G2"
+											 width="50" height="56" />
+									</div>
+								</a>
+								<div class="cap-product mt-3">
+									<a rel="nofollow noopener noreferrer" title="Capterra" class="capterra-mob" href="https://www.capterra.com/p/231104/Bugasura/" target="_blank">
+										<img loading="lazy" src="https://bugasura.io/assets/img/web-application/noteworthy/capterra_plain_new.webp" alt="Capterra" title="Capterra" width="147" height="49" />
+									</a>
+									<a rel="nofollow noopener noreferrer" href="https://www.producthunt.com/posts/bugasura-bug-reporters?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-bugasura-bug-reporters"
+									   target="_blank">
+										<img loading="lazy" src="https://bugasura.io/assets/img/web-application/noteworthy/product-hunt.svg" alt="Product Hunt" title="Product Hunt" width="133" height="49" />
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="footer-freemium hidden">
+						<a rel="nofollow" href="https://my.bugasura.io?go=sign_up" class="position-relative ga-signup try-free-btn tryforfree_btn new_btn">Go Freemium</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="foot-note text-center">
+			© 2025 Moolya Software Testing Pvt Ltd. | All Rights Reserved
+		</div>
+	</footer>
+
+	<!-- Start of modal for playing video files
+	==============================================-->
+	<div class="modal fade" id="video-modal" tabindex="-1" role="dialog" aria-labelledby="play-video-modal" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-body">
+					<video preload="none" autoplay="autoplay" muted="" controls="controls" loop="" playsinline="" width="100%" height="100%" id="modalVideo"></video>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End of modal for playing video files
+	==============================================-->
+	<!-- End of Footer section
+	============================================= -->
+	<!-- Critical CSS -->
+	<link rel="stylesheet" media async href="https://bugasura.io/assets/css20210225180300/custom_14022025.min.css">
+
+	<!-- jQuery CDN from https://developers.google.com/speed/libraries -->
+	<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> -->
+	<script src="https://bugasura.io/assets/js20230202170011/jquery-3.7.1.min.js"></script>
+
+	<link rel="stylesheet" media defer href="https://bugasura.io/assets/css20210225180300/owl.carousel.css">
+
+	<link rel="stylesheet" media href="https://bugasura.io/assets/css20210225180300/animate.css">
+	<link rel="stylesheet" media href="https://bugasura.io/assets/css20210225180300/aos_27022023.min.css">
+	<script type="text/javascript" src="https://bugasura.io/assets/js20230202170011/aos_27022023.min.js"></script>
+	<script defer type="text/javascript">
+		AOS.init();
+	</script>
+
+	<script defer type="text/javascript">
+		jQuery.event.special.touchstart = {
+			setup: function( _, ns, handle ) {
+				this.addEventListener("touchstart", handle, { passive: !ns.includes("noPreventDefault") });
+			}
+		};
+		jQuery.event.special.touchmove = {
+			setup: function( _, ns, handle ) {
+				this.addEventListener("touchmove", handle, { passive: !ns.includes("noPreventDefault") });
+			}
+		};
+		jQuery.event.special.wheel = {
+			setup: function( _, ns, handle ){
+				this.addEventListener("wheel", handle, { passive: true });
+			}
+		};
+		jQuery.event.special.mousewheel = {
+			setup: function( _, ns, handle ){
+				this.addEventListener("mousewheel", handle, { passive: true });
+			}
+		};
+	</script>
+
+	<!-- Using bootstrap CDN for better performance -->
+	<script defer src="https://bugasura.io/assets/js20230202170011/bootstrap.min_15022023.js"></script>
+
+	<script defer type="text/javascript" src="https://bugasura.io/assets/js20230202170011/wow.min.js"></script>
+
+	<script defer type="text/javascript" src="https://bugasura.io/assets/js20230202170011/owl.js"></script>
+
+	<script defer type="text/javascript" src="https://bugasura.io/assets/js20230202170011/web-application_20220106141400.js"></script>
+	<script defer type="text/javascript" src="https://bugasura.io/assets/js20230202170011/lazyload.min.js"></script>
+	<script defer type="text/javascript" src="https://bugasura.io/assets/js20230202170011/custom-05012024.js"></script>
+
+	<script defer type='text/javascript'>
+		setTimeout(function(){
+			//Global site tag (gtag.js) - Google Ads: 921040471
+			var imported = document.createElement('script');
+			imported.src = 'https://www.googletagmanager.com/gtag/js?id=AW-921040471';
+			document.head.appendChild(imported);
+
+			window.dataLayer = window.dataLayer || [];
+			function gtag() {
+				dataLayer.push(arguments);
+			}
+			gtag('js', new Date());
+			gtag('config', 'AW-921040471');
+
+			//Global site tag (gtag.js) - Google Analytics
+			var imported = document.createElement('script');
+			imported.src = 'https://www.googletagmanager.com/gtag/js?id=AW-921040471';
+			document.head.appendChild(imported);
+		}, 5000);
+	</script>
+
+	<script defer type="text/javascript" src="https://bugasura.io/assets/js20230202170011/third-party_20211108144800.js"></script>
+	<script defer type='text/javascript'>
+		$(window).on("load", function() {
+
+			//for video modal
+			$('.vid-block').click(function(){
+				//Initialize src and poster
+				var src = $(this).attr('data-src');
+
+				// Set the src attribute of the video element
+				$('#modalVideo').attr('src', src);
+
+				// Show the modal
+				$('#video-modal').modal('show');
+			});
+
+			function loadProductHuntReviews(containerId, iframeSrc) {
+				const container = document.getElementById(containerId);
+				const iframe = document.createElement('iframe');
+				iframe.src = iframeSrc;
+				iframe.width = 500;
+				iframe.height = 405;
+				iframe.frameBorder = 0;
+				iframe.title = "Product Hunt review"
+				iframe.scrolling = 'no';
+				iframe.loading = 'lazy';
+				iframe.style = 'border: none';
+				iframe.allowFullscreen = true;
+				container.appendChild(iframe);
+			}
+
+			setTimeout(function(){
+
+								//LOAD TESTMONIALS AFTER 5 SEC DELAY
+				const testimonials = document.getElementById('testimonials');
+				if(testimonials){
+					loadProductHuntReviews('ph-review1','https://cards.producthunt.com/cards/reviews/734978?v=1');
+					loadProductHuntReviews('ph-review2','https://cards.producthunt.com/cards/reviews/613857?v=1');
+					loadProductHuntReviews('ph-review3','https://cards.producthunt.com/cards/reviews/553322?v=1');
+					loadProductHuntReviews('ph-review4','https://cards.producthunt.com/cards/reviews/611622?v=1');
+					loadProductHuntReviews('ph-review5','https://cards.producthunt.com/cards/reviews/613998?v=1');
+					loadProductHuntReviews('ph-review6','https://cards.producthunt.com/cards/reviews/552067?v=1');
+					loadProductHuntReviews('ph-review7','https://cards.producthunt.com/cards/reviews/733008?v=1');
+					loadProductHuntReviews('ph-review8','https://cards.producthunt.com/cards/comments/2042910?v=1');
+					loadProductHuntReviews('ph-review9','https://cards.producthunt.com/cards/comments/2043430?v=1');
+					loadProductHuntReviews('ph-review10','https://cards.producthunt.com/cards/comments/2042113?v=1');
+					loadProductHuntReviews('ph-review11','https://cards.producthunt.com/cards/comments/2043814?v=1');
+				}
+
+				//Testimonials
+				jQuery('#testimonials').owlCarousel({
+					loop: true,
+					nav: false,
+					dots: true,
+					center: true,
+					autoplay: true,
+					animateOut: 'fadeOut',
+					animateIn: 'fadeIn',
+					lazyLoad: true,
+					margin: 30,
+					responsive: {
+						0: {
+							items: 1
+						},
+						576: {
+							items: 1
+						},
+						992: {
+							items: 3
+						}
+					}
+				});
+
+				//Initialize utm parameter
+				var utm_param = {
+					"utm_source":"Direct",
+					"utm_medium":"Direct",
+					"utm_campaign":"Direct"
+				};
+
+				var Hash = 'cd52ead9f54c068e3a3bc4caac5e25fb';
+				var timestamp = '1744306167';
+
+				registerEvent(['LO'], "10_LANDED");
+
+				$(".signup_btn, .ga-signup").on("click", function() {
+					registerEvent(['LO','GA'], "15_CLICKED_SIGNUP", "WEBSITE", "SIGNUP");
+
+					const url = window.location.href.split("?")[0];
+					var eventProperty = Object.assign(utm_param,{"URL":url});
+					if ( typeof registerMIXPEvent === 'function' )registerMIXPEvent("Intended Sign up",eventProperty,Hash,timestamp);
+				});
+
+				$(".blog-link").on("click", function() {
+					//mixpanel events
+					var eventProperty = Object.assign(utm_param,{"URL":"bugasura.io/blog"});
+					if ( typeof registerMIXPEvent === 'function' )registerMIXPEvent("Visited Landing Page",eventProperty,Hash,timestamp);
+				});
+
+				$(".release-notes-link").on("click", function() {
+					//mixpanel events
+					var eventProperty = Object.assign(utm_param,{"URL":"bugasura.io/release-notes"});
+					if ( typeof registerMIXPEvent === 'function' )registerMIXPEvent("Visited Landing Page",eventProperty,Hash,timestamp);
+				});
+
+				$(".intend-demo").on("click", function(){
+					const url = window.location.href.split("?")[0];
+					var eventProperty = Object.assign(utm_param,{"URL":url});
+					if ( typeof registerMIXPEvent === 'function' )registerMIXPEvent("Intended Demo",eventProperty,Hash,timestamp);
+					registerEvent(['GA'], "15_INTENDED_DEMO", "WEBSITE", "DEMO");
+				});
+			}, 5000);
+		});
+	</script>
+
+	<script defer type="text/javascript" src="https://bugasura.io/assets/js20230202170011/typed.js"></script>
+	<script defer type="text/javascript">
+		$(window).on("load", function() {
+			//Initialize utm parameter
+			var utm_param = {
+				"utm_source":"Direct",
+				"utm_medium":"Direct",
+				"utm_campaign":"Direct"
+			};
+			var Hash = 'cd52ead9f54c068e3a3bc4caac5e25fb';
+			var timestamp = '1744306167';
+			//mixpanel events
+			setTimeout(function(){
+				var eventProperty = Object.assign(utm_param,{"URL":"bugasura.io"});
+				if ( typeof registerMIXPEvent === 'function' )registerMIXPEvent("Visited Landing Page",eventProperty,Hash,timestamp);
+			}, 5000);
+
+			jQuery("#web-app-header").css("opacity", "1");
+			jQuery("#web-app-preloader").fadeOut("fast", function() {
+				jQuery(this).remove()
+			});
+
+			function elementEntered(element) {
+				if ($(element)[0]['nodeName'] == "VIDEO")
+					element.play();
+			}
+
+			function elementExited(element) {
+				if ($(element)[0]['nodeName'] == "VIDEO")
+					element.pause();
+			}
+
+			// Default instance for elements
+			var lazyLoadInstance = new LazyLoad();
+
+			// Custom instance only for video tags with custom callbacks
+			var lazyLoadInstanceVideo = new LazyLoad({
+				elements_selector: "video",
+				unobserve_entered: false,
+				unobserve_completed: false,
+				callback_enter: elementEntered,
+				callback_exit: elementExited
+			});
+
+			$('.sub-section-feature-text').click(function(){
+				const section = $(this).data('section');
+				const target = $(this).data('target');
+				if ($(this).hasClass('active')) return false;
+				$('.'+section+" .web-app-feature-image .image-block").hide();
+				$('.'+section+" .web-app-feature-image ."+target).fadeIn();
+				$('.'+section+" .sub-section-feature-text").removeClass('active');
+				$(this).addClass('active');
+				var divs_visible = true;
+				$(this).parent().find(".sub-section-content-desc").each(function(i, ele) {
+					if (!$(ele).is(':visible')) {
+						divs_visible = false;
+						return false;
+					}
+				});
+				if (!divs_visible) {
+					$(this).parent().find(".sub-section-content-desc").hide();
+					$(this).find('.sub-section-content-desc').slideDown();
+				}
+			});
+
+		$(document).ready(function() {
+			$(".ai-sub-section .sub-section-feature .sub-section-feature-text").first().click();
+			$(".reporter-sub-section .sub-section-feature .sub-section-feature-text").first().click();
+		});
+
+		});
+	</script>
+</body>
+</html>

@@ -1,8 +1,12 @@
 ﻿using Bug_Tracking_System.Models;
 using Bug_Tracking_System.Repositories.Interfaces;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Composition;
+using System.Data;
+using System.IO.Compression;
 using System.Net.Mail;
 
 namespace Bug_Tracking_System.Controllers
@@ -15,14 +19,30 @@ namespace Bug_Tracking_System.Controllers
         private readonly IAccountRepos _acc;
         private readonly IEmailSenderRepos _emailSender;
         private readonly INotificationRepos _notification;
+        private readonly IPermissionHelperRepos _permission;
+        private readonly IExportRepos _export;
+        private readonly IImportRepos _import;
 
-        public BugsController(IEmailSenderRepos emailSender, IAccountRepos acc, DbBug dbBug, IBugRepos bug, INotificationRepos notification, ISidebarRepos sidebar) : base(sidebar)
+        public BugsController(IEmailSenderRepos emailSender, IImportRepos import, IExportRepos export, IAccountRepos acc, DbBug dbBug, IBugRepos bug, INotificationRepos notification, IPermissionHelperRepos permission, ISidebarRepos sidebar) : base(sidebar)
         {
             _dbBug = dbBug;
             _bug = bug;
             _acc = acc;
             _emailSender = emailSender;
             _notification = notification;
+            _permission = permission;
+            _export = export;
+            _import = import;
+        }
+
+        // Public method to get user permission
+        public string GetUserPermission(string action)
+        {
+            int roleId = HttpContext.Session.GetInt32("UserRoleId").Value;
+            string permissionType = _permission.HasAccess(action, roleId);
+            ViewBag.PermissionType = permissionType;
+
+            return permissionType;
         }
 
         [HttpGet]
@@ -30,23 +50,32 @@ namespace Bug_Tracking_System.Controllers
         {
             try
             {
-                int pageSize = 4;
-                int pageNumber = page ?? 1;
-
-                ViewBag.PageTitle = "Bug List";
-                ViewBag.Breadcrumb = "Manage Bugs";
-
-                var bugs = await _bug?.GetAllBugsData(pageNumber, pageSize);
-
-                if (bugs == null || !bugs.Any())
+                string permissionType = GetUserPermission("View Bugs");
+                if (permissionType
+                    == "canView" || permissionType == "canEdit" || permissionType == "fullAccess")
                 {
-                    return View(new List<Bug>()); // Return empty list if null
+                    int pageSize = 4;
+                    int pageNumber = page ?? 1;
+
+                    ViewBag.PageTitle = "Bug List";
+                    ViewBag.Breadcrumb = "Manage Bugs";
+
+                    var bugs = await _bug?.GetAllBugsData(pageNumber, pageSize);
+
+                    if (bugs == null || !bugs.Any())
+                    {
+                        return View(new List<Bug>()); // Return empty list if null
+                    }
+
+                    ViewBag.StatusList = new SelectList(await _dbBug.BugStatuses.ToListAsync(), "StatusId", "StatusName");
+
+
+                    return View(bugs);
                 }
-
-                ViewBag.StatusList = new SelectList(await _dbBug.BugStatuses.ToListAsync(), "StatusId", "StatusName");
-
-
-                return View(bugs);
+                else
+                {
+                    return RedirectToAction("UnauthorisedAccess", "Error");
+                }
             }
             catch (Exception ex)
             {
@@ -56,80 +85,144 @@ namespace Bug_Tracking_System.Controllers
             }
         }
 
+        public async Task<IActionResult> ExportBugList()
+        {
+            var bugs = await _dbBug.Bugs
+                            .Include(b => b.Attachments)  // Include attachments for images
+                            .Include(b => b.CreatedByNavigation) // Ensure CreatedByNavigation is loaded
+                            .Include(b => b.Project)  // Ensure Project is loaded
+                            .Where(b => b.Status.StatusId != 1)  // Ensure Status is loaded
+                            .Select(b => new Bug
+                            {
+                                BugId = b.BugId,
+                                Title = b.Title,
+                                Description = b.Description, // Ensure description is fetched
+                                CreatedDate = b.CreatedDate,
+                                Priority = b.Priority,
+                                Severity = b.Severity,
+                                Status = b.Status,
+                                CreatedByNavigation = b.CreatedByNavigation,
+                                Project = b.Project,
+                                Attachments = b.Attachments
+                            })
+                            .ToListAsync();
+
+
+            var dataTable = new DataTable("BugListReports");
+            dataTable.Columns.AddRange(new DataColumn[]
+            {
+                new DataColumn("Bug Id"),
+                new DataColumn("Title"),
+                new DataColumn("Description"),
+                new DataColumn("Severity"),
+                new DataColumn("Priority"),
+                new DataColumn("Created Date"),
+                new DataColumn("Created By"),
+                new DataColumn("Status")
+            });
+
+            foreach (var bug in bugs)
+            {
+                dataTable.Rows.Add(bug.BugId, bug.Title, bug.Description, bug.Severity, bug.Priority, bug.CreatedDate, bug.CreatedByNavigation.UserName, bug.Status.StatusName);
+            }
+
+            var fileBytes = _export.ExportToExcel(dataTable, "BugListReports");
+
+            return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "BugListReports.xlsx");
+        }
+
+
 
         [HttpGet]
         public async Task<IActionResult> BugDetails(int id)
         {
-            ViewBag.PageTitle = "Bug Details";
-            ViewBag.Breadcrumb = "Manage Bugs";
-
-            var bug = await _bug.GetBugById(id);
-
-            if (bug == null)
+            string permissionType = GetUserPermission("Manage Bugs");
+            if (permissionType == "canEdit" || permissionType == "fullAccess")
             {
-                return NotFound();
+                ViewBag.PageTitle = "Bug Details";
+                ViewBag.Breadcrumb = "Manage Bugs";
+
+                var bug = await _bug.GetBugById(id);
+
+                if (bug == null)
+                {
+                    return NotFound();
+                }
+
+                ViewBag.StatusList = new SelectList(await _dbBug.BugStatuses.ToListAsync(), "StatusId", "StatusName");
+
+                return View(bug);
             }
-
-            ViewBag.StatusList = new SelectList(await _dbBug.BugStatuses.ToListAsync(), "StatusId", "StatusName");
-
-            return View(bug);
+            else
+            {
+                return RedirectToAction("UnauthorisedAccess", "Error");
+            }
         }
 
         [HttpGet]
         public async Task<IActionResult> SaveBug(int? id)
         {
-            ViewBag.Breadcrumb = "Manage Bugs";
-
-            if (id == null)
+            string permissionType = GetUserPermission("Report Bug");
+            if (permissionType == "canEdit" || permissionType == "fullAccess")
             {
-                ViewBag.PageTitle = "Add a Bug";
+
+                ViewBag.Breadcrumb = "Manage Bugs";
+
+                if (id == null)
+                {
+                    ViewBag.PageTitle = "Add a Bug";
+                }
+                else
+                {
+                    ViewBag.PageTitle = "Edit Bug";
+
+                }
+
+                Bug bugs = new Bug();
+
+                if (id > 0)
+                {
+                    bugs = await _dbBug.Bugs.FirstOrDefaultAsync(b => b.BugId == id);
+                }
+
+                // Fetch the bug along with attachments
+                var bug = await _dbBug.Bugs
+                    .Include(b => b.Attachments)  // Load attachments
+                    .FirstOrDefaultAsync(b => b.BugId == id);
+
+                // Retrieve UserId and UserName from session
+                int? userId = HttpContext.Session.GetInt32("UserId");
+                var username = HttpContext.Session.GetString("UserName");
+
+                if (userId == null)
+                {
+                    return RedirectToAction("Login"); // Redirect to login if session is null
+                }
+
+                // Check if session exists, otherwise set a default value
+                ViewBag.TestedBy = !string.IsNullOrEmpty(username) ? username : "Unknown User";
+
+                //Define priority levels
+                ViewBag.Priority = new List<string> { "Highest", "High", "Medium", "Low", "Lowest" };
+
+                //Define priority levels
+                ViewBag.Severity = new List<string> { "Critical", "Major", "Minor", "Low" };
+
+                // Fetch projects dynamically
+                ViewBag.Projects = new SelectList(await _dbBug.Projects
+                                                .Select(p => new { p.ProjectId, p.ProjectName })
+                                                .ToListAsync(), "ProjectId", "ProjectName");
+
+                // Fetch status dynamically
+                ViewBag.Status = new SelectList(await _dbBug.BugStatuses
+                                                .Select(s => new { s.StatusId, s.StatusName })
+                                                .ToListAsync(), "StatusId", "StatusName");
+                return View(bugs);
             }
             else
             {
-                ViewBag.PageTitle = "Edit Bug";
-
+                return RedirectToAction("UnauthorisedAccess", "Error");
             }
-
-            Bug bugs = new Bug();
-
-            if (id > 0)
-            {
-                bugs = await _dbBug.Bugs.FirstOrDefaultAsync(b => b.BugId == id);
-            }
-
-            // Fetch the bug along with attachments
-            var bug = await _dbBug.Bugs
-                .Include(b => b.Attachments)  // Load attachments
-                .FirstOrDefaultAsync(b => b.BugId == id);
-
-            // Retrieve UserId and UserName from session
-            int? userId = HttpContext.Session.GetInt32("UserId");
-            var username = HttpContext.Session.GetString("UserName");
-
-            if (userId == null)
-            {
-                return RedirectToAction("Login"); // Redirect to login if session is null
-            }
-
-            // Check if session exists, otherwise set a default value
-            ViewBag.TestedBy = !string.IsNullOrEmpty(username) ? username : "Unknown User";
-
-            //Define priority levels
-            ViewBag.Priority = new List<string> { "Highest", "High", "Medium", "Low", "Lowest" };
-
-            //Define priority levels
-            ViewBag.Severity = new List<string> { "Critical", "Major", "Minor", "Low" };
-
-            // Fetch projects dynamically
-            ViewBag.Projects = new SelectList(await _dbBug.Projects
-                                            .Select(p => new { p.ProjectId, p.ProjectName })
-                                            .ToListAsync(), "ProjectId", "ProjectName");
-
-            // Fetch status dynamically
-            ViewBag.Status = new SelectList(await _dbBug.BugStatuses
-                                            .Select(s => new { s.StatusId, s.StatusName })
-                                            .ToListAsync(), "StatusId", "StatusName");
-            return View(bugs);
         }
 
         [HttpPost]
@@ -148,6 +241,71 @@ namespace Bug_Tracking_System.Controllers
 
             var success = await _bug.SaveBug(bugs, attachments);
             return RedirectToAction("BugList");
+        }
+
+        public IActionResult DownloadSampleFile()
+        {
+            var fileBytes = _import.GenerateSampleBugExcel(false);
+
+            return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "SampleFile.xlsx");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ImportBugsWithImages(IFormFile excelFile, IFormFile imageZip)
+        {
+            var allowedExtensions = new HashSet<string> { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+
+            if (excelFile == null || imageZip == null)
+                return BadRequest("Both Excel file and ZIP of images are required.");
+
+            if (!imageZip.FileName.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+                return Json(new { success = false, message = "Only .zip files are allowed for images." });
+
+            if (!excelFile.FileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
+                return Json(new { success = false, message = "Only .xlsx files are allowed for data." });
+
+            var imageFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "BugAttachments");
+            Directory.CreateDirectory(imageFolderPath);
+
+            // ✅ Extract images from ZIP
+            using (var zipStream = new MemoryStream())
+            {
+                await imageZip.CopyToAsync(zipStream);
+                zipStream.Seek(0, SeekOrigin.Begin);
+
+                using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
+                {
+                    foreach (var entry in archive.Entries)
+                    {
+                        string extension = Path.GetExtension(entry.Name).ToLower();
+                        if (!allowedExtensions.Contains(extension))
+                            return Json(new { success = false, message = "ZIP contains invalid file format: " + entry.Name });
+
+                        string imagePath = Path.Combine(imageFolderPath, entry.Name);
+                        if (!System.IO.File.Exists(imagePath))
+                            entry.ExtractToFile(imagePath);
+                    }
+                }
+            }
+
+            // ✅ Process Excel File
+            try
+            {
+                var importResult = await _import.BugsExcelImport(excelFile); // You already have this method
+                string fileBase64 = Convert.ToBase64String(importResult);
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Bugs imported successfully!",
+                    fileData = fileBase64,
+                    fileName = "BugImportResult.xlsx"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error occurred: " + ex.Message });
+            }
         }
 
 
@@ -198,33 +356,49 @@ namespace Bug_Tracking_System.Controllers
         [HttpGet]
         public async Task<IActionResult> UnassignBugList(int? page)
         {
-            int pageSize = 4;
-            int pageNumber = page ?? 1;
+            string permissionType = GetUserPermission("Assign Bug");
+            if (permissionType == "canEdit" || permissionType == "fullAccess")
+            {
+                int pageSize = 4;
+                int pageNumber = page ?? 1;
 
-            ViewBag.Breadcrumb = "Manage Bugs";
-            ViewBag.PageTitle = "Unassigned Bugs";
+                ViewBag.Breadcrumb = "Manage Bugs";
+                ViewBag.PageTitle = "Unassigned Bugs";
 
-            var bugs = await _bug.GetUnassignedBugs(pageNumber, pageSize);
-            return View(bugs);
+                var bugs = await _bug.GetUnassignedBugs(pageNumber, pageSize);
+                return View(bugs);
+            }
+            else
+            {
+                return RedirectToAction("UnauthorisedAccess", "Error");
+            }
         }
 
         [HttpGet]
         public async Task<IActionResult> AssignBug(int id)
         {
-            ViewBag.PageTitle = "Assign Bug";
-            ViewBag.Breadcrumb = "Manage Bugs";
+            string permissionType = GetUserPermission("Assign Bug");
+            if (permissionType == "canEdit" || permissionType == "fullAccess")
+            {
+                ViewBag.PageTitle = "Assign Bug";
+                ViewBag.Breadcrumb = "Manage Bugs";
 
-            ViewBag.Developers = await _dbBug.Users
-                    .Where(u => u.Role.RoleName == "Developer") // Ensure this filters only developers
-                    .Select(u => new
-                    {
-                        Value = u.UserId, // Ensure UserId is mapped correctly
-                        Text = u.UserName  // Ensure FullName or UserName exists in the User model
-                    })
-                    .ToListAsync();
+                ViewBag.Developers = await _dbBug.Users
+                        .Where(u => u.Role.RoleName == "Developer") // Ensure this filters only developers
+                        .Select(u => new
+                        {
+                            Value = u.UserId, // Ensure UserId is mapped correctly
+                            Text = u.UserName  // Ensure FullName or UserName exists in the User model
+                        })
+                        .ToListAsync();
 
-            var bug = await _bug.GetBugById(id);
-            return View(bug);
+                var bug = await _bug.GetBugById(id);
+                return View(bug);
+            }
+            else
+            {
+                return RedirectToAction("UnauthorisedAccess", "Error");
+            }
         }
 
         [HttpPost]
@@ -301,6 +475,8 @@ namespace Bug_Tracking_System.Controllers
                 return Json(new { success = false, message = "Server error: " + ex.Message });
             }
         }
+
+
 
     }
 }

@@ -121,11 +121,11 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="mb-0">Bug List</h3>
+                    <button id="exportProductsBtn" class="btn btn-success"><i class="fas fa-file-excel"></i></button>
 
                 </div>
 
                 <div class="card-body">
-                    @* <button id="exportBtn" class="btn btn-primary"><i class="fas fa-file-excel"></i></button> *@
                     <div class="table-responsive">
                         <table class="table align-items-center table-flush">
                             <thead class="thead-light">
@@ -156,14 +156,23 @@
                                         <!-- Status with Dropdown -->
                                         <td>
                                             <div class="dropdown">
-                                                <button class="btn btn-sm dropdown-toggle status-btn" data-id="@item.BugId" data-status="@item.Status?.StatusId" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <button class="btn btn-sm dropdown-toggle status-btn @(item.Status?.StatusName == "Fixed" ? "disabled" : "")"
+                                                        data-id="@item.BugId"
+                                                        data-status="@item.Status?.StatusId"
+                                                        data-bs-toggle="dropdown"
+                                                        aria-expanded="false">
                                                     @item.Status?.StatusName
                                                 </button>
                                                 <ul class="dropdown-menu">
                                                     @foreach (var status in ViewBag.StatusList)
                                                     {
                                                         <li>
-                                                            <a class="dropdown-item change-status" href="#" data-bug-id="@item.BugId" data-status-id="@status.Value">@status.Text</a>
+                                                            <a class="dropdown-item change-status @(item.Status?.StatusName == "Fixed" ? "disabled" : "")"
+                                                               href="#"
+                                                               data-bug-id="@item.BugId"
+                                                               data-status-id="@status.Value">
+                                                                @status.Text
+                                                            </a>
                                                         </li>
                                                     }
                                                 </ul>
@@ -171,23 +180,30 @@
                                         </td>
 
 
+
                                         <td style="margin-top: 8px;">
-                                            <div style="display: flex; gap: 10px; align-items: center;">
-                                                <a asp-action="SaveBug" asp-route-id="@item.BugId" class="btn btn-warning btn-sm"
-                                                   style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
-                                                    <i class="fas fa-edit" style="font-size: 16px;"></i>
-                                                </a>
+                                            @if (ViewBag.PermissionType != "canView")
+                                            {
+                                                <div style="display: flex; gap: 10px; align-items: center;">
+                                                    <a asp-action="SaveBug" asp-route-id="@item.BugId" class="btn btn-warning btn-sm"
+                                                       style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
+                                                        <i class="fas fa-edit" style="font-size: 16px;"></i>
+                                                    </a>
 
-                                                <a asp-action="BugDetails" asp-route-id="@item.BugId" class="btn btn-info btn-sm"
-                                                   style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
-                                                    <i class="fas fa-eye" style="font-size: 16px;"></i>
-                                                </a>
+                                                    <a asp-action="BugDetails" asp-route-id="@item.BugId" class="btn btn-info btn-sm"
+                                                       style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
+                                                        <i class="fas fa-eye" style="font-size: 16px;"></i>
+                                                    </a>
 
-                                                <a href="#" class="btn btn-danger btn-sm delete-bug" data-bugid="@item.BugId" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </a>
-                                            </div>
-
+                                                    <a href="#" class="btn btn-danger btn-sm delete-bug" data-bugid="@item.BugId" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </a>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <p>------</p>
+                                            }
                                         </td>
                                     </tr>
                                 }
@@ -224,6 +240,11 @@
 
     <script src="~/js/Bugs.js"></script>
     <script>
+
+                document.getElementById("exportProductsBtn").addEventListener("click", function () {
+                    window.location.href = "/Bugs/ExportBugList";
+        });
+
             $(".change-status").click(function (e) {
             e.preventDefault();
 
@@ -246,6 +267,12 @@
                             position: "right",
                             backgroundColor: "#28a745"
                         }).showToast();
+
+                         // Reload the page after a short delay
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1000);
+
                     } else {
                         Toastify({
                             text: "Failed to update status",

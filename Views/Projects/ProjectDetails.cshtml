@@ -36,7 +36,7 @@
                     <strong>Completion:</strong>
                     <p class="text-muted">@Model.Completion %</p>
                 </div>
-                
+
             </div>
 
             <hr class="my-4">
@@ -73,7 +73,12 @@
         </div>
 
         <div class="card-footer d-flex justify-content-between">
-            <a class="btn btn-primary" asp-action="AddOrEditProject" asp-route-id="@Model?.ProjectId">Edit Project</a>
+
+            @if (ViewBag.PermissionType != "canView")
+            {
+                <a class="btn btn-primary" asp-action="AddOrEditProject" asp-route-id="@Model?.ProjectId">Edit Project</a>
+            }
+            
             <a class="btn btn-secondary" asp-action="ProjectList">Back to List</a>
         </div>
     </div>

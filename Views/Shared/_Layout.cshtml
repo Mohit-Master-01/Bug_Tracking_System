@@ -15,7 +15,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Bug_Tracking_System</title>
+    <title>@ViewData["Title"] Bug_Tracking_System</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Bug_Tracking_System.styles.css" asp-append-version="true" />
@@ -70,56 +70,56 @@
 
         /* Submenu styles */
         .nav-item .submenu {
-        display: none;
-        list-style: none;
-        padding-left: 15px;
-        margin-top: 5px;
+            display: none;
+            list-style: none;
+            padding-left: 15px;
+            margin-top: 5px;
         }
 
-        .nav-item .submenu .nav-link {
-        font-size: 0.85rem;
-        padding-left: 30px;
-        color: #6c757d;
-        transition: all 0.3s ease-in-out;
-        }
+            .nav-item .submenu .nav-link {
+                font-size: 0.85rem;
+                padding-left: 30px;
+                color: #6c757d;
+                transition: all 0.3s ease-in-out;
+            }
 
-        .nav-item .submenu .nav-link:hover {
-        color: #000; /* Dark color on hover */
-        }
+                .nav-item .submenu .nav-link:hover {
+                    color: #000; /* Dark color on hover */
+                }
 
         /* Toggle submenu on click */
         .nav-item.has-submenu > a {
-        position: relative;
+            position: relative;
         }
 
-        .nav-item.has-submenu > a::after {
-        content: "\f107"; /* FontAwesome down arrow */
-        font-family: "Font Awesome 5 Free";
-        font-weight: 900;
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 0.75rem;
-        color: #6c757d;
-        }
+            .nav-item.has-submenu > a::after {
+                content: "\f107"; /* FontAwesome down arrow */
+                font-family: "Font Awesome 5 Free";
+                font-weight: 900;
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 0.75rem;
+                color: #6c757d;
+            }
 
         /* Show submenu on active state */
         .nav-item.has-submenu.active .submenu {
-        display: block;
+            display: block;
         }
 
         /* Animation for submenu */
         .submenu {
-        opacity: 0;
-        height: 0;
-        overflow: hidden;
-        transition: all 0.3s ease-in-out;
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
         }
 
         .nav-item.has-submenu.active .submenu {
-        opacity: 1;
-        height: auto;
+            opacity: 1;
+            height: auto;
         }
 
         html, body {
@@ -155,7 +155,6 @@
             padding-bottom: 60px; /* Space for the footer */
         }
 
-
     </style>
 </head>
 <body class="g-sidenav-show bg-gray-100">
@@ -182,47 +181,51 @@
         <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
             <ul class="navbar-nav">
 
-                @foreach(var tab in (List<SidebarModel>)ViewBag.SidebarTabs)
+
+                @if (ViewBag.SidebarTabs != null)
                 {
-                    var res = "";
-                    bool subtabs = tab.SubTabs != null && tab.SubTabs.Any();
-                    @if(subtabs)
+                    @foreach (var tab in (List<SidebarModel>)ViewBag.SidebarTabs)
                     {
-                        res = "has-submenu";
-                    }
-                    <li class="nav-item @res">
-                        <a class="nav-link" href="@tab.TabUrl">
-                            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                                <i class="@tab.IconPath text-dark text-sm opacity-10"></i> <!-- Fixed Icon Usage -->
-                            </div>
-                            <span class="nav-link-text ms-1">@tab.TabName</span>
-                        </a>
+                        var res = "";
+                        bool subtabs = tab.SubTabs != null && tab.SubTabs.Any();
                         @if (subtabs)
                         {
-                            <ul class="submenu">
-                                @foreach (var subTab in tab.SubTabs)
-                                {
-                                    <li>
-                                        <a class="nav-link" href="@subTab.TabUrl">
-                                            <i class="fa fa-angle-right me-2"></i> <!-- Added Submenu Icon -->
-                                            @subTab.TabName
-                                        </a>
-                                    </li>
-                                }
-                            </ul>
+                            res = "has-submenu";
                         }
-                    </li>
+                        <li class="nav-item @res">
+                            <a class="nav-link" href="@tab.TabUrl">
+                                <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="@tab.IconPath text-dark text-sm opacity-10"></i> <!-- Fixed Icon Usage -->
+                                </div>
+                                <span class="nav-link-text ms-1">@tab.TabName</span>
+                            </a>
+                            @if (subtabs)
+                            {
+                                <ul class="submenu">
+                                    @foreach (var subTab in tab.SubTabs)
+                                    {
+                                        <li>
+                                            <a class="nav-link" href="@subTab.TabUrl">
+                                                <i class="fa fa-angle-right me-2"></i> <!-- Added Submenu Icon -->
+                                                @subTab.TabName
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </li>
 
-                }                                        
+                    }
+                }
             </ul>
         </div>
 
     </aside>
 
-     <main role="main" class="main-content position-relative border-radius-lg ">
+    <main role="main" class="main-content position-relative border-radius-lg ">
 
-            <!-- Navbar -->
-         <nav class="navbar navbar-main navbar-expand-lg bg-dark px-3 shadow-none border-radius-xl">
+        <!-- Navbar -->
+        <nav class="navbar navbar-main navbar-expand-lg bg-dark px-3 shadow-none border-radius-xl">
 
             <div class="container-fluid">
                 <div class="d-flex flex-column">
@@ -282,20 +285,19 @@
 
 
                     <li class="nav-item px-3" style="margin-top: 4px">
-                        <a href="~/Account/Login" class="nav-link text-white p-0">
+                        <a href="~/Account/Logout" class="nav-link text-white p-0">
                             <i class="fa fa-sign-out"></i>
                         </a>
                     </li>
                 </ul>
             </div>
 
-         </nav>
+        </nav>
 
         <!-- End Navbar -->
-
         @RenderBody()
-                      
-     </main>
+
+    </main>
 
     <footer class="footer py-2">
 
@@ -309,7 +311,7 @@
             </div>
         </div>
     </footer>
-           
+
 
 
     @* <footer class="border-top footer text-muted"> *@
@@ -389,7 +391,7 @@
             }, 1000); // Adjust delay as needed
         });
 
-                  
+
     </script>
 
     <!-- Github buttons -->

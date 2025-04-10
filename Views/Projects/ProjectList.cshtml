@@ -10,56 +10,56 @@
 
     /* Status Colors */
     [data-status="Assigned"]::before {
-        content: "Assigned";
-        background: #00d0e1;
+    content: "Assigned";
+    background: #00d0e1;
     }
 
     [data-status="New"]::before {
-        content: "New";
-        background: #03037a;
+    content: "New";
+    background: #03037a;
     }
 
     /* Badge Styling */
     [data-status]::before {
-        color: white;
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-weight: bold;
-        display: inline-block;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    display: inline-block;
     }
 
 
 
     .table th, .table td {
-        text-align: center; /* Align text to center */
-        vertical-align: middle; /* Align items vertically */
-        padding: 10px; /* Add consistent padding */
+    text-align: center; /* Align text to center */
+    vertical-align: middle; /* Align items vertically */
+    padding: 10px; /* Add consistent padding */
     }
 
     td[data-status] {
-        min-width: 100px; /* Ensure uniform column width */
+    min-width: 100px; /* Ensure uniform column width */
     }
 
     td:last-child div {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
     }
 
     .progress {
-        background-color: #e9ecef;
-        border-radius: 4px;
-        overflow: hidden;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
     }
 
     .progress-bar {
-        transition: width 0.5s ease-in-out;
+    transition: width 0.5s ease-in-out;
     }
 
     .completion-text {
-        font-size: 14px;
-        font-weight: bold;
-        margin-top: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 5px;
     }
 
 
@@ -69,9 +69,15 @@
     <div class="card shadow-lg border-0">
         <div class="card-header text-white d-flex justify-content-between align-items-center">
             <h4 class="mb-0">Project List</h4>
-            <a asp-action="AddOrEditProject" class="btn btn-light btn-sm text-primary">
-                <i class="fas fa-plus"></i> Add New Project
-            </a>
+
+            @if (ViewBag.PermissionType != "canView")
+            {
+                <a asp-action="AddOrEditProject" class="btn btn-light btn-sm text-primary">
+                    <i class="fas fa-plus"></i> Add New Project
+                </a>
+            }
+            <button id="exportProductsBtn" class="btn btn-success"><i class="fas fa-file-excel"></i></button>
+
         </div>
         <div class="card-body">
             <table class="table table-hover align-middle text-center">
@@ -100,36 +106,50 @@
                             <td>
                                 <div class="progress" style="height: 8px;">
                                     <div class="progress-bar @(item.Completion == 100 ? "bg-success" : "bg-primary")"
-                                         role="progressbar"
-                                         style="width: @item.Completion%;"
-                                         aria-valuenow="@item.Completion"
-                                         aria-valuemin="0"
-                                         aria-valuemax="100">
+                                    role="progressbar"
+                                    style="width: @item.Completion%;"
+                                    aria-valuenow="@item.Completion"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100">
                                     </div>
                                 </div>
                                 <span class="completion-text">@item.Completion%</span>
                             </td>
 
                             <td style ="margin-top: 8px;">
-                                <div style="display: flex; gap: 10px; align-items: center;">
+                                @if (ViewBag.PermissionType != "canView")
+                                {
 
-                                <a asp-action="AddOrEditProject" asp-route-id="@item.ProjectId" class="btn btn-warning btn-sm" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a asp-action="ProjectDetails" asp-route-id="@item.ProjectId" class="btn btn-info btn-sm" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
-                                        <i class="fas fa-eye"></i>
-                                </a>
-                                <a href="#" class="btn btn-danger btn-sm delete-project" data-project-id="@item.ProjectId" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
-                                    <i class="fas fa-trash-alt"></i>
-                                </a>
+                                    <div style="display: flex; gap: 10px; align-items: center;">
 
-                                <button class="btn btn-primary btn-sm update-completion" data-project-id="@item.ProjectId" data-completion="@item.Completion" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
-                                    <i class="fas fa-bars"></i>
-                                </button>
-                                </div>
-                                @* <a asp-action="Delete" asp-route-id="@item.ProjectId" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')"> *@
-                                @*     <i class="fas fa-trash-alt"></i> *@
-                                @* </a> *@
+                                        <a asp-action="AddOrEditProject" asp-route-id="@item.ProjectId" class="btn btn-warning btn-sm" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a asp-action="ProjectDetails" asp-route-id="@item.ProjectId" class="btn btn-info btn-sm" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-danger btn-sm delete-project" data-project-id="@item.ProjectId" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+
+                                        <button class="btn btn-primary btn-sm update-completion"
+                                        data-project-id="@item.ProjectId"
+                                        data-completion="@item.Completion"
+                                        style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;"
+                                        @(item.Completion == 100 ? "disabled" : "")>
+                                            <i class="fas fa-bars"></i>
+                                        </button>
+
+                                    </div>
+                                    @* <a asp-action="Delete" asp-route-id="@item.ProjectId" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')"> *@
+                                    @*     <i class="fas fa-trash-alt"></i> *@
+                                    @* </a> *@
+                                }
+                                else
+                                {
+                                    <p>------</p>
+                                }
+
                             </td>
                         </tr>
                     }
@@ -159,6 +179,10 @@
     <!-- SweetAlert2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+            document.getElementById("exportProductsBtn").addEventListener("click", function () {
+                    window.location.href = "/Bugs/ExportBugList";
+        });
+
             $(".update-completion").click(function () {
             var projectId = $(this).data("project-id");
             var currentCompletion = $(this).data("completion");

@@ -40,6 +40,9 @@ builder.Services.AddScoped<IMembersRepos, MemberClassRepos>();
 builder.Services.AddScoped<IBugRepos, BugsClassRepos>();
 builder.Services.AddScoped<INotificationRepos, NotificationClassRepos>();
 builder.Services.AddScoped<IAuditLogsRepos, AuditLogsClassRepos>();
+builder.Services.AddScoped<IPermissionHelperRepos, PermissionHelperClassRepos>();
+builder.Services.AddScoped<IImportRepos, ImportClassRepos>();
+builder.Services.AddScoped<IExportRepos, ExportClassRepos>();
 
 
 

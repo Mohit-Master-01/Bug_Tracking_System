@@ -28,6 +28,7 @@ public partial class User
 
     public DateTime? OtpExpiry { get; set; }
 
+    [Column("IsEmailVerified")]
     public bool? IsEmailVerified { get; set; }
 
     public string? ProfileImage { get; set; }
@@ -51,6 +52,8 @@ public partial class User
     public string? Skills { get; set; }
 
     public int? BugId { get; set; }
+
+
 
     [JsonIgnore]
     public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();

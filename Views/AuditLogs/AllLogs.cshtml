@@ -4,7 +4,6 @@
 @{
     ViewData["Title"] = "Audit Logs";
 
-    // Group module usage data for the Chart
     var moduleUsage = Model
         .GroupBy(x => x.ModuleName)
         .Select(g => new { ModuleName = g.Key, Count = g.Count() })
@@ -13,15 +12,75 @@
     var moduleLabels = moduleUsage.Select(m => m.ModuleName).ToList();
     var moduleData = moduleUsage.Select(m => m.Count).ToList();
 
+    var peakHours = Model
+        .GroupBy(x => x.ActionDate.Hour)
+        .Select(g => new { Hour = g.Key, Count = g.Count() })
+        .OrderBy(g => g.Hour)
+        .ToList();
+
+    var peakHoursLabels = peakHours.Select(p => $"{p.Hour}:00").ToList();
+    var peakHoursData = peakHours.Select(p => p.Count).ToList();
 }
 
 <style>
     .dataTables_length select {
         padding-right: 25px !important;
-        width: 80px;  /* Optional */
+        width: 80px;
     }
-</style>
 
+    .charts-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        width: 100%;
+        margin-top: 30px;
+    }
+
+    .chart-card {
+        flex: 1 1 48%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chart-container {
+        position: relative;
+        width: 100%;
+        height: 350px;
+    }
+
+    canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    media (max-width: 768px) {
+        .chart-card
+
+    {
+        flex: 1 1 100%;
+    }
+
+    }
+
+
+    /* Restrict Pie Chart Container */
+    #modulePieChart {
+        max-width: 350px;
+        margin: 0 auto; /* Center the chart */
+    }
+
+    /* Optional: Remove forceful width/height that affects aspect ratio */
+    canvas {
+        width: auto !important;
+        height: auto !important;
+    }
+
+    .chart-scroll-container {
+        width: 100%;
+        overflow-x: auto; /* Enable horizontal scroll */
+    }
+
+</style>
 
 <div class="container-fluid py-4">
     <div class="row">
@@ -36,28 +95,20 @@
                         <table id="auditLogTable" class="table align-items-center mb-0">
                             <thead>
                                 <tr>
-                                    <th class="text-uppercase text-secondary text-xs font-weight-bolder ">User</th>
-                                    <th class="text-uppercase text-secondary text-xs font-weight-bolder ">Action</th>
-                                    <th class="text-uppercase text-secondary text-xs font-weight-bolder ">Module</th>
-                                    <th class="text-uppercase text-secondary text-xs font-weight-bolder ">Date</th>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Module</th>
+                                    <th>Date</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (var log in Model)
                                 {
                                     <tr>
-                                        <td class="align-middle text-sm">
-                                            <span class="text-xs font-weight-bold">@log.User.UserName</span>
-                                        </td>
-                                        <td class="align-middle text-sm">
-                                            <span class="text-xs">@log.Action</span>
-                                        </td>
-                                        <td class="align-middle text-sm">
-                                            <span class="text-xs">@log.ModuleName</span>
-                                        </td>
-                                        <td class="align-middle text-sm">
-                                            <span class="text-xs text-secondary">@log.ActionDate.ToString("yyyy-MM-dd | HH:mm:ss")</span>
-                                        </td>
+                                        <td>@log.User.UserName</td>
+                                        <td>@log.Action</td>
+                                        <td>@log.ModuleName</td>
+                                        <td>@log.ActionDate.ToString("yyyy-MM-dd | HH:mm:ss")</td>
                                     </tr>
                                 }
                             </tbody>
@@ -67,81 +118,127 @@
             </div>
         </div>
     </div>
-</div>
 
-<!-- Pie Chart Section -->
-<div class="row mt-4">
-    <div class="col-lg-6 mx-auto">
-        <div class="card">
+    <!-- Charts Section -->
+    <div class="charts-section">
+        <!-- Pie Chart - Module Usage -->
+        <div class="card chart-card">
             <div class="card-header pb-0">
-                <h6 class="mb-0">Module Usage (Pie Chart)</h6>
+                <h6>Module Usage</h6>
             </div>
             <div class="card-body">
-                <canvas id="modulePieChart" style="width:100%; height:300px;"></canvas>
+                <div class="chart-container" style="max-width: 350px; margin: 0 auto;">
+                    <canvas id="modulePieChart"></canvas>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Curve Graph - Peak Login Hours -->
+        <div class="card chart-card">
+            <div class="card-header pb-0">
+                <h6>Peak Login Hours (Curve)</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-scroll-container">
+                    <canvas id="peakHoursChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Required JS libraries -->
+<!-- JS and Chart Libraries -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<!-- DataTables -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-
-<!-- SweetAlert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- Argon Dashboard JS (correct path) -->
-<script src="~/assets/js/argon-dashboard.min.js"></script>
-
-
-
 <script>
+    // DataTables Initialization
+    $('#auditLogTable').DataTable({
+        "order": [[3, "desc"]],
+        "paging": true,
+        "searching": true,
+        "language": {
+            "paginate": {
+                "previous": "<",
+                "next": ">"
+            }
+        }
+    });
 
-    
-
-     // Module Data for Chart
+    // Chart Data
     var moduleLabels = @Html.Raw(JsonConvert.SerializeObject(moduleLabels));
     var moduleData = @Html.Raw(JsonConvert.SerializeObject(moduleData));
 
-    // Render Pie Chart
-    var ctx = document.getElementById('modulePieChart').getContext('2d');
-    new Chart(ctx, {
+    var peakHoursLabels = @Html.Raw(JsonConvert.SerializeObject(peakHoursLabels));
+    var peakHoursData = @Html.Raw(JsonConvert.SerializeObject(peakHoursData));
+
+        // Module Usage - Pie Chart (with maintainAspectRatio and fixed size)
+    new Chart(document.getElementById('modulePieChart').getContext('2d'), {
         type: 'pie',
         data: {
             labels: moduleLabels,
             datasets: [{
-                label: 'Module Usage',
                 data: moduleData,
                 backgroundColor: [
-                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
-                    '#FF9F40', '#E7E9ED', '#00A36C', '#E34234', '#3D9970'
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                    '#9966FF', '#FF9F40', '#E7E9ED', '#00A36C',
+                    '#E34234', '#3D9970'
                 ],
                 borderWidth: 1
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: true,  // Ensures circular shape
             plugins: {
                 legend: {
                     position: 'bottom',
-                    labels: {
-                        color: '#344767',
-                        font: { size: 12 }
-                    }
+                    labels: { color: '#344767', font: { size: 12 } }
                 }
             }
         }
     });
-    
 
-                    function clearLogs() {
+    // Peak Hours - Curve Chart
+    new Chart(document.getElementById('peakHoursChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: peakHoursLabels,
+            datasets: [{
+                label: 'Login Count',
+                data: peakHoursData,
+                fill: true,
+                borderColor: '#36A2EB',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: '#344767' }
+                },
+                x: {
+                    ticks: { color: '#344767' }
+                }
+            }
+        }
+    });
+
+    // Clear Logs Function with Password Check
+    function clearLogs() {
         Swal.fire({
             title: 'Enter Password to Clear Logs',
             input: 'password',
@@ -159,10 +256,7 @@
                     Swal.showValidationMessage('Password is required!');
                     return false;
                 }
-
-                // Fetch CSRF token if available
                 const csrfToken = $('input[name="__RequestVerificationToken"]').val() || '';
-
                 return fetch('/AuditLogs/ClearLogs', {
                     method: 'POST',
                     headers: {
@@ -171,58 +265,23 @@
                     },
                     body: JSON.stringify({ confirmPassword: password })
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (!data.success) {
-                        throw new Error(data.message);
-                    }
-                    return data;
-                })
-                .catch(error => {
-                    Swal.showValidationMessage(`Error: ${error.message}`);
-                });
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network error');
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (!data.success) throw new Error(data.message);
+                        return data;
+                    })
+                    .catch(error => {
+                        Swal.showValidationMessage(`Error: ${error.message}`);
+                    });
             },
             allowOutsideClick: () => !Swal.isLoading()
         }).then((result) => {
             if (result.isConfirmed && result.value) {
-                Swal.fire({
-                    title: 'Success!',
-                    text: result.value.message,
-                    icon: 'success'
-                }).then(() => {
-                    location.reload(); // Refresh after success
-                });
-            } else {
-                // If user cancels or any error occurs, reload the page
-                location.reload();
+                Swal.fire('Success!', result.value.message, 'success').then(() => location.reload());
             }
         });
     }
-
-    // $('#auditLogTable').DataTable({
-    //         "order": [[3, "desc"]],
-    //         "paging": true,
-    //         "searching": true,
-
-    //     });
-
-        
-        $('#auditLogTable').DataTable({
-            "order": [[3, "desc"]],
-            "paging": true,
-            "searching": true,
-            "language": {
-                "paginate": {
-                    "previous": "<",
-                    "next": ">"
-                }
-            }
-        });
-   
-
 </script>

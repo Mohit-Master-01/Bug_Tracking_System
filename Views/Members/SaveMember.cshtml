@@ -12,7 +12,9 @@
             <div class="card shadow-lg border-0">
                 <div class="card-header bg-dark text-white">
                     <h5 class="mb-0">@ViewData["Title"]</h5>
+                    
                 </div>
+
                 <div class="card-body">
                     <form role="form" id="memberForm" method="post" enctype="multipart/form-data">
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
@@ -68,6 +70,8 @@
     </div>
 </div>
 
+
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
@@ -78,6 +82,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Include Members.js here -->
     <script src="~/js/Members.js"></script>
+
+
 }

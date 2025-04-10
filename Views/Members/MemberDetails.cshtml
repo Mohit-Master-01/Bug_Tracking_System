@@ -1,0 +1,113 @@
+﻿@model Bug_Tracking_System.Models.User
+
+@{
+    ViewBag.Title = "Member Details";
+    var projects = ViewBag.AssignedProjects as List<Bug_Tracking_System.Models.Project>;
+}
+
+<div class="container-fluid mt-4">
+    <div class="card shadow border-0">
+        <div class="card-header text-white">
+            <h3 class="mb-0">Member Details</h3>
+        </div>
+
+        <div class="card-body">
+            @if (Model != null)
+            {
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <img src="@(string.IsNullOrEmpty(Model.ProfileImage) ? Url.Content("~/assets/img/default-profile.png") : Url.Content(Model.ProfileImage))"
+                             class="rounded-circle img-fluid" style="width: 150px; height: 150px;" alt="Profile Image">
+                        <h4 class="mt-3">@Model.UserName</h4>
+                        <span>@Model.Role.RoleName</span>
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">First Name</th>
+                                        <td>@Model.FirstName</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Email</th>
+                                        <td>@Model.Email</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Username</th>
+                                        <td>@Model.UserName</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Phone Number</th>
+                                        <td>@Model.PhoneNumber</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Joining Date</th>
+                                        <td>@Model.CreatedDate?.ToString("dd MMM yyyy")</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assigned Projects Section -->
+                <div class="mt-5">
+                    <h4>Assigned Projects</h4>
+                    @if (projects != null && projects.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Project Name</th>
+                                        <th>Description</th>
+                                        <th>Status</th>
+                                        <th>Start Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var project in projects)
+                                    {
+                                        <tr>
+                                            <td>@project.ProjectName</td>
+                                            <td>@project.Description</td>
+                                            <td>
+                                                @if (project.Status == "Completed")
+                                                {
+                                                    <span class="badge badge-success">Completed</span>
+                                                }
+                                                else if (project.Status == "In Progress")
+                                                {
+                                                    <span class="badge badge-warning">In Progress</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>@project.Status</span>
+                                                }
+                                            </td>
+                                            <td>@project.CreatedDate?.ToString("dd MMM yyyy")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">No projects assigned.</div>
+                    }
+                </div>
+
+                <a href="@Url.Action("MembersList", "Members")" class="btn btn-secondary mt-4">
+                    <i class="ni ni-bold-left"></i> Back to Members List
+                </a>
+            }
+            else
+            {
+                <div class="alert alert-warning">No member data found.</div>
+            }
+        </div>
+    </div>
+</div>

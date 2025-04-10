@@ -15,11 +15,11 @@ public partial class Notification
 
     public DateTime? NotificationDate { get; set; }
 
-    public int Type { get; set; }
+    public int? Type { get; set; }
 
-    public int RelatedId { get; set; }
+    public int? RelatedId { get; set; }
 
-    public string ModuleType { get; set; }
+    public string? ModuleType { get; set; }
 
     public virtual User User { get; set; } = null!;
 }

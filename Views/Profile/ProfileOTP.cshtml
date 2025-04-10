@@ -146,7 +146,8 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/OtpCheck.js"></script>
+    <script src="~/js/ProfileOTP.js"></script>
+    @* <script src="~/js/OtpCheck.js"></script> *@
     <script>
         // Automatically focus on the next input box
         document.querySelectorAll('.otp-box').forEach((input, index, inputs) => {

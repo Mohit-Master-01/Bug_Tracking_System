@@ -2,7 +2,7 @@
 $(document).ready(function () {
 
 
-
+     
     // Profile Image Preview
     $("#ProfileImage").change(function (event) {
         var reader = new FileReader();

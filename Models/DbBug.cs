@@ -143,6 +143,7 @@ public partial class DbBug : DbContext
             entity.Property(e => e.Isactive)
                 .HasDefaultValue(true)
                 .HasColumnName("isactive");
+            entity.Property(e => e.PermissionType).HasMaxLength(40);
             entity.Property(e => e.Roleid).HasColumnName("roleid");
             entity.Property(e => e.Tabid).HasColumnName("tabid");
 
