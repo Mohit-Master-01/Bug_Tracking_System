@@ -5,8 +5,10 @@ namespace Bug_Tracking_System.Repositories.Interfaces
 {
     public interface IBugRepos
     {
-        Task<IPagedList<Bug>> GetAllBugsData(int pageNumber, int pageSize);
-        
+        Task<List<Bug>> GetBugsByProject(int projectId);
+
+        Task<List<Bug>> GetAllBugs();
+
         Task<Bug> GetBugById(int bugId);
 
         Task<bool> UpdateBugStatus(int bugId, int statusId);
@@ -15,7 +17,9 @@ namespace Bug_Tracking_System.Repositories.Interfaces
 
         Task<bool> DeleteBug(int bugId);
 
-        Task<IPagedList<Bug>> GetUnassignedBugs(int pageNumber, int pageSize);  // ✅ Get all unassigned (new) bugs
+        Task<List<Bug>> GetUnassignedBugsByProject(int projectId); // ✅ Get all unassigned (new) bugs
+
+        Task<List<Bug>> GetAllUnassignedBugs(); 
 
         Task<List<User>> GetDevelopers();  // ✅ Get list of developers
 

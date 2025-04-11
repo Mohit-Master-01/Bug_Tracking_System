@@ -247,13 +247,15 @@ namespace Bug_Tracking_System.Repositories
                                RoleId = Roles.RoleId,
                                RoleName = Roles.RoleName
                            },
-                           Projects = _dbBug.Projects
-                                      .Where(p => p.Users.Any(au => au.UserId == Users.UserId)) // Fetch all projects assigned to the user
-                                      .Select(p => new Project
-                                      {
-                                          ProjectId = p.ProjectId,
-                                          ProjectName = p.ProjectName
-                                      }).ToList()
+                           Projects = _dbBug.UserProjects
+                                    .Where(up => up.UserId == userId)
+                                    .Include(up => up.Project)
+                                    .Select(up => new Project
+                                    {
+                                        ProjectId = up.Project.ProjectId,
+                                        ProjectName = up.Project.ProjectName
+                                    })
+                                    .ToList()
                        }).FirstOrDefaultAsync();
 
             return user;

@@ -1,5 +1,7 @@
 ﻿using Bug_Tracking_System.Models;
 using Bug_Tracking_System.Repositories.Interfaces;
+using Microsoft.Build.Evaluation;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using System.Drawing;
 using X.PagedList;
@@ -73,41 +75,77 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
                 .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
-        public async Task<IPagedList<User>> GetAllDevelopers(int pageNumber, int pageSize)
+        public async Task<List<User>> GetAllDevelopers()
         {
             var members = await(
-                    from Users in _dbBug.Users
-                    join Roles in _dbBug.Roles on Users.RoleId equals Roles.RoleId
-                    join Projects in _dbBug.Projects on Users.ProjectId equals Projects.ProjectId into projGroup
-                    from project in projGroup.DefaultIfEmpty() // Left Join to include users without projects
-                    where Users.RoleId == 2 // Exclude Admins
-                    select new User
-                    {
-                        UserId = Users.UserId,
-                        UserName = Users.UserName,
-                        Email = Users.Email,
-                        RoleId = Users.RoleId,
-                        CreatedDate = Users.CreatedDate,
-                        IsActive = Users.IsActive,
-                        ProfileImage = Users.ProfileImage,
-                        ProjectId = Users.ProjectId,
-                        Role = new Role
-                        {
-                            RoleId = Roles.RoleId,
-                            RoleName = Roles.RoleName
-                        },
-                        Project = project != null ? new Project
-                        {
-                            ProjectId = project.ProjectId,
-                            ProjectName = project.ProjectName
-                        } : null
-                    }
-                ).OrderByDescending(m => m.CreatedDate).ToListAsync();
+                                from Users in _dbBug.Users
+                                join Roles in _dbBug.Roles on Users.RoleId equals Roles.RoleId
+                                join Projects in _dbBug.Projects on Users.ProjectId equals Projects.ProjectId into projGroup
+                                from project in projGroup.DefaultIfEmpty() // Left Join to include users without projects
+                                where Users.RoleId == 2 // Exclude Admins
+                                select new User
+                                {
+                                    UserId = Users.UserId,
+                                    UserName = Users.UserName,
+                                    Email = Users.Email,
+                                    RoleId = Users.RoleId,
+                                    CreatedDate = Users.CreatedDate,
+                                    IsActive = Users.IsActive,
+                                    ProfileImage = Users.ProfileImage,
+                                    ProjectId = Users.ProjectId,
+                                    Role = new Role
+                                    {
+                                        RoleId = Roles.RoleId,
+                                        RoleName = Roles.RoleName
+                                    },
+                                    Project = project != null ? new Models.Project
+                                    {
+                                        ProjectId = project.ProjectId,
+                                        ProjectName = project.ProjectName
+                                    } : null
+                                }
+                            ).OrderByDescending(m => m.CreatedDate).ToListAsync();
 
-            return members.ToPagedList(pageNumber, pageSize);
+            return members;
         }
 
-        public async Task<IPagedList<User>> GetAllMembers(int pageNumber, int pageSize)
+        public async Task<List<User>> GetAllDevelopersByProject(int projectId)
+        {
+            var developers = await (
+                        from up in _dbBug.UserProjects
+                        join user in _dbBug.Users on up.UserId equals user.UserId
+                        join role in _dbBug.Roles on user.RoleId equals role.RoleId
+                        where up.ProjectId == projectId && user.RoleId == 2
+                        select new User
+                        {
+                            UserId = user.UserId,
+                            UserName = user.UserName,
+                            Email = user.Email,
+                            RoleId = user.RoleId,
+                            CreatedDate = user.CreatedDate,
+                            IsActive = user.IsActive,
+                            ProfileImage = user.ProfileImage,
+                            Role = new Role
+                            {
+                                RoleId = role.RoleId,
+                                RoleName = role.RoleName
+                            },
+                            // You can set a single project or list of projects if needed
+                            Project = new Models.Project
+                            {
+                                ProjectId = (int)up.ProjectId,
+                                ProjectName = _dbBug.Projects
+                                    .Where(p => p.ProjectId == up.ProjectId)
+                                    .Select(p => p.ProjectName)
+                                    .FirstOrDefault()
+                            }
+                        }
+                    ).OrderByDescending(m => m.CreatedDate).ToListAsync();
+
+            return developers;
+        }
+
+        public async Task<List<User>> GetAllMembers()
         {
             var members = await (
         from Users in _dbBug.Users
@@ -130,7 +168,7 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
                 RoleId = Roles.RoleId,
                 RoleName = Roles.RoleName
             },
-            Project = project != null ? new Project
+            Project = project != null ? new Models.Project
             {
                 ProjectId = project.ProjectId,
                 ProjectName = project.ProjectName
@@ -138,7 +176,7 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
         }
     ).OrderByDescending(m => m.CreatedDate).ToListAsync();
 
-            return members.ToPagedList(pageNumber, pageSize);
+            return members;
 
 
             //var member = await _dbBug.Users.Include(m => m.Role).Where(m => m.RoleId == 2).Where(m => (bool)m.IsActive).Where(m => (bool)m.IsEmailVerified).OrderByDescending(m => m.CreatedDate).ToListAsync();
@@ -168,7 +206,7 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
                                   RoleId = Roles.RoleId,
                                   RoleName = Roles.RoleName
                               },
-                              Project = new Project
+                              Project = new Models.Project
                               {
                                   ProjectId = Projects.ProjectId,
                                   ProjectName = Projects.ProjectName,
@@ -180,13 +218,46 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
 
         }
 
-        public async Task<IPagedList<User>> GetAllProjectManagers(int pageNumber, int pageSize)
+        public async Task<List<User>> GetAllProjectManagers()
+        {
+            var members = await(
+                                from Users in _dbBug.Users
+                                join Roles in _dbBug.Roles on Users.RoleId equals Roles.RoleId
+                                join Projects in _dbBug.Projects on Users.ProjectId equals Projects.ProjectId
+                                where Users.RoleId == 1 // Include Project managers
+                                select new User
+                                {
+                                    UserId = Users.UserId,
+                                    UserName = Users.UserName,
+                                    Email = Users.Email,
+                                    RoleId = Users.RoleId,
+                                    CreatedDate = Users.CreatedDate,
+                                    IsActive = Users.IsActive,
+                                    ProfileImage = Users.ProfileImage,
+                                    ProjectId = Users.ProjectId,
+                                    Role = new Role
+                                    {
+                                        RoleId = Roles.RoleId,
+                                        RoleName = Roles.RoleName
+                                    },
+                                    Project = new Models.Project
+                                    {
+                                        ProjectId = Projects.ProjectId,
+                                        ProjectName = Projects.ProjectName,
+                                    }
+                                }
+                            ).OrderByDescending(m => m.CreatedDate).ToListAsync();
+
+            return members;
+        }
+
+        public async Task<List<User>> GetAllProjectManagersByProject(int projectId)
         {
             var members = await(
                     from Users in _dbBug.Users
                     join Roles in _dbBug.Roles on Users.RoleId equals Roles.RoleId
                     join Projects in _dbBug.Projects on Users.ProjectId equals Projects.ProjectId
-                    where Users.RoleId == 1 // Include Project managers
+                    where Users.RoleId == 1 && Users.Project.ProjectId == projectId// Include Project managers
                     select new User
                     {
                         UserId = Users.UserId,
@@ -202,7 +273,7 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
                             RoleId = Roles.RoleId,
                             RoleName = Roles.RoleName
                         },                            
-                        Project = new Project
+                        Project = new Models.Project
                         {
                             ProjectId = Projects.ProjectId,
                             ProjectName = Projects.ProjectName,
@@ -210,7 +281,7 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
                     }
                 ).OrderByDescending(m => m.CreatedDate).ToListAsync();
 
-            return members.ToPagedList(pageNumber, pageSize);
+            return members;
         }
 
         public async Task<List<Role>> GetAllRoles()
@@ -218,38 +289,74 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
             return await _dbBug.Roles.ToListAsync();
         }
 
-        public async Task<IPagedList<User>> GetAllTesters(int pageNumber, int pageSize)
+        public async Task<List<User>> GetAllTesters()
         {
             var members = await(
-                    from Users in _dbBug.Users
-                    join Roles in _dbBug.Roles on Users.RoleId equals Roles.RoleId
-                    join Projects in _dbBug.Projects on Users.ProjectId equals Projects.ProjectId into projGroup
-                    from project in projGroup.DefaultIfEmpty() // Left Join to include users without projects
-                    where Users.RoleId == 3 // Exclude Admins
-                    select new User
-                    {
-                        UserId = Users.UserId,
-                        UserName = Users.UserName,
-                        Email = Users.Email,
-                        RoleId = Users.RoleId,
-                        CreatedDate = Users.CreatedDate,
-                        IsActive = Users.IsActive,
-                        ProfileImage = Users.ProfileImage,
-                        ProjectId = Users.ProjectId,
-                        Role = new Role
-                        {
-                            RoleId = Roles.RoleId,
-                            RoleName = Roles.RoleName
-                        },
-                        Project = project != null ? new Project
-                        {
-                            ProjectId = project.ProjectId,
-                            ProjectName = project.ProjectName
-                        } : null
-                    }
-                ).OrderByDescending(m => m.CreatedDate).ToListAsync();
+                                from Users in _dbBug.Users
+                                join Roles in _dbBug.Roles on Users.RoleId equals Roles.RoleId
+                                join Projects in _dbBug.Projects on Users.ProjectId equals Projects.ProjectId into projGroup
+                                from project in projGroup.DefaultIfEmpty() // Left Join to include users without projects
+                                where Users.RoleId == 3 // Exclude Admins
+                                select new User
+                                {
+                                    UserId = Users.UserId,
+                                    UserName = Users.UserName,
+                                    Email = Users.Email,
+                                    RoleId = Users.RoleId,
+                                    CreatedDate = Users.CreatedDate,
+                                    IsActive = Users.IsActive,
+                                    ProfileImage = Users.ProfileImage,
+                                    ProjectId = Users.ProjectId,
+                                    Role = new Role
+                                    {
+                                        RoleId = Roles.RoleId,
+                                        RoleName = Roles.RoleName
+                                    },
+                                    Project = project != null ? new Models.Project
+                                    {
+                                        ProjectId = project.ProjectId,
+                                        ProjectName = project.ProjectName
+                                    } : null
+                                }
+                            ).OrderByDescending(m => m.CreatedDate).ToListAsync();
 
-            return members.ToPagedList(pageNumber, pageSize);
+            return members;
+        }
+
+        public async Task<List<User>> GetAllTestersByProject(int projectId)
+        {
+            var testers = await (
+                        from up in _dbBug.UserProjects
+                        join user in _dbBug.Users on up.UserId equals user.UserId
+                        join role in _dbBug.Roles on user.RoleId equals role.RoleId
+                        where up.ProjectId == projectId && user.RoleId == 2
+                        select new User
+                        {
+                            UserId = user.UserId,
+                            UserName = user.UserName,
+                            Email = user.Email,
+                            RoleId = user.RoleId,
+                            CreatedDate = user.CreatedDate,
+                            IsActive = user.IsActive,
+                            ProfileImage = user.ProfileImage,
+                            Role = new Role
+                            {
+                                RoleId = role.RoleId,
+                                RoleName = role.RoleName
+                            },
+                            // You can set a single project or list of projects if needed
+                            Project = new Models.Project
+                            {
+                                ProjectId = (int)up.ProjectId,
+                                ProjectName = _dbBug.Projects
+                                    .Where(p => p.ProjectId == up.ProjectId)
+                                    .Select(p => p.ProjectName)
+                                    .FirstOrDefault()
+                            }
+                        }
+                    ).OrderByDescending(m => m.CreatedDate).ToListAsync();
+
+            return testers;
         }
 
         public async Task<object> SaveMember(User member, IFormFile? ImageFile, List<int>? ProjectIds)

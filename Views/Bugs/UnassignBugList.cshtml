@@ -1,5 +1,5 @@
-﻿@model X.PagedList.IPagedList<Bug_Tracking_System.Models.Bug>
-@using X.PagedList.Mvc.Core
+﻿@model List<Bug_Tracking_System.Models.Bug>
+
 
 @{
     ViewData["Title"] = "Unassigned Bugs";
@@ -7,6 +7,38 @@
 }
 
 <style>
+
+    .no-data-card {
+        border: 1px solid #dee2e6;
+        border-radius: 1rem;
+        padding: 2rem;
+        text-align: center;
+        background: linear-gradient(145deg, #f8f9fa, #ffffff);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+    }
+
+    .no-data-icon {
+        font-size: 4rem;
+        color: #5e72e4;
+        margin-bottom: 1rem;
+    }
+
+    .no-data-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #32325d;
+    }
+
+    .no-data-text {
+        color: #8898aa;
+        font-size: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .dataTables_length select {
+        padding-right: 25px !important;
+        width: 80px;
+    }
 
     /* Severity Colors */
     [data-severity="Critical"]::before {
@@ -118,61 +150,97 @@
 <div class="container-fluid" style="font-size: small">
     <div class="row">
         <div class="col">
-            <div class="card shadow">
-                <div class="card-header text-white">
-                    <h3 class="mb-0">Unassigned Bugs</h3>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table align-items-center table-flush">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Description</th>
-                                    <th>Severity</th>
-                                    <th>Priority</th>
-                                    <th>Project</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model)
-                                {
-                                    <tr>
-                                        <td>@item.Title</td>
-                                        <td style="padding-top: 29px;">@Html.Raw(item.Description)</td>
 
-                                        <td data-severity="@item.Severity"></td>
-                                        <td data-priority="@item.Priority"></td>                                      
-                                     
-                                        <td>@item.Project?.ProjectName</td>
-                                        <td data-status="@item.Status?.StatusName"></td>
-                                        
-                                        <td>
-                                            <a asp-action="AssignBug" asp-route-id="@item.BugId" class="btn btn-sm btn-primary">
-                                                <i class="ni ni-send"></i> Assign Bug
-                                            </a>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+            @if (!Model.Any())
+            {
+                <!-- No data UI -->
+                <div class="no-data-card">
+                    <div class="no-data-icon">
+                        <i class="fas fa-bug-slash"></i>
                     </div>
+                    <div class="no-data-title">
+                        All Bugs Seems To Be Assigned
+                    </div>
+                    <div class="no-data-text">
+                        Great job! Everything seems to be working fine.<br />
+                        
+                    </div>
+                    @* <a href="/Bugs/SaveBug" class="btn btn-primary mt-4"> *@
+                    @*     <i class="fas fa-plus"></i> Report New Bug *@
+                    @* </a> *@
                 </div>
+            }
+            else
+            {
+                <div class="card shadow">
+                    <div class="card-header text-white">
+                        <h3 class="mb-0">Unassigned Bugs</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="bugTable" class="table align-items-center table-flush">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Description</th>
+                                        <th>Severity</th>
+                                        <th>Priority</th>
+                                        <th>Project</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>@item.Title</td>
+                                            <td style="padding-top: 29px;">@Html.Raw(item.Description)</td>
 
-                <!-- Pagination UI -->
-                <div class="d-flex justify-content-center">
-                    @Html.PagedListPager(Model, page => Url.Action("UnassignBugList", new { page }),
-                             new PagedListRenderOptions
-                    {
-                        Display = PagedListDisplayMode.IfNeeded,
-                        UlElementClasses = new[] { "pagination", "justify-content-center" },
-                        LiElementClasses = new[] { "page-item" },
-                        PageClasses = new[] { "page-link" }
-                    })
+                                            <td data-severity="@item.Severity"></td>
+                                            <td data-priority="@item.Priority"></td>
+
+                                            <td>@item.Project?.ProjectName</td>
+                                            <td data-status="@item.Status?.StatusName"></td>
+
+                                            <td>
+                                                <a asp-action="AssignBug" asp-route-id="@item.BugId" class="btn btn-sm btn-primary">
+                                                    <i class="ni ni-send"></i> Assign Bug
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
                 </div>
-            </div>
+            }
         </div>
     </div>
 </div>
+
+
+@section Scripts {
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+            // DataTables Initialization
+        $('#bugTable').DataTable({
+            "order": [[3, "desc"]],
+            "paging": true,
+            "searching": true,
+            "language": {
+                "paginate": {
+                    "previous": "<",
+                    "next": ">"
+                }
+            }
+        });
+    </script>
+}

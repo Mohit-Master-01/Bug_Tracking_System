@@ -1,5 +1,6 @@
 ﻿using Bug_Tracking_System.Models;
 using Bug_Tracking_System.Repositories.Interfaces;
+using DocumentFormat.OpenXml.InkML;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bug_Tracking_System.Repositories
@@ -11,6 +12,16 @@ namespace Bug_Tracking_System.Repositories
         public SidebarClassRepos(DbBug dbBug)
         {
             _dbBug = dbBug;            
+        }
+
+        public List<Project> GetAssignedProjects(int userId)
+        {
+            return _dbBug.UserProjects
+           .Include(up => up.Project)
+           .Where(up => up.UserId == userId && up.Project.IsActive)
+           .Select(up => up.Project)
+           .Distinct()
+           .ToList();
         }
 
         public async Task<List<SidebarModel>> GetTabsByRoleIdAsync(int roleId)

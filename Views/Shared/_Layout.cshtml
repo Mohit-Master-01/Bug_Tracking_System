@@ -1,6 +1,9 @@
 ﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 
 @{
+    var assignedProjects = ViewBag.AssignedProjects as List<Bug_Tracking_System.Models.Project>;
+    int? currentProjectId = ViewBag.CurrentProjectId as int?;
+
     var userId = HttpContextAccessor.HttpContext?.Session.GetInt32("UserId");
     var userName = HttpContextAccessor.HttpContext?.Session.GetString("UserName");
     // var userImage = HttpContextAccessor.HttpContext?.Session.GetString("UserImage");
@@ -242,15 +245,36 @@
                 </div>
             </div>
 
-            <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-                <div class="input-group">
-                    <span class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></span>
-                    <input type="text" id="global-search" class="form-control" placeholder="Search..." autocomplete="off">
-                </div>
-                <div id="search-results" class="search-dropdown bg-white shadow-lg p-2 rounded d-none">
-                    <!-- Search results will appear here -->
-                </div>
-            </div>
+            @if (assignedProjects != null && assignedProjects.Count > 1)
+            {
+                <li class="nav-item dropdown px-3" style="margin-top: 4px; list-style: none;">
+                    <select id="projectSwitcher" class="form-select form-select-sm" style="padding-right: 2rem; margin-top: -3px;">
+                        @foreach (var project in assignedProjects)
+                        {
+                            <option value="@project.ProjectId" selected="@(project.ProjectId == currentProjectId ? "selected" : null)">
+                                @project.ProjectName
+                            </option>
+                        }
+                    </select>
+                </li>
+
+                <script>
+                    document.getElementById("projectSwitcher").addEventListener("change", function () {
+                        var selectedProjectId = this.value;
+                        window.location.href = '/Projects/SetCurrentProject?projectId=' + selectedProjectId;
+                    });
+                </script>
+            }
+
+            @* <div class="ms-md-auto pe-md-3 d-flex align-items-center"> *@
+            @*     <div class="input-group"> *@
+            @*         <span class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></span> *@
+            @*         <input type="text" id="global-search" class="form-control" placeholder="Search..." autocomplete="off"> *@
+            @*     </div> *@
+            @*     <div id="search-results" class="search-dropdown bg-white shadow-lg p-2 rounded d-none"> *@
+            @*         <!-- Search results will appear here --> *@
+            @*     </div> *@
+            @* </div> *@
 
             <div class="collapse navbar-collapse" id="navbar">
                 <ul class="navbar-nav ms-auto">

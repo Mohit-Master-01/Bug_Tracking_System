@@ -6,5 +6,7 @@ namespace Bug_Tracking_System.Repositories.Interfaces
     {
         Task<List<SidebarModel>> GetTabsByRoleIdAsync(int roleId);
 
+        List<Project> GetAssignedProjects(int userId);
+
     }
 }

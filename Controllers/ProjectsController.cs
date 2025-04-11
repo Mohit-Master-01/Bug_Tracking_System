@@ -22,6 +22,12 @@ namespace Bug_Tracking_System.Controllers
             _permission = permission;
         }
 
+        public IActionResult SetCurrentProject(int projectId)
+        {
+            HttpContext.Session.SetInt32("CurrentProjectId", projectId);
+            return Redirect(Request.Headers["Referer"].ToString());
+        }
+
         // Public method to get user permission
         public string GetUserPermission(string action)
         {

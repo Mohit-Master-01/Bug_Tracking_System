@@ -41,18 +41,16 @@ namespace Bug_Tracking_System.Controllers
 
 
         [ActionName("MembersList")]
-        public async Task<IActionResult> Index(int? page)
+        public async Task<IActionResult> Index()
         {
             string permissionType = GetUserPermission("Manage Members");
             if (permissionType
                 == "canView" || permissionType == "canEdit" || permissionType == "fullAccess")
             {
-                int pageSize = 4; // Number of records per page
-                int pageNumber = page ?? 1; // Default to page 1
 
                 ViewBag.PageTitle = "Members List";
                 ViewBag.Breadcrumb = "Reports";
-                var members = await _member.GetAllMembers(pageNumber, pageSize);
+                var members = await _member.GetAllMembers();
                 return View(members);
             }
             else
@@ -117,35 +115,60 @@ namespace Bug_Tracking_System.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ProjectManagersList(int? page)
+        public async Task<IActionResult> ProjectManagersList()
         {
-            string permissionType = GetUserPermission("View Project Managers");
-            if (permissionType == "canView" || permissionType == "canEdit" || permissionType == "fullAccess")
+            try
             {
-                int pageSize = 4;
-                int pageNumber = page ?? 1;
-                ViewBag.PageTitle = "Project Managers List";
-                ViewBag.Breadcrumb = "Reports";
+                string permissionType = GetUserPermission("View Project Managers");
 
-                var ProjectManagers = await _member.GetAllProjectManagers(pageNumber, pageSize);
+                if (permissionType == "canView" || permissionType == "canEdit" || permissionType == "fullAccess")
+                {
+                    ViewBag.PageTitle = "Project Managers List";
+                    ViewBag.Breadcrumb = "Reports";
 
-                ViewBag.TotalManagers = ProjectManagers.Count;
-                ViewBag.ActiveManagers = ProjectManagers.Count(u => (bool)u.IsActive);
-                ViewBag.InactiveManagers = ProjectManagers.Count(u => (bool)!u.IsActive);
+                    int? currentProjectId = HttpContext.Session.GetInt32("CurrentProjectId");
+                    int? roleId = HttpContext.Session.GetInt32("UserRoleId");
 
-                ViewBag.JoinedThisMonth = ProjectManagers.Count(u =>
-                                            u.CreatedDate.HasValue &&
-                                            u.CreatedDate.Value.Month == DateTime.Now.Month &&
-                                            u.CreatedDate.Value.Year == DateTime.Now.Year);
+                    if ((currentProjectId == null || currentProjectId == 0) && roleId != 4)
+                    {
+                        TempData["Error"] = "Please select a project first.";
+                        return RedirectToAction("Index", "Home");
+                    }
 
+                    List<User> projectManagers;
 
-                return View(ProjectManagers);
+                    if (roleId == 4) // Admin
+                    {
+                        projectManagers = await _member.GetAllProjectManagers();
+                    }
+                    else
+                    {
+                        projectManagers = await _member.GetAllProjectManagersByProject((int)currentProjectId);
+                    }
+
+                    // Stats for dashboard/cards
+                    ViewBag.TotalManagers = projectManagers.Count;
+                    ViewBag.ActiveManagers = projectManagers.Count(u => u.IsActive == true);
+                    ViewBag.InactiveManagers = projectManagers.Count(u => u.IsActive == false);
+                    ViewBag.JoinedThisMonth = projectManagers.Count(u =>
+                                                        u.CreatedDate.HasValue &&
+                                                        u.CreatedDate.Value.Month == DateTime.Now.Month &&
+                                                        u.CreatedDate.Value.Year == DateTime.Now.Year);
+
+                    return View(projectManagers);
+                }
+                else
+                {
+                    return RedirectToAction("UnauthorisedAccess", "Error");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return RedirectToAction("UnauthorisedAccess", "Error");
+                Console.WriteLine($"Error fetching project managers list: {ex.Message}");
+                return View("Error");
             }
         }
+
 
         public async Task<IActionResult> ExportProjectManagerList()
         {
@@ -200,38 +223,58 @@ namespace Bug_Tracking_System.Controllers
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ProjectManagerListReports.xlsx");
         }
 
-        [HttpGet]
-        public async Task<IActionResult> DevelopersList(int? page)
+        [HttpGet, ActionName("DevelopersList")]
+        public async Task<IActionResult> DevelopersList()
         {
-            string permissionType = GetUserPermission("View Developers");
-            if (permissionType == "canView" || permissionType == "canEdit" || permissionType == "fullAccess")
+            try
             {
-                int pageSize = 4;
-                int pageNumber = page ?? 1;
-                ViewBag.PageTitle = "Developers List";
-                ViewBag.Breadcrumb = "Reports";
+                string permissionType = GetUserPermission("View Developers");
 
-                var developers = await _member.GetAllDevelopers(pageNumber, pageSize);
-
-                ViewBag.TotalDevelopers = developers.Count;
-                ViewBag.ActiveDevelopers = developers.Count(u => (bool)u.IsActive);
-                ViewBag.InactiveDevelopers = developers.Count(u => (bool)!u.IsActive);
-
-                ViewBag.JoinedThisMonth = developers.Count(u =>
-                                            u.CreatedDate.HasValue &&
-                                            u.CreatedDate.Value.Month == DateTime.Now.Month &&
-                                            u.CreatedDate.Value.Year == DateTime.Now.Year);
-
-                if (developers == null || !developers.Any())
+                if (permissionType == "canView" || permissionType == "canEdit" || permissionType == "fullAccess")
                 {
-                    ViewBag.Message = "No developers found.";
-                }
+                    ViewBag.PageTitle = "Developers List";
+                    ViewBag.Breadcrumb = "Reports";
 
-                return View(developers);
+                    int? currentProjectId = HttpContext.Session.GetInt32("CurrentProjectId");
+                    int? roleId = HttpContext.Session.GetInt32("UserRoleId");
+
+                    if ((currentProjectId == null || currentProjectId == 0) && roleId != 4)
+                    {
+                        TempData["Error"] = "Please select a project first.";
+                        return RedirectToAction("Index", "Home");
+                    }
+
+                    List<User> Developers;
+
+                    if (roleId == 4) // Admin
+                    {
+                        Developers = await _member.GetAllDevelopers();
+                    }
+                    else
+                    {
+                        Developers = await _member.GetAllDevelopersByProject((int)currentProjectId);
+                    }
+
+                    // Stats for dashboard/cards
+                    ViewBag.TotalDevelopers = Developers.Count;
+                    ViewBag.ActiveDevelopers = Developers.Count(u => u.IsActive == true);
+                    ViewBag.InactiveDevelopers = Developers.Count(u => u.IsActive == false);
+                    ViewBag.JoinedThisMonth = Developers.Count(u =>
+                                                        u.CreatedDate.HasValue &&
+                                                        u.CreatedDate.Value.Month == DateTime.Now.Month &&
+                                                        u.CreatedDate.Value.Year == DateTime.Now.Year);
+
+                    return View(Developers);
+                }
+                else
+                {
+                    return RedirectToAction("UnauthorisedAccess", "Error");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return RedirectToAction("UnauthorisedAccess", "Error");
+                Console.WriteLine($"Error fetching project managers list: {ex.Message}");
+                return View("Error");
             }
         }
 
@@ -300,7 +343,7 @@ namespace Bug_Tracking_System.Controllers
                 int pageNumber = page ?? 1;
                 ViewBag.PageTitle = "Tester List";
                 ViewBag.Breadcrumb = "Reports";
-                var Testers = await _member.GetAllTesters(pageNumber, pageSize);
+                var Testers = await _member.GetAllTesters();
 
                 ViewBag.TotalTesters = Testers.Count;
                 ViewBag.ActiveTesters = Testers.Count(u => (bool)u.IsActive);
@@ -387,12 +430,14 @@ namespace Bug_Tracking_System.Controllers
             if (member == null)
                 return NotFound();
 
-            // Assuming a many-to-many relationship (UserProjects table)
-            var projects = await _dbBug.Projects
-                .Where(p => p.Users.Any(pd => pd.UserId == id))
+            // Fetch assigned projects using the UserProject join table
+            var assignedProjects = await _dbBug.UserProjects
+                .Where(up => up.UserId == id)
+                .Include(up => up.Project)
+                .Select(up => up.Project)
                 .ToListAsync();
 
-            ViewBag.AssignedProjects = projects;
+            ViewBag.AssignedProjects = assignedProjects;
 
             return View(member);
         }

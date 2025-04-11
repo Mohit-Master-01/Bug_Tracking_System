@@ -7,6 +7,8 @@ using System.Drawing;
 using System.Drawing.Printing;
 using X.PagedList;
 using X.PagedList.Extensions;
+using Microsoft.CodeAnalysis;
+using Microsoft.Build.Evaluation;
 
 
 namespace Bug_Tracking_System.Repositories.BugsClasses
@@ -83,24 +85,23 @@ namespace Bug_Tracking_System.Repositories.BugsClasses
             }
             return false;
         }
-                
-        public async Task<IPagedList<Bug>> GetAllBugsData(int pageNumber, int pageSize)
+
+        public async Task<List<Bug>> GetBugsByProject(int projectId)
         {
             if (_dbBug == null)
-            {
                 throw new InvalidOperationException("Database context (_dbBug) is not initialized.");
-            }
 
             var bugs = await _dbBug.Bugs
-                .Include(b => b.Attachments)  // Include attachments for images
-                .Include(b => b.CreatedByNavigation) // Ensure CreatedByNavigation is loaded
-                .Include(b => b.Project)  // Ensure Project is loaded
-                .Where(b => b.Status.StatusId != 1)  // Ensure Status is loaded
+                .Include(b => b.Attachments)
+                .Include(b => b.CreatedByNavigation)
+                .Include(b => b.Project)
+                .Where(b => b.ProjectId == projectId)
+                .OrderByDescending(b => b.CreatedDate)
                 .Select(b => new Bug
                 {
                     BugId = b.BugId,
                     Title = b.Title,
-                    Description = b.Description, // Ensure description is fetched
+                    Description = b.Description,
                     CreatedDate = b.CreatedDate,
                     Priority = b.Priority,
                     Severity = b.Severity,
@@ -111,9 +112,9 @@ namespace Bug_Tracking_System.Repositories.BugsClasses
                 })
                 .ToListAsync();
 
-            return bugs.ToPagedList(pageNumber, pageSize);
-
+            return bugs;
         }
+    
 
         public async Task<Bug> GetBugById(int bugId)
         {
@@ -151,23 +152,19 @@ namespace Bug_Tracking_System.Repositories.BugsClasses
                         .ToListAsync();
         }
 
-        public async Task<IPagedList<Bug>> GetUnassignedBugs(int pageNumber, int pageSize)
+        public async Task<List<Bug>> GetUnassignedBugsByProject(int projectId)
         {
-            if (_dbBug == null)
-            {
-                throw new InvalidOperationException("Database context (_dbBug) is not initialized.");
-            }
-
             var bugs = await _dbBug.Bugs
-                .Include(b => b.Attachments)  // Include attachments for images
-                .Include(b => b.CreatedByNavigation) // Ensure CreatedByNavigation is loaded
-                .Include(b => b.Project)  // Ensure Project is loaded
-                .Where(b => b.Status.StatusId == 1 )  // Ensure Status is loaded
+                .Include(b => b.Attachments)
+                .Include(b => b.CreatedByNavigation)
+                .Include(b => b.Project)
+                .Where(b => b.ProjectId == projectId && b.Status.StatusId == 1)
+                .OrderByDescending(b => b.CreatedDate)
                 .Select(b => new Bug
                 {
                     BugId = b.BugId,
                     Title = b.Title,
-                    Description = b.Description, // Ensure description is fetched
+                    Description = b.Description,
                     CreatedDate = b.CreatedDate,
                     Priority = b.Priority,
                     Severity = b.Severity,
@@ -178,8 +175,9 @@ namespace Bug_Tracking_System.Repositories.BugsClasses
                 })
                 .ToListAsync();
 
-            return bugs.ToPagedList(pageNumber, pageSize);
+            return bugs;
         }
+
 
         public async Task<bool> SaveBug(Bug bug, List<IFormFile> attachments)
         {
@@ -345,6 +343,60 @@ namespace Bug_Tracking_System.Repositories.BugsClasses
                 return await _dbBug.SaveChangesAsync() > 0;
             }
             return false;
+        }
+
+        public async Task<List<Bug>> GetAllUnassignedBugs()
+        {
+            var bugs = await _dbBug.Bugs
+                           .Include(b => b.Attachments)
+                           .Include(b => b.CreatedByNavigation)
+            .Include(b => b.Project)
+                           .Where(b => b.Status.StatusId == 1)
+                           .OrderByDescending(b => b.CreatedDate)
+                           .Select(b => new Bug
+                           {
+                               BugId = b.BugId,
+                               Title = b.Title,
+                               Description = b.Description,
+                               CreatedDate = b.CreatedDate,
+                               Priority = b.Priority,
+                               Severity = b.Severity,
+                               Status = b.Status,
+                               CreatedByNavigation = b.CreatedByNavigation,
+                               Project = b.Project,
+                               Attachments = b.Attachments
+                           })
+                           .ToListAsync();
+
+            return bugs;
+        }
+
+        public async Task<List<Bug>> GetAllBugs()
+        {
+            if (_dbBug == null)
+                throw new InvalidOperationException("Database context (_dbBug) is not initialized.");
+
+            var bugs = await _dbBug.Bugs
+                .Include(b => b.Attachments)
+                .Include(b => b.CreatedByNavigation)
+            .Include(b => b.Project)
+                .OrderByDescending(b => b.CreatedDate)
+                .Select(b => new Bug
+                {
+                    BugId = b.BugId,
+                    Title = b.Title,
+                    Description = b.Description,
+                    CreatedDate = b.CreatedDate,
+                    Priority = b.Priority,
+                    Severity = b.Severity,
+                    Status = b.Status,
+                    CreatedByNavigation = b.CreatedByNavigation,
+                    Project = b.Project,
+                    Attachments = b.Attachments
+                })
+                .ToListAsync();
+
+            return bugs;
         }
     }
 }

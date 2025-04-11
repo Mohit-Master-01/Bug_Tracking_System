@@ -46,29 +46,40 @@ namespace Bug_Tracking_System.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> BugList(int? page)
+        public async Task<IActionResult> BugList()
         {
             try
             {
                 string permissionType = GetUserPermission("View Bugs");
-                if (permissionType
-                    == "canView" || permissionType == "canEdit" || permissionType == "fullAccess")
+                if (permissionType == "canView" || permissionType == "canEdit" || permissionType == "fullAccess")
                 {
-                    int pageSize = 4;
-                    int pageNumber = page ?? 1;
-
                     ViewBag.PageTitle = "Bug List";
                     ViewBag.Breadcrumb = "Manage Bugs";
 
-                    var bugs = await _bug?.GetAllBugsData(pageNumber, pageSize);
+                    int? currentProjectId = HttpContext.Session.GetInt32("CurrentProjectId");
 
-                    if (bugs == null || !bugs.Any())
+                    int? roleId = HttpContext.Session.GetInt32("UserRoleId");
+
+                    if ((currentProjectId == null || currentProjectId == 0) && roleId != 4) // Only validate projectId if not admin
                     {
-                        return View(new List<Bug>()); // Return empty list if null
+                        TempData["Error"] = "Please select a project first.";
+                        return RedirectToAction("Index", "Home");
+                    }
+
+                    List<Bug> bugs;
+
+                    if (roleId == 4) // Admin
+                    {
+                        // Fetch all unassigned bugs for admin
+                        bugs = await _bug.GetAllBugs(); // You can create this method if not existing
+                    }
+                    else
+                    {
+                        // For project users
+                        bugs = await _bug.GetBugsByProject((int)currentProjectId);
                     }
 
                     ViewBag.StatusList = new SelectList(await _dbBug.BugStatuses.ToListAsync(), "StatusId", "StatusName");
-
 
                     return View(bugs);
                 }
@@ -79,11 +90,52 @@ namespace Bug_Tracking_System.Controllers
             }
             catch (Exception ex)
             {
-                // Log error (ensure you use ILogger)
                 Console.WriteLine($"Error fetching bug list: {ex.Message}");
-                return View("Error"); // Redirect to an error page
+                return View("Error");
             }
         }
+
+
+
+        //[HttpGet]
+        //public async Task<IActionResult> BugList(int? page)
+        //{
+        //    try
+        //    {
+        //        string permissionType = GetUserPermission("View Bugs");
+        //        if (permissionType
+        //            == "canView" || permissionType == "canEdit" || permissionType == "fullAccess")
+        //        {
+        //            int pageSize = 4;
+        //            int pageNumber = page ?? 1;
+
+        //            ViewBag.PageTitle = "Bug List";
+        //            ViewBag.Breadcrumb = "Manage Bugs";
+
+        //            var bugs = await _bug?.GetAllBugsData(pageNumber, pageSize);
+
+        //            if (bugs == null || !bugs.Any())
+        //            {
+        //                return View(new List<Bug>()); // Return empty list if null
+        //            }
+
+        //            ViewBag.StatusList = new SelectList(await _dbBug.BugStatuses.ToListAsync(), "StatusId", "StatusName");
+
+
+        //            return View(bugs);
+        //        }
+        //        else
+        //        {
+        //            return RedirectToAction("UnauthorisedAccess", "Error");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Log error (ensure you use ILogger)
+        //        Console.WriteLine($"Error fetching bug list: {ex.Message}");
+        //        return View("Error"); // Redirect to an error page
+        //    }
+        //}
 
         public async Task<IActionResult> ExportBugList()
         {
@@ -136,7 +188,7 @@ namespace Bug_Tracking_System.Controllers
         [HttpGet]
         public async Task<IActionResult> BugDetails(int id)
         {
-            string permissionType = GetUserPermission("Manage Bugs");
+            string permissionType = GetUserPermission("View Bugs");
             if (permissionType == "canEdit" || permissionType == "fullAccess")
             {
                 ViewBag.PageTitle = "Bug Details";
@@ -354,18 +406,37 @@ namespace Bug_Tracking_System.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> UnassignBugList(int? page)
+        public async Task<IActionResult> UnassignBugList()
         {
             string permissionType = GetUserPermission("Assign Bug");
+
             if (permissionType == "canEdit" || permissionType == "fullAccess")
             {
-                int pageSize = 4;
-                int pageNumber = page ?? 1;
-
                 ViewBag.Breadcrumb = "Manage Bugs";
                 ViewBag.PageTitle = "Unassigned Bugs";
 
-                var bugs = await _bug.GetUnassignedBugs(pageNumber, pageSize);
+                int? currentProjectId = HttpContext.Session.GetInt32("CurrentProjectId");
+                int? roleId = HttpContext.Session.GetInt32("UserRoleId");
+
+                if ((currentProjectId == null || currentProjectId == 0) && roleId != 4) // Only validate projectId if not admin
+                {
+                    TempData["Error"] = "Please select a project first.";
+                    return RedirectToAction("Index", "Home");
+                }
+
+                List<Bug> bugs;
+
+                if (roleId == 4) // Admin
+                {
+                    // Fetch all unassigned bugs for admin
+                    bugs = await _bug.GetAllUnassignedBugs(); // You can create this method if not existing
+                }
+                else
+                {
+                    // For project users
+                    bugs = await _bug.GetUnassignedBugsByProject((int)currentProjectId);
+                }
+
                 return View(bugs);
             }
             else
@@ -373,6 +444,29 @@ namespace Bug_Tracking_System.Controllers
                 return RedirectToAction("UnauthorisedAccess", "Error");
             }
         }
+
+
+
+        //[HttpGet]
+        //public async Task<IActionResult> UnassignBugList(int? page)
+        //{
+        //    string permissionType = GetUserPermission("Assign Bug");
+        //    if (permissionType == "canEdit" || permissionType == "fullAccess")
+        //    {
+        //        int pageSize = 4;
+        //        int pageNumber = page ?? 1;
+
+        //        ViewBag.Breadcrumb = "Manage Bugs";
+        //        ViewBag.PageTitle = "Unassigned Bugs";
+
+        //        var bugs = await _bug.GetUnassignedBugs(pageNumber, pageSize);
+        //        return View(bugs);
+        //    }
+        //    else
+        //    {
+        //        return RedirectToAction("UnauthorisedAccess", "Error");
+        //    }
+        //}
 
         [HttpGet]
         public async Task<IActionResult> AssignBug(int id)

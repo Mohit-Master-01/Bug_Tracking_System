@@ -1,5 +1,5 @@
-﻿@model X.PagedList.IPagedList<Bug_Tracking_System.Models.Bug>
-@using X.PagedList.Mvc.Core
+﻿@model List<Bug_Tracking_System.Models.Bug>
+
 
 @{
     ViewData["Title"] = "Bug List";
@@ -8,6 +8,38 @@
 
 
 <style>
+
+    .no-data-card {
+        border: 1px solid #dee2e6;
+        border-radius: 1rem;
+        padding: 2rem;
+        text-align: center;
+        background: linear-gradient(145deg, #f8f9fa, #ffffff);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+    }
+
+    .no-data-icon {
+        font-size: 4rem;
+        color: #5e72e4;
+        margin-bottom: 1rem;
+    }
+
+    .no-data-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #32325d;
+    }
+
+    .no-data-text {
+        color: #8898aa;
+        font-size: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .dataTables_length select {
+        padding-right: 25px !important;
+        width: 80px;
+    }
 
     /* Severity Colors */
     [data-severity="Critical"]::before {
@@ -95,7 +127,7 @@
         font-weight: bold;
         display: inline-block;
     }
-       
+
 
     .table th, .table td {
         text-align: center; /* Align text to center */
@@ -118,6 +150,29 @@
 <div class="container-fluid py-4" style="font-size: small">
     <div class="row">
         <div class="col-12">
+
+            @if (!Model.Any())
+            {
+                <!-- No data UI -->
+                <div class="no-data-card">
+                    <div class="no-data-icon">
+                        <i class="fas fa-bug-slash"></i>
+                    </div>
+                    <div class="no-data-title">
+                        No Bugs Reported Yet
+                    </div>
+                    <div class="no-data-text">
+                        Great job! Everything seems to be working fine.<br />
+                        You can add a new bug if you find one.
+                    </div>
+                    <a href="/Bugs/SaveBug" class="btn btn-primary mt-4">
+                        <i class="fas fa-plus"></i> Report New Bug
+                    </a>
+                </div>
+            }
+            else
+            {
+
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="mb-0">Bug List</h3>
@@ -127,7 +182,7 @@
 
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table align-items-center table-flush">
+                        <table id="bugTable" class="table align-items-center table-flush">
                             <thead class="thead-light">
                                 <tr>
                                     <th>Title</th>
@@ -142,91 +197,84 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var item in Model)
-                                {
-                                    <tr>
-                                        <td>@item.Title</td>
-                                        <td style="padding-top: 29px;">@Html.Raw(item.Description)</td>
-                                        <td data-severity="@item.Severity"></td>
-                                        <td data-priority="@item.Priority"></td>
-                                        <td>@item.CreatedDate?.ToString("dd-MM-yyyy | HH:mm")</td>
-                                        <td>@(item.CreatedByNavigation?.UserName ?? "N/A")</td>
+                                
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>@item.Title</td>
+                                            <td style="padding-top: 29px;">@Html.Raw(item.Description)</td>
+                                            <td data-severity="@item.Severity"></td>
+                                            <td data-priority="@item.Priority"></td>
+                                            <td>@item.CreatedDate?.ToString("dd-MM-yyyy | HH:mm")</td>
+                                            <td>@(item.CreatedByNavigation?.UserName ?? "N/A")</td>
 
 
-                                        <!-- Status with Dropdown -->
-                                        <td>
-                                            <div class="dropdown">
-                                                <button class="btn btn-sm dropdown-toggle status-btn @(item.Status?.StatusName == "Fixed" ? "disabled" : "")"
-                                                        data-id="@item.BugId"
-                                                        data-status="@item.Status?.StatusId"
-                                                        data-bs-toggle="dropdown"
-                                                        aria-expanded="false">
-                                                    @item.Status?.StatusName
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    @foreach (var status in ViewBag.StatusList)
-                                                    {
-                                                        <li>
-                                                            <a class="dropdown-item change-status @(item.Status?.StatusName == "Fixed" ? "disabled" : "")"
-                                                               href="#"
-                                                               data-bug-id="@item.BugId"
-                                                               data-status-id="@status.Value">
-                                                                @status.Text
-                                                            </a>
-                                                        </li>
-                                                    }
-                                                </ul>
-                                            </div>
-                                        </td>
-
-
-
-                                        <td style="margin-top: 8px;">
-                                            @if (ViewBag.PermissionType != "canView")
-                                            {
-                                                <div style="display: flex; gap: 10px; align-items: center;">
-                                                    <a asp-action="SaveBug" asp-route-id="@item.BugId" class="btn btn-warning btn-sm"
-                                                       style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
-                                                        <i class="fas fa-edit" style="font-size: 16px;"></i>
-                                                    </a>
-
-                                                    <a asp-action="BugDetails" asp-route-id="@item.BugId" class="btn btn-info btn-sm"
-                                                       style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
-                                                        <i class="fas fa-eye" style="font-size: 16px;"></i>
-                                                    </a>
-
-                                                    <a href="#" class="btn btn-danger btn-sm delete-bug" data-bugid="@item.BugId" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
-                                                        <i class="fas fa-trash-alt"></i>
-                                                    </a>
+                                            <!-- Status with Dropdown -->
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm dropdown-toggle status-btn @(item.Status?.StatusName == "Fixed" ? "disabled" : "")"
+                                                            data-id="@item.BugId"
+                                                            data-status="@item.Status?.StatusId"
+                                                            data-bs-toggle="dropdown"
+                                                            aria-expanded="false">
+                                                        @item.Status?.StatusName
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        @foreach (var status in ViewBag.StatusList)
+                                                        {
+                                                            <li>
+                                                                <a class="dropdown-item change-status @(item.Status?.StatusName == "Fixed" ? "disabled" : "")"
+                                                                   href="#"
+                                                                   data-bug-id="@item.BugId"
+                                                                   data-status-id="@status.Value">
+                                                                    @status.Text
+                                                                </a>
+                                                            </li>
+                                                        }
+                                                    </ul>
                                                 </div>
-                                            }
-                                            else
-                                            {
-                                                <p>------</p>
-                                            }
-                                        </td>
-                                    </tr>
-                                }
+                                            </td>
+
+
+
+                                            <td style="margin-top: 8px;">
+                                                @if (ViewBag.PermissionType != "canView")
+                                                {
+                                                    <div style="display: flex; gap: 10px; align-items: center;">
+                                                        <a asp-action="SaveBug" asp-route-id="@item.BugId" class="btn btn-warning btn-sm"
+                                                           style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
+                                                            <i class="fas fa-edit" style="font-size: 16px;"></i>
+                                                        </a>
+
+                                                        <a asp-action="BugDetails" asp-route-id="@item.BugId" class="btn btn-info btn-sm"
+                                                           style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
+                                                            <i class="fas fa-eye" style="font-size: 16px;"></i>
+                                                        </a>
+
+                                                        <a href="#" class="btn btn-danger btn-sm delete-bug" data-bugid="@item.BugId" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </a>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <p>------</p>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                
                             </tbody>
 
                         </table>
 
-                        <!-- Pagination UI -->
-                        <div class="d-flex justify-content-center">
-                            @Html.PagedListPager(Model, page => Url.Action("BugList", new { page }),
-                                     new PagedListRenderOptions
-                            {
-                                Display = PagedListDisplayMode.IfNeeded,
-                                UlElementClasses = new[] { "pagination", "justify-content-center" },
-                                LiElementClasses = new[] { "page-item" },
-                                PageClasses = new[] { "page-link" }
-                            })
-                        </div>
+
 
                     </div>
                 </div>
 
             </div>
+            }
         </div>
     </div>
 </div>
@@ -234,12 +282,26 @@
 @section Scripts {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <!-- Include SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script src="~/js/Bugs.js"></script>
     <script>
+             // DataTables Initialization
+        $('#bugTable').DataTable({
+            "order": [[3, "desc"]],
+            "paging": true,
+            "searching": true,
+            "language": {
+                "paginate": {
+                    "previous": "<",
+                    "next": ">"
+                }
+            }
+        });
+
 
                 document.getElementById("exportProductsBtn").addEventListener("click", function () {
                     window.location.href = "/Bugs/ExportBugList";
@@ -351,7 +413,7 @@
                 });
             });
         });
-        
+
     </script>
-        
+
 }

@@ -7,13 +7,18 @@ namespace Bug_Tracking_System.Repositories.Interfaces
     {
         Task<User> GetAllMembersData();
 
-        Task<IPagedList<User>> GetAllMembers(int pageNumber, int pageSize);
+        Task<List<User>> GetAllMembers();
 
-        Task<IPagedList<User>> GetAllProjectManagers(int pageNumber, int pageSize);
+        Task<List<User>> GetAllProjectManagersByProject(int projectId);
 
-        Task<IPagedList<User>> GetAllDevelopers(int pageNumber, int pageSize);
+        Task<List<User>> GetAllProjectManagers();
 
-        Task<IPagedList<User>> GetAllTesters(int pageNumber, int pageSize);
+        Task<List<User>> GetAllDevelopersByProject(int projectId);
+            
+        Task<List<User>> GetAllDevelopers();
+
+        Task<List<User>> GetAllTestersByProject(int projectId);
+        Task<List<User>> GetAllTesters();
 
         Task<object> SaveMember(User member, IFormFile? ImageFile, List<int>? ProjectIds);
 

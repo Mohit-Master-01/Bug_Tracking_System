@@ -1,10 +1,43 @@
-﻿@model X.PagedList.IPagedList<Bug_Tracking_System.Models.User>
-@using X.PagedList.Mvc.Core
+﻿@model List<Bug_Tracking_System.Models.User>
 
 @{
     ViewData["Title"] = "Members List";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+<style>
+    .no-data-card {
+        border: 1px solid #dee2e6;
+        border-radius: 1rem;
+        padding: 2rem;
+        text-align: center;
+        background: linear-gradient(145deg, #f8f9fa, #ffffff);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+    }
+
+    .no-data-icon {
+        font-size: 4rem;
+        color: #5e72e4;
+        margin-bottom: 1rem;
+    }
+
+    .no-data-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #32325d;
+    }
+
+    .no-data-text {
+        color: #8898aa;
+        font-size: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .dataTables_length select {
+        padding-right: 25px !important;
+        width: 80px;
+    }
+</style>
 
 <div class="container-fluid py-4">
     <div class="card shadow-lg border-0">
@@ -13,7 +46,7 @@
 
             @if (ViewBag.PermissionType != "canView")
             {
-                <a asp-action="SaveMember" class="btn btn-light btn-sm text-primary">
+                <a asp-action="SaveMember" class="btn btn-light btn-sm text-primary" style="margin-right: -769px;">
                     <i class="fas fa-plus"></i> Add New Member
                 </a>
             }
@@ -21,7 +54,7 @@
 
         </div>
         <div class="card-body">  
-            <table class="table table-hover align-middle text-center">
+            <table id="memberTable" class="table table-hover align-middle text-center">
                 <thead class="bg-dark">
                     <tr>
                         <th class="text-white">Profile Image</th>
@@ -75,24 +108,31 @@
                 </tbody>
             </table>
 
-            <!-- Pagination UI -->
-            <div class="d-flex justify-content-center">
-                @Html.PagedListPager(Model, page => Url.Action("MembersList", new { page }),
-                         new PagedListRenderOptions
-                {
-                    Display = PagedListDisplayMode.IfNeeded,
-                    UlElementClasses = new[] { "pagination", "justify-content-center" },
-                    LiElementClasses = new[] { "page-item" },
-                    PageClasses = new[] { "page-link" }
-                })
-            </div>
+
         </div>
     </div>
 </div>
 
 @section Scripts {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+            // DataTables Initialization
+        $('#memberTable').DataTable({
+            "order": [[3, "desc"]],
+            "paging": true,
+            "searching": true,
+            "language": {
+                "paginate": {
+                    "previous": "<",
+                    "next": ">"
+                }
+            }
+        });
+
             document.getElementById("exportProductsBtn").addEventListener("click", function () {
                     window.location.href = "/Members/ExportMemberList";
         });
