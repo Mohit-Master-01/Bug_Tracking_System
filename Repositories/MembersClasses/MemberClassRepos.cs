@@ -163,6 +163,7 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
             IsActive = Users.IsActive,
             ProfileImage = Users.ProfileImage,
             ProjectId = Users.ProjectId,
+            IsRestricted = Users.IsRestricted,
             Role = new Role
             {
                 RoleId = Roles.RoleId,
@@ -184,39 +185,40 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
 
         }
 
-        public async Task<User> GetAllMembersData()
+        public async Task<List<User>> GetAllMembersByProject(int projectId)
         {
             var members = await (
-                          from Users in _dbBug.Users
-                          join Roles in _dbBug.Roles on Users.RoleId equals Roles.RoleId
-                          join Projects in _dbBug.Projects on Users.ProjectId equals Projects.ProjectId
-                          where Users.RoleId != 4
-                          select new User
-                          {
-                              UserId = Users.UserId,
-                              UserName = Users.UserName,
-                              Email = Users.Email,
-                              RoleId = Users.RoleId,
-                              CreatedDate = Users.CreatedDate,
-                              IsActive = Users.IsActive,
-                              ProfileImage = Users.ProfileImage,
-                              ProjectId = Users.ProjectId,
-                              Role = new Role
-                              {
-                                  RoleId = Roles.RoleId,
-                                  RoleName = Roles.RoleName
-                              },
-                              Project = new Models.Project
-                              {
-                                  ProjectId = Projects.ProjectId,
-                                  ProjectName = Projects.ProjectName,
-                              }
+                       from Users in _dbBug.Users
+                       join Roles in _dbBug.Roles on Users.RoleId equals Roles.RoleId
+                       join Projects in _dbBug.Projects on Users.ProjectId equals Projects.ProjectId
+                       where Users.RoleId != 4 && Users.ProjectId == projectId // <-- filter by projectId
+                       select new User
+                       {
+                           UserId = Users.UserId,
+                           UserName = Users.UserName,
+                           Email = Users.Email,
+                           RoleId = Users.RoleId,
+                           CreatedDate = Users.CreatedDate,
+                           IsActive = Users.IsActive,
+                           ProfileImage = Users.ProfileImage,
+                           ProjectId = Users.ProjectId,
+                           IsRestricted = Users.IsRestricted,
+                           Role = new Role
+                           {
+                               RoleId = Roles.RoleId,
+                               RoleName = Roles.RoleName
+                           },
+                           Project = new Models.Project
+                           {
+                               ProjectId = Projects.ProjectId,
+                               ProjectName = Projects.ProjectName,
+                           }
 
-                          }).FirstOrDefaultAsync();
+                       }).ToListAsync();
 
             return members;
-
         }
+
 
         public async Task<List<User>> GetAllProjectManagers()
         {

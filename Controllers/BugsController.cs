@@ -1,5 +1,6 @@
 ﻿using Bug_Tracking_System.Models;
 using Bug_Tracking_System.Repositories.Interfaces;
+using DocumentFormat.OpenXml.InkML;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -95,6 +96,17 @@ namespace Bug_Tracking_System.Controllers
             }
         }
 
+        [HttpGet]
+        public JsonResult GetCalendarBugs()
+        {
+            var bugs = _dbBug.Bugs.Select(b => new {
+                id = b.BugId,
+                title = b.Title,
+                start = b.CreatedDate.ToString("yyyy-MM-dd")
+            }).ToList();
+
+            return Json(bugs);
+        }
 
 
         //[HttpGet]

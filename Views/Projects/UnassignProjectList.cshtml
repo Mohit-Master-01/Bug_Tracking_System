@@ -1,5 +1,4 @@
-﻿@model X.PagedList.IPagedList<Bug_Tracking_System.Models.Project>
-@using X.PagedList.Mvc.Core
+﻿@model List<Bug_Tracking_System.Models.Project>
 
 @{
     ViewData["Title"] = "Unassigned Projects";
@@ -7,6 +6,38 @@
 }
 
 <style>
+
+    .no-data-card {
+        border: 1px solid #dee2e6;
+        border-radius: 1rem;
+        padding: 2rem;
+        text-align: center;
+        background: linear-gradient(145deg, #f8f9fa, #ffffff);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+    }
+
+    .no-data-icon {
+        font-size: 4rem;
+        color: #5e72e4;
+        margin-bottom: 1rem;
+    }
+
+    .no-data-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #32325d;
+    }
+
+    .no-data-text {
+        color: #8898aa;
+        font-size: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .dataTables_length select {
+        padding-right: 25px !important;
+        width: 80px;
+    }
 
         /* Status Colors */
     [data-status="Assigned"]::before {
@@ -76,7 +107,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table align-items-center table-flush">
+                        <table id="projectTable" class="table align-items-center table-flush">
                             <thead class="thead-light">
                                 <tr>
                                     <th>Project Name</th>
@@ -123,18 +154,29 @@
                     </div>
                 </div>
 
-                <!-- Pagination UI -->
-                <div class="d-flex justify-content-center">
-                    @Html.PagedListPager(Model, page => Url.Action("UnassignBugList", new { page }),
-                             new PagedListRenderOptions
-                    {
-                        Display = PagedListDisplayMode.IfNeeded,
-                        UlElementClasses = new[] { "pagination", "justify-content-center" },
-                        LiElementClasses = new[] { "page-item" },
-                        PageClasses = new[] { "page-link" }
-                    })
-                </div>
+
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts{
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+                    // DataTables Initialization
+                $('#projectTable').DataTable({
+                    "order": [[3, "desc"]],
+                    "paging": true,
+                    "searching": true,
+                    "language": {
+                        "paginate": {
+                            "previous": "<",
+                            "next": ">"
+                        }
+                    }
+                });
+    </script>
+}

@@ -16,7 +16,7 @@ public partial class User
     public string? PasswordHash { get; set; }
 
     [NotMapped]
-    public string? ConfirmPassword {  get; set; }
+    public string? ConfirmPassword { get; set; }
 
     public int? RoleId { get; set; }
 
@@ -29,6 +29,7 @@ public partial class User
     public DateTime? OtpExpiry { get; set; }
 
     [Column("IsEmailVerified")]
+
     public bool? IsEmailVerified { get; set; }
 
     public string? ProfileImage { get; set; }
@@ -53,7 +54,7 @@ public partial class User
 
     public int? BugId { get; set; }
 
-
+    public bool IsRestricted { get; set; }
 
     [JsonIgnore]
     public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();

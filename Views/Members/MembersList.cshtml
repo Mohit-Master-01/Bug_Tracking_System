@@ -82,20 +82,49 @@
                                     @((bool)item.IsActive ? "Active" : "Inactive")
                                 </span>
                             </td>
+                           
                             <td style="margin-top: 8px;">
                                 @if (ViewBag.PermissionType != "canView")
                                 {
                                     <div style="display: flex; gap: 10px; align-items: center;">
 
-                                        <a asp-action="SaveMember" asp-route-id="@item.UserId" class="btn btn-warning btn-sm" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
+                                        <!-- Edit Button -->
+                                        <a asp-action="SaveMember" asp-route-id="@item.UserId" class="btn btn-warning btn-sm"
+                                           style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a asp-action="MemberDetails" asp-route-id="@item.UserId" class="btn btn-info btn-sm" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
+
+                                        <!-- View Details Button -->
+                                        <a asp-action="MemberDetails" asp-route-id="@item.UserId" class="btn btn-info btn-sm"
+                                           style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="#" class="btn btn-danger btn-sm delete-member" data-userid="@item.UserId" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
+
+                                        <!-- Delete Button -->
+                                        <a href="#" class="btn btn-danger btn-sm delete-member" data-userid="@item.UserId"
+                                           style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
                                             <i class="fas fa-trash-alt"></i>
                                         </a>
+
+                                        <!-- Restrict/Unrestrict Button -->
+                                        @if (item.IsRestricted)
+                                        {
+                                            <!-- Activate User -->
+                                            <a href="#" class="btn btn-success btn-sm toggle-restriction" title="Activate User"
+                                               data-userid="@item.UserId" data-restricted="false"
+                                               style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
+                                                <i class="fas fa-check"></i>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <!-- Restrict User -->
+                                            <a href="#" class="btn btn-secondary btn-sm toggle-restriction" title="Restrict User"
+                                               data-userid="@item.UserId" data-restricted="true"
+                                               style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
+                                                <i class="fas fa-ban"></i>
+                                            </a>
+                                        }
                                     </div>
                                 }
                                 else
@@ -103,6 +132,7 @@
                                     <p>------</p>
                                 }
                             </td>
+
                         </tr>
                     }
                 </tbody>
@@ -131,6 +161,46 @@
                     "next": ">"
                 }
             }
+        });
+
+             $(document).ready(function () {
+            $('.toggle-restriction').click(function (e) {
+                e.preventDefault();
+
+                const userId = $(this).data('userid');
+                const restrict = $(this).data('restricted');
+                const actionText = restrict ? 'restrict' : 'activate';
+
+                Swal.fire({
+                    title: `Are you sure?`,
+                    text: `You are about to ${actionText} this user.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: restrict ? '#6c757d' : '#28a745',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: `Yes, ${actionText}!`
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/Members/ToggleRestriction',
+                            type: 'POST',
+                            data: { userId: userId, restrict: restrict },
+                            success: function (response) {
+                                if (response.success) {
+                                    Swal.fire('Success', response.message, 'success').then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire('Failed', response.message, 'error');
+                                }
+                            },
+                            error: function () {
+                                Swal.fire('Error', 'Something went wrong.', 'error');
+                            }
+                        });
+                    }
+                });
+            });
         });
 
             document.getElementById("exportProductsBtn").addEventListener("click", function () {

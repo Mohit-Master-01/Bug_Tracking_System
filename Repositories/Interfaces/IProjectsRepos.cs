@@ -5,7 +5,9 @@ namespace Bug_Tracking_System.Repositories.Interfaces
 {
     public interface IProjectsRepos
     {
-        Task<IPagedList<Project>> GetAllProjects(int pageNumber, int pageSize);
+        Task<List<Project>> GetAllProjects();
+
+        Task<List<Project>> GetProjectByUser(int userId);
 
         Task<object> UpdateStatus(int projectId, bool status);
 
@@ -15,7 +17,7 @@ namespace Bug_Tracking_System.Repositories.Interfaces
 
         Task<bool> DeleteProject(int projectId);
 
-        Task<IPagedList<Project>> GetUnassignedProjects(int pageNumber, int pageSize);  // ✅ Get all unassigned (new) bugs
+        Task<List<Project>> GetUnassignedProjects();  // ✅ Get all unassigned (new) bugs
         
         Task<List<User>> GetDevelopers();  // ✅ Get list of developers
         

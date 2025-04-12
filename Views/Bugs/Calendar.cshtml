@@ -1,0 +1,31 @@
+﻿<div id="calendar"></div>
+
+
+<!-- FullCalendar CSS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet" />
+
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            selectable: true,
+            events: '/Bug/GetCalendarBugs', // controller endpoint to fetch bug events
+            dateClick: function (info) {
+                // Open modal or redirect to Add Bug page
+                window.location.href = `/Bug/AddBug?date=${info.dateStr}`;
+            },
+            eventClick: function (info) {
+                // Show bug details or open edit form
+                window.location.href = `/Bug/Details/${info.event.id}`;
+            }
+        });
+
+        calendar.render();
+    });
+</script>

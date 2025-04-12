@@ -8,6 +8,7 @@
     var userName = HttpContextAccessor.HttpContext?.Session.GetString("UserName");
     // var userImage = HttpContextAccessor.HttpContext?.Session.GetString("UserImage");
     var userImage = Context.Session.GetString("UserImage") ?? "/assets/default-user.png"; // Fallback to default image if null
+    var userRoleId = HttpContextAccessor.HttpContext?.Session.GetInt32("UserRoleId");
 
 
     Console.WriteLine("Profile" + userImage);
@@ -45,117 +46,138 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link id="pagestyle" href="https://cdn.jsdelivr.net/npm/argon-dashboard/assets/css/argon-dashboard.min.css" rel="stylesheet">
 
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet" />
+
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
+
+
     @RenderSection("Styles", required: false)
     <style>
 
         /* Initially hide the sidebar */
         .sidenav {
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.5s ease-in-out, visibility 0s linear 0.0s;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.5s ease-in-out, visibility 0s linear 0.0s;
         }
 
         /* Preloader should overlay everything */
         #preloader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white; /* Background to cover everything */
-            z-index: 1050; /* Keep above everything */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.5s ease-out;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: white; /* Background to cover everything */
+        z-index: 1050; /* Keep above everything */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.5s ease-out;
         }
 
 
         /* Submenu styles */
         .nav-item .submenu {
-            display: none;
-            list-style: none;
-            padding-left: 15px;
-            margin-top: 5px;
+        display: none;
+        list-style: none;
+        padding-left: 15px;
+        margin-top: 5px;
         }
 
-            .nav-item .submenu .nav-link {
-                font-size: 0.85rem;
-                padding-left: 30px;
-                color: #6c757d;
-                transition: all 0.3s ease-in-out;
-            }
+        .nav-item .submenu .nav-link {
+        font-size: 0.85rem;
+        padding-left: 30px;
+        color: #6c757d;
+        transition: all 0.3s ease-in-out;
+        }
 
-                .nav-item .submenu .nav-link:hover {
-                    color: #000; /* Dark color on hover */
-                }
+        .nav-item .submenu .nav-link:hover {
+        color: #000; /* Dark color on hover */
+        }
 
         /* Toggle submenu on click */
         .nav-item.has-submenu > a {
-            position: relative;
+        position: relative;
         }
 
-            .nav-item.has-submenu > a::after {
-                content: "\f107"; /* FontAwesome down arrow */
-                font-family: "Font Awesome 5 Free";
-                font-weight: 900;
-                position: absolute;
-                right: 10px;
-                top: 50%;
-                transform: translateY(-50%);
-                font-size: 0.75rem;
-                color: #6c757d;
-            }
+        .nav-item.has-submenu > a::after {
+        content: "\f107"; /* FontAwesome down arrow */
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.75rem;
+        color: #6c757d;
+        }
 
         /* Show submenu on active state */
         .nav-item.has-submenu.active .submenu {
-            display: block;
+        display: block;
         }
 
         /* Animation for submenu */
         .submenu {
-            opacity: 0;
-            height: 0;
-            overflow: hidden;
-            transition: all 0.3s ease-in-out;
+        opacity: 0;
+        height: 0;
+        overflow: hidden;
+        transition: all 0.3s ease-in-out;
         }
 
         .nav-item.has-submenu.active .submenu {
-            opacity: 1;
-            height: auto;
+        opacity: 1;
+        height: auto;
         }
 
         html, body {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
         }
 
         .container {
-            flex: 1; /* Pushes the footer down */
+        flex: 1; /* Pushes the footer down */
         }
 
         footer {
-            position: relative;
-            bottom: 0;
-            width: 100%;
-            background-color: #f8f9fa; /* Adjust as needed */
-            text-align: center;
-            padding: 10px 0;
+        position: relative;
+        bottom: 0;
+        width: 100%;
+        background-color: #f8f9fa; /* Adjust as needed */
+        text-align: center;
+        padding: 10px 0;
         }
 
         footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background-color: #f8f9fa;
-            text-align: center;
-            padding: 10px 0;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: #f8f9fa;
+        text-align: center;
+        padding: 10px 0;
         }
 
         main {
-            min-height: calc(100vh - 100px); /* Adjust 100px based on your header/footer size */
-            padding-bottom: 60px; /* Space for the footer */
+        min-height: calc(100vh - 100px); /* Adjust 100px based on your header/footer size */
+        padding-bottom: 60px; /* Space for the footer */
+        }
+
+        df-messenger {
+            --df-messenger-font-family: 'Open Sans', sans-serif;
+            --df-messenger-button-titlebar-color: #2f4267; /* Your theme color */
+            --df-messenger-button-titlebar-font-color: #ffffff;
+            --df-messenger-chat-background: #ffffff;
+            --df-messenger-user-message: #e9ecef;
+            --df-messenger-bot-message: #dce9ff;
+            --df-messenger-message-font-color: #2f4267;
+            --df-messenger-send-icon: #2f4267;
+            --df-messenger-input-box-color: #f6f9fc;
+            --df-messenger-border-radius: 0.75rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
         }
 
     </style>
@@ -176,14 +198,12 @@
             <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
             <a class="navbar-brand" href="/Dashboard/Dashboard" target="_blank">
                 <img src="~/images/ladybug_2820811.png" width="30" height="30" class="navbar-brand-img h-100" alt="main_logo">
-                @* <img src="~/AuthAssets/img/Bug.png.png" width="50" height="100" class="navbar-brand-img h-100" alt="main_logo"> *@
                 <span class="font-weight-bold">Bugify</span>
             </a>
         </div>
         <hr class="horizontal dark mt-0">
-        <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+        <div class="collapse navbar-collapse w-auto" id="sidenav-collapse-main">
             <ul class="navbar-nav">
-
 
                 @if (ViewBag.SidebarTabs != null)
                 {
@@ -191,14 +211,14 @@
                     {
                         var res = "";
                         bool subtabs = tab.SubTabs != null && tab.SubTabs.Any();
-                        @if (subtabs)
+                        if (subtabs)
                         {
                             res = "has-submenu";
                         }
                         <li class="nav-item @res">
                             <a class="nav-link" href="@tab.TabUrl">
                                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                                    <i class="@tab.IconPath text-dark text-sm opacity-10"></i> <!-- Fixed Icon Usage -->
+                                    <i class="@tab.IconPath text-dark text-sm opacity-10"></i>
                                 </div>
                                 <span class="nav-link-text ms-1">@tab.TabName</span>
                             </a>
@@ -209,7 +229,7 @@
                                     {
                                         <li>
                                             <a class="nav-link" href="@subTab.TabUrl">
-                                                <i class="fa fa-angle-right me-2"></i> <!-- Added Submenu Icon -->
+                                                <i class="fa fa-angle-right me-2"></i>
                                                 @subTab.TabName
                                             </a>
                                         </li>
@@ -217,13 +237,15 @@
                                 </ul>
                             }
                         </li>
-
                     }
                 }
             </ul>
         </div>
 
+
+
     </aside>
+
 
     <main role="main" class="main-content position-relative border-radius-lg ">
 
@@ -260,8 +282,8 @@
 
                 <script>
                     document.getElementById("projectSwitcher").addEventListener("change", function () {
-                        var selectedProjectId = this.value;
-                        window.location.href = '/Projects/SetCurrentProject?projectId=' + selectedProjectId;
+                    var selectedProjectId = this.value;
+                    window.location.href = '/Projects/SetCurrentProject?projectId=' + selectedProjectId;
                     });
                 </script>
             }
@@ -278,19 +300,35 @@
 
             <div class="collapse navbar-collapse" id="navbar">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item px-0">
-                        @* <a href="~/Profile/Profile" class="nav-link text-white p-0"> *@
-                        @*     <i class="fas fa-user"></i> <!-- Fixed: Ensure correct FA class --> *@
-                        @* </a> *@
-                        <a class="nav-link text-white p-0" id="profileDropdown" href="~/Profile/Profile">
-                            <div class="nav-profile-img">
-                                <img src="@userImage" alt="User Image" class="rounded-circle" width="40" height="40">
-                            </div>
-                            @* <div class="nav-profile-text"> *@
-                            @*     <span class="ml-2">@userName</span> *@
-                            @* </div> *@
+                    <li class="nav-item dropdown p-0">
+                        <a class="nav-link text-white p-0 d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="@userImage" alt="User Image" class="rounded-circle" width="40" height="40">
                         </a>
+                        <ul class="dropdown-menu dropdown-menu-end p-2 shadow border-0 mt-2 animate__animated animate__fadeIn" aria-labelledby="profileDropdown" style="min-width: 200px; border-radius: 1rem;">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center text-dark fw-semibold py-2 rounded" href="~/Profile/Profile">
+                                    <i class="fas fa-user me-2 text-primary"></i> My Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center text-dark fw-semibold py-2 rounded" href="~/Profile/MyTeam">
+                                    <i class="fas fa-users me-2 text-primary"></i> My Team
+                                </a>
+                            </li>
+
+                            @if (userRoleId != 4 && userRoleId != 3)
+                            {
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center text-dark fw-semibold py-2 rounded" href="~/Profile/MyProjects">
+                                        <i class="fas fa-project-diagram me-2 text-primary"></i> My Projects
+                                    </a>
+                                </li>
+                            }
+                                                      
+                        </ul>
                     </li>
+
+
                     <li class="nav-item px-3" style="margin-top: 4px">
                         <a href="#" class="nav-link text-white p-0">
                             <i class="fas fa-cog"></i> <!-- Fixed: Corrected FA class -->
@@ -318,10 +356,19 @@
 
         </nav>
 
+
         <!-- End Navbar -->
         @RenderBody()
 
     </main>
+
+    <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+    <df-messenger intent="WELCOME"
+                  chat-title="BugifyBot"
+                  agent-id="a30c4823-8758-4fac-9d2e-44c72d58c046"
+                  language-code="en"
+                  chat-icon="https://img.icons8.com/?size=100&id=79708&format=png&color=FFFFFF">
+    </df-messenger>
 
     <footer class="footer py-2">
 
@@ -343,6 +390,8 @@
     @*         &copy; 2025 - Bug_Tracking_System - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a> *@
     @*     </div> *@
     @* </footer> *@
+
+    
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 
@@ -423,5 +472,9 @@
     <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
     <script src="~/AuthAssets/js/argon-dashboard.min.js?v=2.1.0"></script>
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+
+  
+
+
 </body>
 </html>

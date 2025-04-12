@@ -17,7 +17,22 @@ namespace Bug_Tracking_System.Controllers
             int? roleId = HttpContext.Session.GetInt32("UserRoleId");
 
             ViewBag.Breadcrumb = "Dashboard";
-            ViewBag.PageTitle = (roleId == 4) ? "Admin Dashboard" : "Member Dashboard";
+            if(roleId == 4)
+            {
+                ViewBag.PageTitle = "Admin's Dashboard";
+            }
+            else if(roleId == 3)
+            {
+                ViewBag.PageTitle = "Tester's Dashboard";
+            }
+            else if(roleId == 2)
+            {
+                ViewBag.PageTitle = "Developer's Dashboard";
+            }
+            else
+            {
+                ViewBag.PageTitle = "Project Manager's Dashboard";
+            }
 
             return View();
         }

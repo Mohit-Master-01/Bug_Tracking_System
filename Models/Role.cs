@@ -9,9 +9,9 @@ public partial class Role
 
     public string RoleName { get; set; } = null!;
 
-    public bool IsActive { get; set; }
+    public bool? IsActive { get; set; }
 
-    public bool IsDelete { get; set; }
+    public bool? IsDelete { get; set; }
 
     public virtual ICollection<Permission> Permissions { get; set; } = new List<Permission>();
 

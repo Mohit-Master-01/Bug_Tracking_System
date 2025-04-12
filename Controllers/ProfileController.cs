@@ -11,13 +11,28 @@ namespace Bug_Tracking_System.Controllers
         private readonly DbBug _dbBug;
         private readonly IEmailSenderRepos _emailSender;
         private readonly IAccountRepos _acc;
+        private readonly IMembersRepos _member;
+        private readonly IPermissionHelperRepos _permission;
+        private readonly IProjectsRepos _projects;
 
-        public ProfileController(DbBug dbBug, IAccountRepos acc ,IProfileRepos profile, IEmailSenderRepos emailSender, ISidebarRepos sidebar) : base(sidebar) 
+        public ProfileController(DbBug dbBug, IAccountRepos acc ,IProfileRepos profile, IProjectsRepos projects, IPermissionHelperRepos permission, IEmailSenderRepos emailSender, IMembersRepos member, ISidebarRepos sidebar) : base(sidebar) 
         {
             _profile = profile;
             _dbBug = dbBug;
             _emailSender = emailSender;
             _acc = acc;
+            _member = member;
+            _permission = permission;
+            _projects = projects;
+        }
+
+        // Public method to get user permission
+        public string GetUserPermission(string action)
+        {
+            int roleId = HttpContext.Session.GetInt32("UserRoleId").Value;
+            string permissionType = _permission.HasAccess(action, roleId);
+            ViewBag.PermissionType = permissionType;
+            return permissionType;
         }
 
         [ActionName("Profile")]
@@ -57,6 +72,122 @@ namespace Bug_Tracking_System.Controllers
             //}
             //return View(user);
         }
+
+        [HttpGet]
+        public async  Task<IActionResult> MyTeam()
+        {
+            try
+            {
+                string permissionType = GetUserPermission("View Developers");
+
+                if (permissionType == "canView" || permissionType == "canEdit" || permissionType == "fullAccess")
+                {
+                    ViewBag.PageTitle = "My Team";
+                    ViewBag.Breadcrumb = "Profile";
+
+                    int? currentProjectId = HttpContext.Session.GetInt32("CurrentProjectId");
+                    int? roleId = HttpContext.Session.GetInt32("UserRoleId");
+
+                    if ((currentProjectId == null || currentProjectId == 0) && roleId != 4)
+                    {
+                        TempData["Error"] = "Please select a project first.";
+                        return RedirectToAction("Index", "Home");
+                    }
+
+                    List<User> members;
+
+                    if (roleId == 4) // Admin
+                    {
+                        members = await _member.GetAllMembers();
+                    }
+                    else
+                    {
+                        members = await _member.GetAllMembersByProject((int)currentProjectId);
+                    }
+
+                    // Stats for dashboard/cards
+                    ViewBag.TotalMembers = members.Count;
+                    ViewBag.ActiveMembers = members.Count(u => u.IsActive == true);
+                    ViewBag.InactiveMembers = members.Count(u => u.IsActive == false);
+                    ViewBag.JoinedThisMonth = members.Count(u =>
+                                                        u.CreatedDate.HasValue &&
+                                                        u.CreatedDate.Value.Month == DateTime.Now.Month &&
+                                                        u.CreatedDate.Value.Year == DateTime.Now.Year);
+
+                    return View(members);
+                }
+                else
+                {
+                    return RedirectToAction("UnauthorisedAccess", "Error");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching project managers list: {ex.Message}");
+                return View("Error");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MyProjects()
+        {
+            try
+            {
+                string permissionType = GetUserPermission("View Developers");
+
+                if (permissionType == "canView" || permissionType == "canEdit" || permissionType == "fullAccess")
+                {
+                    ViewBag.PageTitle = "My Projects";
+                    ViewBag.Breadcrumb = "Profile";
+
+                    int? userId = HttpContext.Session.GetInt32("UserId");
+                    int? roleId = HttpContext.Session.GetInt32("UserRoleId");
+
+                    if (!userId.HasValue || !roleId.HasValue)
+                    {
+                        TempData["Error"] = "Session expired. Please login again.";
+                        return RedirectToAction("Login", "Account");
+                    }
+
+                    List<Project> projects;
+
+                    if (roleId.Value == 4) // Admin
+                    {
+                        projects = await _projects.GetAllProjects(); // Get all projects
+                    }
+                    else if (roleId.Value == 1 || roleId.Value == 2) // PM or Developer
+                    {
+                        projects = await _projects.GetProjectByUser(userId.Value); // Assigned projects
+                    }
+                    else
+                    {
+                        TempData["Error"] = "Access not permitted.";
+                        return RedirectToAction("UnauthorisedAccess", "Error");
+                    }
+
+                    // Stats
+                    ViewBag.TotalProjects = projects.Count;
+                    ViewBag.ActiveProjects = projects.Count(p => p.Status == "In Progress" || p.Status == "Active");
+                    ViewBag.CompletedProjects = projects.Count(p => p.Completion == 100);
+                    ViewBag.ProjectsThisMonth = projects.Count(p =>
+                                                    p.CreatedDate.HasValue &&
+                                                    p.CreatedDate.Value.Month == DateTime.Now.Month &&
+                                                    p.CreatedDate.Value.Year == DateTime.Now.Year);
+
+                    return View(projects);
+                }
+                else
+                {
+                    return RedirectToAction("UnauthorisedAccess", "Error");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in MyProjects(): {ex.Message}");
+                return View("Error");
+            }
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> GenerateDefaultProfile()

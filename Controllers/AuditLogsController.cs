@@ -45,7 +45,7 @@ namespace Bug_Tracking_System.Controllers
 
             IEnumerable<AuditLog> logs;
 
-            if (userRoleId == 1) // ✅ Admin (RoleId = 1)
+            if (userRoleId == 4) // ✅ Admin 
             {
                 logs = await _audit.GetAllLogsAsync();
             }

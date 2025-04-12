@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pag
 using X.PagedList.Extensions;
 using X.PagedList;
 using System;
+using DocumentFormat.OpenXml.InkML;
 
 namespace Bug_Tracking_System.Repositories.ProjectsClasses
 {
@@ -125,11 +126,11 @@ namespace Bug_Tracking_System.Repositories.ProjectsClasses
             return false;
         }
 
-        public async Task<IPagedList<Project>> GetAllProjects(int pageNumber, int pageSize)
+        public async Task<List<Project>> GetAllProjects()
         {
             var project =  await _dbBug.Projects.Include(p => p.CreatedByNavigation).Where(p => p.Status != "New").Where(p => (bool)p.IsActive).OrderByDescending(p => p.CreatedDate).ToListAsync();
 
-            return project.ToPagedList(pageNumber, pageSize);
+            return project;
         }
 
         public async Task<List<User>> GetDevelopers()
@@ -147,6 +148,15 @@ namespace Bug_Tracking_System.Repositories.ProjectsClasses
                 .FirstOrDefaultAsync(p => p.ProjectId == projectId);
 
             return project;
+        }
+
+        public async Task<List<Project>> GetProjectByUser(int userId)
+        {
+            return await _dbBug.UserProjects
+                        .Where(up => up.UserId == userId)
+                        .Select(up => up.Project)
+                        .Distinct()
+                        .ToListAsync();
         }
 
 
@@ -172,11 +182,11 @@ namespace Bug_Tracking_System.Repositories.ProjectsClasses
 
         //}
 
-        public async Task<IPagedList<Project>> GetUnassignedProjects(int pageNumber, int pageSize)
+        public async Task<List<Project>> GetUnassignedProjects()
         {
             var project = await _dbBug.Projects.Include(p => p.CreatedByNavigation).Where(p => (bool)p.IsActive).Where(p => p.Status == "New").OrderByDescending(p => p.CreatedDate).ToListAsync();
 
-            return project.ToPagedList(pageNumber, pageSize);
+            return project;
         }
 
         public async Task<object> UpdateStatus(int projectId, bool status)

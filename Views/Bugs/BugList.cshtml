@@ -205,7 +205,7 @@
                                             <td style="padding-top: 29px;">@Html.Raw(item.Description)</td>
                                             <td data-severity="@item.Severity"></td>
                                             <td data-priority="@item.Priority"></td>
-                                            <td>@item.CreatedDate?.ToString("dd-MM-yyyy | HH:mm")</td>
+                                            <td>@item.CreatedDate.ToString("dd-MM-yyyy | HH:mm")</td>
                                             <td>@(item.CreatedByNavigation?.UserName ?? "N/A")</td>
 
 

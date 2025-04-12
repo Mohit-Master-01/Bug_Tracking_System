@@ -194,6 +194,22 @@ namespace Bug_Tracking_System.Controllers
             //Set session if login was successful
             if (((dynamic)result).success)
             {
+                //Fetch user details and set session variables
+                string email = await _acc.fetchEmail(login.EmailOrUsername);
+                HttpContext.Session.SetString("UserEmail", email);
+
+
+
+                var data = await _acc.GetUserDataByEmail(email);
+
+                // ✅ Restriction Check BEFORE session is created
+                if (data.IsRestricted)
+                {
+                    await _auditLogs.AddAuditLogAsync(data.UserId, $"Restricted user {data.UserName} attempted to login.", "Login");
+                    return Json(new { success = false, message = "Your account has been restricted. Please contact the administrator." });
+                }
+
+
                 //Successful login
                 HttpContext.Session.SetString("Cred", login.EmailOrUsername);
 
@@ -216,13 +232,7 @@ namespace Bug_Tracking_System.Controllers
                     Response.Cookies.Delete("RememberMe_Password");
                 }
 
-                //Fetch user details and set session variables
-                string email = await _acc.fetchEmail(login.EmailOrUsername);
-                HttpContext.Session.SetString("UserEmail", email);
 
-                
-
-                var data = await _acc.GetUserDataByEmail(email);
                 int id = data.UserId;
                 HttpContext.Session.SetInt32("UserId", id);
                 HttpContext.Session.SetInt32("UserRoleId", (int)data.RoleId);

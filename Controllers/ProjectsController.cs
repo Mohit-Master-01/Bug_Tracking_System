@@ -39,19 +39,17 @@ namespace Bug_Tracking_System.Controllers
         }
 
         [HttpGet, ActionName("ProjectList")]
-        public async Task<IActionResult> Index(int? page)
+        public async Task<IActionResult> Index()
         {
             string permissionType = GetUserPermission("View Projects");
             if (permissionType
                 == "canView" || permissionType == "canEdit" || permissionType == "fullAccess")
             {
 
-                int pageSize = 4; // Number of records per page
-                int pageNumber = page ?? 1; // Default to page 1
-
+                
                 ViewBag.PageTitle = "Projects List";
                 ViewBag.Breadcrumb = "Reports";
-                var projects = await _project.GetAllProjects(pageNumber, pageSize);
+                var projects = await _project.GetAllProjects();
                 return View(projects);
             }
             else
@@ -158,19 +156,17 @@ namespace Bug_Tracking_System.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> UnassignProjectList(int? page)
+        public async Task<IActionResult> UnassignProjectList()
         {
 
             string permissionType = GetUserPermission("Assign Project");
             if (permissionType == "canEdit" || permissionType == "fullAccess")
             {
-                int pageSize = 4;
-                int pageNumber = page ?? 1;
-
+                
                 ViewBag.Breadcrumb = "Manage Projects";
                 ViewBag.PageTitle = "Unassigned Projects";
 
-                var bugs = await _project.GetUnassignedProjects(pageNumber, pageSize);
+                var bugs = await _project.GetUnassignedProjects();
                 return View(bugs);
             }
             else

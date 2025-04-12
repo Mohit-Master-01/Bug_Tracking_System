@@ -10,6 +10,7 @@ namespace Bug_Tracking_System.Repositories
         private readonly IAccountRepos _acc;
         private readonly IEmailSenderRepos _emailSender;
 
+
         public ProfileClassRepos(DbBug dbBug, IAccountRepos acc, IEmailSenderRepos emailSender)
         {
             _dbBug = dbBug;            

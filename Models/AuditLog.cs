@@ -17,6 +17,6 @@ public partial class AuditLog
 
     public string? ModuleName { get; set; }
 
-    [NotMapped, JsonIgnore]
+    [JsonIgnore, NotMapped]
     public virtual User User { get; set; } = null!;
 }

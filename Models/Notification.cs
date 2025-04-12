@@ -13,7 +13,7 @@ public partial class Notification
 
     public bool IsRead { get; set; }
 
-    public DateTime? NotificationDate { get; set; }
+    public DateTime NotificationDate { get; set; }
 
     public int? Type { get; set; }
 

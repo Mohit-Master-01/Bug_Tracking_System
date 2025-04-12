@@ -19,7 +19,7 @@ public partial class Bug
 
     public int CreatedBy { get; set; }
 
-    public DateTime? CreatedDate { get; set; }
+    public DateTime CreatedDate { get; set; }
 
     public int? ProjectId { get; set; }
 

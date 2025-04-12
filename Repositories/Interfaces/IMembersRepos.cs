@@ -5,7 +5,7 @@ namespace Bug_Tracking_System.Repositories.Interfaces
 {
     public interface IMembersRepos
     {
-        Task<User> GetAllMembersData();
+        Task<List<User>> GetAllMembersByProject(int projectId);
 
         Task<List<User>> GetAllMembers();
 

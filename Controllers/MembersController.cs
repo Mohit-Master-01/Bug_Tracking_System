@@ -18,8 +18,9 @@ namespace Bug_Tracking_System.Controllers
         private readonly IPermissionHelperRepos _permission;
         private readonly IExportRepos _export;
         private readonly IImportRepos _import;
+        private readonly IAuditLogsRepos _auditLogs;
 
-        public MembersController(DbBug dbBug, IExportRepos export, IImportRepos import, IPermissionHelperRepos permission, IMembersRepos member, IEmailSenderRepos emailSender, IAccountRepos acc, ISidebarRepos sidebar) : base(sidebar)
+        public MembersController(DbBug dbBug, IExportRepos export, IImportRepos import, IAuditLogsRepos auditLogs, IPermissionHelperRepos permission, IMembersRepos member, IEmailSenderRepos emailSender, IAccountRepos acc, ISidebarRepos sidebar) : base(sidebar)
         {
             _dbBug = dbBug;
             _member = member;
@@ -28,6 +29,7 @@ namespace Bug_Tracking_System.Controllers
             _permission = permission;
             _export = export;
             _import = import;
+            _auditLogs = auditLogs;
         }
 
         // Public method to get user permission
@@ -79,6 +81,7 @@ namespace Bug_Tracking_System.Controllers
                         IsActive = Users.IsActive,
                         ProfileImage = Users.ProfileImage,
                         ProjectId = Users.ProjectId,
+                        IsRestricted = Users.IsRestricted,
                         Role = new Role
                         {
                             RoleId = Roles.RoleId,
@@ -101,12 +104,13 @@ namespace Bug_Tracking_System.Controllers
                 new DataColumn("Email"),
                 new DataColumn("Role"),
                 new DataColumn("Joining Date"),
-                new DataColumn("Status")
+                new DataColumn("Status"),
+                new DataColumn("IsRestricted")
             });
 
             foreach (var member in members)
             {
-                dataTable.Rows.Add(member.UserId, member.UserName, member.Email, member.Role?.RoleName, member.CreatedDate, member.IsActive);
+                dataTable.Rows.Add(member.UserId, member.UserName, member.Email, member.Role?.RoleName, member.CreatedDate, member.IsActive, member.IsRestricted);
             }
 
             var fileBytes = _export.ExportToExcel(dataTable, "MembersListReports");
@@ -384,6 +388,7 @@ namespace Bug_Tracking_System.Controllers
                         IsActive = Users.IsActive,
                         ProfileImage = Users.ProfileImage,
                         ProjectId = Users.ProjectId,
+                        IsRestricted = Users.IsRestricted,
                         Role = new Role
                         {
                             RoleId = Roles.RoleId,
@@ -791,5 +796,30 @@ namespace Bug_Tracking_System.Controllers
 
             return Ok(new { message = "User deleted successfully" });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleRestriction(int userId, bool restrict)
+        {
+            var user = await _dbBug.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return Json(new { success = false, message = "User not found." });
+            }
+
+            user.IsRestricted = restrict;
+            await _dbBug.SaveChangesAsync();
+
+
+
+            string action = restrict ? "restricted" : "activated";
+
+            // ✅ Optional: Add to audit logs
+            await _auditLogs.AddAuditLogAsync(userId, $"User has been {action}.", "Restriction");
+
+            return Json(new { success = true, message = $"User has been successfully {action}." });
+
+
+        }
+
     }
 }
