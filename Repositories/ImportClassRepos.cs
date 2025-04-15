@@ -16,7 +16,7 @@ namespace Bug_Tracking_System.Repositories
             _bug = bug;
             _acc = acc;
         }
-
+            
 
 
         public byte[] GenerateSampleBugExcel(bool bug)

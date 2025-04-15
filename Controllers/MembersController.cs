@@ -1,8 +1,11 @@
 ﻿using Bug_Tracking_System.Models;
 using Bug_Tracking_System.Repositories.Interfaces;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Composition;
 using System.Data;
 using System.Net.Mail;
@@ -585,6 +588,8 @@ namespace Bug_Tracking_System.Controllers
                     await _emailSender.SendEmailAsync(member.Email, subject, body, "NewMemberAdded");
                 }
 
+                await _auditLogs.AddAuditLogAsync(member.UserId, $"{member.UserName} has been added successfully by admin.", "Add Member");
+
                 return Ok(res);
             }
             catch (Exception ex)
@@ -711,11 +716,13 @@ namespace Bug_Tracking_System.Controllers
             members.IsActive = isActive;
             await _dbBug.SaveChangesAsync();
 
+            //await _auditLogs.AddAuditLogAsync(id, $"{members.UserName} has been deleted.", "Update Status Member");
+
             return Json(new { success = true, message = "Member status updated" });
         }
 
         [HttpPost]
-        public IActionResult DeleteMember(int id)
+        public async Task<IActionResult> DeleteMember(int id)
         {
             var user = _dbBug.Users.FirstOrDefault(u => u.UserId == id);
             if (user == null)
@@ -745,6 +752,8 @@ namespace Bug_Tracking_System.Controllers
             _dbBug.Users.Remove(user);
             _dbBug.SaveChanges();
 
+            await _auditLogs.AddAuditLogAsync(id, $"{user.UserName} has been deleted.", "Deleted Member");
+
             return Ok(new { success = true, message = "User deleted successfully" });
         }
 
@@ -753,7 +762,7 @@ namespace Bug_Tracking_System.Controllers
 
 
         [HttpPost]
-        public IActionResult DeleteProjectManager(int id)
+        public async Task<IActionResult> DeleteProjectManager(int id)
         {
             var user = _dbBug.Users.Find(id);
             if (user == null)
@@ -763,12 +772,14 @@ namespace Bug_Tracking_System.Controllers
 
             _dbBug.Users.Remove(user);
             _dbBug.SaveChanges();
+
+            await _auditLogs.AddAuditLogAsync(id, $"{user.UserName} has been deleted.", "Deleted Project Manager");
 
             return Ok(new { message = "User deleted successfully" });
         }
 
         [HttpPost]
-        public IActionResult DeleteDeveloper(int id)
+        public async Task<IActionResult> DeleteDeveloper(int id)
         {
             var user = _dbBug.Users.Find(id);
             if (user == null)
@@ -778,12 +789,14 @@ namespace Bug_Tracking_System.Controllers
 
             _dbBug.Users.Remove(user);
             _dbBug.SaveChanges();
+
+            await _auditLogs.AddAuditLogAsync(id, $"{user.UserName} has been deleted.", "Deleted Developer");
 
             return Ok(new { message = "User deleted successfully" });
         }
 
         [HttpPost]
-        public IActionResult DeleteTester(int id)
+        public async Task<IActionResult> DeleteTester(int id)
         {
             var user = _dbBug.Users.Find(id);
             if (user == null)
@@ -793,6 +806,8 @@ namespace Bug_Tracking_System.Controllers
 
             _dbBug.Users.Remove(user);
             _dbBug.SaveChanges();
+
+            await _auditLogs.AddAuditLogAsync(id, $"{user.UserName} has been deleted.", "Deleted Tester");
 
             return Ok(new { message = "User deleted successfully" });
         }
@@ -814,7 +829,7 @@ namespace Bug_Tracking_System.Controllers
             string action = restrict ? "restricted" : "activated";
 
             // ✅ Optional: Add to audit logs
-            await _auditLogs.AddAuditLogAsync(userId, $"User has been {action}.", "Restriction");
+            await _auditLogs.AddAuditLogAsync(userId, $"{user.UserName} has been {action}.", "Restriction");
 
             return Json(new { success = true, message = $"User has been successfully {action}." });
 

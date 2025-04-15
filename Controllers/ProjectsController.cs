@@ -2,6 +2,7 @@
 using Bug_Tracking_System.Models;
 using Bug_Tracking_System.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Bug_Tracking_System.Controllers
 {
@@ -12,14 +13,16 @@ namespace Bug_Tracking_System.Controllers
         private readonly IEmailSenderRepos _emailsender;
         private readonly IAccountRepos _acc;
         private readonly IPermissionHelperRepos _permission;
+        private readonly IAuditLogsRepos _auditLogs;
 
-        public ProjectsController(IAccountRepos acc, IPermissionHelperRepos permission, IEmailSenderRepos emailsender, IProjectsRepos project, DbBug Bug, ISidebarRepos sidebar) : base(sidebar)
+        public ProjectsController(IAccountRepos acc, IAuditLogsRepos auditLogs, IPermissionHelperRepos permission, IEmailSenderRepos emailsender, IProjectsRepos project, DbBug Bug, ISidebarRepos sidebar) : base(sidebar)
         {
             _dbBug = Bug;
             _project = project;
             _emailsender = emailsender;
             _acc = acc;
             _permission = permission;
+            _auditLogs = auditLogs;
         }
 
         public IActionResult SetCurrentProject(int projectId)
@@ -75,6 +78,7 @@ namespace Bug_Tracking_System.Controllers
                     project = await _dbBug.Projects.FirstOrDefaultAsync(p => p.ProjectId == id);
                 }
 
+
                 return View(project);
             }
             else
@@ -110,7 +114,12 @@ namespace Bug_Tracking_System.Controllers
 
             try
             {
+                int userId = 2018;
+
                 var result = await _project.AddOrEditProject(projects);
+                                
+                await _auditLogs.AddAuditLogAsync(userId, $"{projects.ProjectName} project has been added successfully by admin.", "Add Project");
+
                 return Json(result);
             }
             catch (Exception ex)
@@ -120,15 +129,31 @@ namespace Bug_Tracking_System.Controllers
         }
 
 
-        [HttpPost,ActionName("Delete")]
+        [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
-        {            
-            var success = await _project.DeleteProject(id);
-            if(success)
-                return Json(new { success = true, message = "Project deleted successfully." });
+        {
+            // Fetch the project for logging before deleting
+            var project = await _project.GetProjectById(id); // Ensure this method exists in your repo
 
-            return Json(new { success = false, message = "Project not found." });
+            if (project == null)
+            {
+                return Json(new { success = false, message = "Project not found." });
+            }
+
+            var success = await _project.DeleteProject(id);
+            if (success)
+            {
+                // Get logged-in userId from session or default to 2018
+                int userId = (int)HttpContext.Session.GetInt32("UserId");
+
+                await _auditLogs.AddAuditLogAsync(userId, $"{project.ProjectName} project was deleted by admin.", "Delete Project");
+
+                return Json(new { success = true, message = "Project deleted successfully." });
+            }
+
+            return Json(new { success = false, message = "Failed to delete the project." });
         }
+
 
         public async Task<IActionResult> UpdateStatus(int projectId, bool Status)
         {
@@ -151,8 +176,12 @@ namespace Bug_Tracking_System.Controllers
             project.Completion = completion;
             await _dbBug.SaveChangesAsync();
 
+            int userId = (int)HttpContext.Session.GetInt32("UserId");
+            await _auditLogs.AddAuditLogAsync(userId, $"{project.ProjectName} completion updated to {completion}% by admin.", "Update Completion");
+
             return Json(new { success = true, message = "Completion updated successfully", newCompletion = completion });
         }
+
 
 
         [HttpGet]
@@ -270,6 +299,9 @@ namespace Bug_Tracking_System.Controllers
                         await _emailsender.SendEmailAsync(developer.Email, "New Project Assigned - Bugify", emailBody, "AssignProject");
                     }
                 }
+
+                await _auditLogs.AddAuditLogAsync(userId.Value, $"Project '{project.ProjectName}' assigned to developers ({string.Join(", ", developerIds)}).", "Assign Project");
+
             }
 
             return Json(new { success = true, message = "Project assigned successfully to selected developers!" });
@@ -332,6 +364,12 @@ namespace Bug_Tracking_System.Controllers
                 // Step 4: Finally, delete the project
                 _dbBug.Projects.Remove(project);
                 int changes = _dbBug.SaveChanges(); // Ensure changes are committed
+
+                if (changes > 0)
+                {
+                    int userId = (int)HttpContext.Session.GetInt32("UserId");
+                    _auditLogs.AddAuditLogAsync(userId, $"Project '{project.ProjectName}' and its related bugs were deleted by admin.", "Force Delete Project");
+                }
 
                 return Json(new
                 {

@@ -1,6 +1,7 @@
 ﻿using Bug_Tracking_System.Models;
 using Bug_Tracking_System.Repositories.Interfaces;
 using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.Office.CoverPageProps;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -23,8 +24,9 @@ namespace Bug_Tracking_System.Controllers
         private readonly IPermissionHelperRepos _permission;
         private readonly IExportRepos _export;
         private readonly IImportRepos _import;
+        private readonly IAuditLogsRepos _auditLog;
 
-        public BugsController(IEmailSenderRepos emailSender, IImportRepos import, IExportRepos export, IAccountRepos acc, DbBug dbBug, IBugRepos bug, INotificationRepos notification, IPermissionHelperRepos permission, ISidebarRepos sidebar) : base(sidebar)
+        public BugsController(IEmailSenderRepos emailSender, IAuditLogsRepos auditLog, IImportRepos import, IExportRepos export, IAccountRepos acc, DbBug dbBug, IBugRepos bug, INotificationRepos notification, IPermissionHelperRepos permission, ISidebarRepos sidebar) : base(sidebar)
         {
             _dbBug = dbBug;
             _bug = bug;
@@ -34,6 +36,7 @@ namespace Bug_Tracking_System.Controllers
             _permission = permission;
             _export = export;
             _import = import;
+            _auditLog = auditLog;
         }
 
         // Public method to get user permission
@@ -96,19 +99,7 @@ namespace Bug_Tracking_System.Controllers
             }
         }
 
-        [HttpGet]
-        public JsonResult GetCalendarBugs()
-        {
-            var bugs = _dbBug.Bugs.Select(b => new {
-                id = b.BugId,
-                title = b.Title,
-                start = b.CreatedDate.ToString("yyyy-MM-dd")
-            }).ToList();
-
-            return Json(bugs);
-        }
-
-
+      
         //[HttpGet]
         //public async Task<IActionResult> BugList(int? page)
         //{
@@ -304,6 +295,10 @@ namespace Bug_Tracking_System.Controllers
             bugs.CreatedBy = userId.Value;
 
             var success = await _bug.SaveBug(bugs, attachments);
+
+            await _auditLog.AddAuditLogAsync(userId.Value, $"Bug '{bugs.Title}' created", "Report Bug");
+
+
             return RedirectToAction("BugList");
         }
 
@@ -372,7 +367,6 @@ namespace Bug_Tracking_System.Controllers
             }
         }
 
-
         [HttpPost]
         public async Task<IActionResult> UpdateStatus(int bugId, int statusId)
         {
@@ -390,14 +384,88 @@ namespace Bug_Tracking_System.Controllers
                 .Select(s => s.StatusName)
                 .FirstOrDefaultAsync();
 
-            return Json(new { success = true, message = "Status updated successfully", newStatus = updatedStatus });
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId != null)
+            {
+                await _auditLog.AddAuditLogAsync(userId.Value, $"Bug ID {bugId} status changed to {updatedStatus}", "BugController");
+            }
+
+            bool projectUpdated = false;
+            int newCompletion = 0;
+
+            // 👉 Recalculate completion if status is "Fixed"
+            if (updatedStatus == "Fixed" && bug.ProjectId.HasValue)
+            {
+                int projectId = bug.ProjectId.Value;
+
+                var totalBugs = await _dbBug.Bugs
+                    .CountAsync(b => b.ProjectId == projectId);
+
+                var closedBugs = await _dbBug.Bugs
+                    .CountAsync(b => b.ProjectId == projectId && b.Status.StatusName == "Fixed");
+
+                newCompletion = totalBugs > 0 ? (int)((closedBugs * 100.0) / totalBugs) : 0;
+
+                var project = await _dbBug.Projects.FindAsync(projectId);
+                if (project != null)
+                {
+                    project.Completion = newCompletion;
+                    await _dbBug.SaveChangesAsync();
+                    projectUpdated = true;
+
+                    await _auditLog.AddAuditLogAsync(userId ?? 0, $"Project '{project.ProjectName}' completion auto-updated to {newCompletion}%", "BugController");
+                }
+            }
+
+            return Json(new
+            {
+                success = true,
+                message = "Status updated successfully",
+                newStatus = updatedStatus,
+                projectUpdated,
+                newCompletion = projectUpdated ? newCompletion : (int?)null
+            });
         }
+
+
+        //[HttpPost]
+        //public async Task<IActionResult> UpdateStatus(int bugId, int statusId)
+        //{
+        //    var bug = await _dbBug.Bugs.FindAsync(bugId);
+        //    if (bug == null)
+        //    {
+        //        return Json(new { success = false, message = "Bug not found" });
+        //    }
+
+        //    bug.StatusId = statusId;
+        //    await _dbBug.SaveChangesAsync();
+
+        //    var updatedStatus = await _dbBug.BugStatuses
+        //        .Where(s => s.StatusId == statusId)
+        //        .Select(s => s.StatusName)
+        //        .FirstOrDefaultAsync();
+
+        //    int? userId = HttpContext.Session.GetInt32("UserId");
+        //    if (userId != null)
+        //    {
+        //        await _auditLog.AddAuditLogAsync(userId.Value, $"Bug ID {bugId} status changed to {updatedStatus}", "BugController");
+        //    }
+
+        //    return Json(new { success = true, message = "Status updated successfully", newStatus = updatedStatus });
+        //}
 
 
         [HttpPost]
         public async Task<IActionResult> Delete(int bugId)
         {
             var success = await _bug.DeleteBug(bugId);
+
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId != null)
+            {
+                await _auditLog.AddAuditLogAsync(userId.Value, $"Bug ID {bugId} deleted (via service)", "Delete Bug");
+            }
+
             return Json(new { success, message = success ? "Bug deleted successfully!" : "Failed to delete bug." });
         }
 
@@ -536,9 +604,12 @@ namespace Bug_Tracking_System.Controllers
 
                     await _emailSender.SendEmailAsync(developer.Email, "New Bug Assigned - Bugify", emailBody, "AssignBug");
                 }
+
+                await _auditLog.AddAuditLogAsync(userId.Value, $"Bug ID {bugId} assigned to Developer ID {developerId}", "Assign Bug");
+
             }
 
-          
+
             return Json(new { success = true, message = "Bug assigned successfully!" });
         }
 
@@ -573,6 +644,12 @@ namespace Bug_Tracking_System.Controllers
 
                 // Save all changes in a single transaction
                 _dbBug.SaveChanges();
+
+                int? userId = HttpContext.Session.GetInt32("UserId");
+                if (userId != null)
+                {
+                    _ = _auditLog.AddAuditLogAsync(userId.Value, $"Bug ID {bugId} deleted with cascading records", "Delete Bug");
+                }
 
                 return Json(new { success = true, message = "Bug deleted successfully!" });
             }

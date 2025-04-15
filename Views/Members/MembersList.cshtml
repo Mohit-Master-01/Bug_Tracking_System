@@ -148,6 +148,7 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
             // DataTables Initialization
@@ -208,49 +209,51 @@
         });
 
 
-        $(".delete-member").click(function (e) {
-            e.preventDefault();
-            var userId = $(this).data("userid");
+                $(document).ready(function () {
+            $(".delete-member").click(function (e) {
+                e.preventDefault();
+                var userId = $(this).data("userid");
 
-            Swal.fire({
-                title: "Are you sure?",
-                text: "You won't be able to revert this!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: "Yes, delete it!"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "/Members/DeleteMember",
-                        type: "POST",
-                        data: { id: userId },
-                        success: function (response) {
-                            Swal.fire({
-                                title: "Deleted!",
-                                text: "Member has been removed.",
-                                icon: "success",
-                                timer: 2000,
-                                showConfirmButton: false
-                            }).then(() => {
-                                location.reload();
-                            });
-                        },
-                        error: function (xhr) {
-                            let errorMessage = "Something went wrong.";
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete it!"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/Members/DeleteMember",
+                            type: "POST",
+                            data: { id: userId },
+                            success: function (response) {
+                                Swal.fire({
+                                    title: "Deleted!",
+                                    text: "Member has been removed.",
+                                    icon: "success",
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            },
+                            error: function (xhr) {
+                                let errorMessage = "Something went wrong.";
 
-                            // Check if response contains a custom error message
-                            if (xhr.responseJSON && xhr.responseJSON.message) {
-                                errorMessage = xhr.responseJSON.message;
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    errorMessage = xhr.responseJSON.message;
+                                }
+
+                                Swal.fire("Warning!", errorMessage, "warning");
                             }
-
-                            Swal.fire("Warning!", errorMessage, "warning");
-                        }
-                    });
-                }
+                        });
+                    }
+                });
             });
         });
+
     </script>
 
 

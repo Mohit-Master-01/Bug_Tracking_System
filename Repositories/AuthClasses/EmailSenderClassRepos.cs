@@ -30,7 +30,7 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
             try
             {
                 var message = new MimeMessage();
-                message.From.Add(new MailboxAddress("OTP Verifier", "tester.mohit17@gmail.com"));
+                message.From.Add(new MailboxAddress("Bugify - The Bug Tracking System", "tester.mohit17@gmail.com"));
                 message.To.Add(new MailboxAddress("User", toEmail));
                 message.Subject = subject;
 

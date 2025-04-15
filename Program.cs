@@ -43,6 +43,7 @@ builder.Services.AddScoped<IAuditLogsRepos, AuditLogsClassRepos>();
 builder.Services.AddScoped<IPermissionHelperRepos, PermissionHelperClassRepos>();
 builder.Services.AddScoped<IImportRepos, ImportClassRepos>();
 builder.Services.AddScoped<IExportRepos, ExportClassRepos>();
+builder.Services.AddScoped<IDashboardRepos, DashboardClassRepos>();
 
 
 
