@@ -310,71 +310,65 @@ namespace Bug_Tracking_System.Controllers
 
 
         [HttpPost]
-        public JsonResult DeleteProject(int projectId, bool forceDelete = false)
+        public JsonResult DeleteProject(int projectId, bool forceDeactivate = false)
         {
             try
             {
-                // Fetch the project along with its related bugs
                 var project = _dbBug.Projects
-                                      .Include(p => p.Bugs) // Load related bugs
-                                      .FirstOrDefault(p => p.ProjectId == projectId);
+                                    .Include(p => p.Bugs)
+                                    .FirstOrDefault(p => p.ProjectId == projectId);
 
                 if (project == null)
                 {
                     return Json(new { success = false, message = "Project not found!" });
                 }
 
-                // Get the list of bug IDs for this project
-                var bugIds = project.Bugs.Select(b => b.BugId).ToList();
+                if (!project.IsActive)
+                {
+                    return Json(new { success = false, message = "Project is already deactivated!" });
+                }
 
-                // Check if there are any unsolved bugs
+                // Check for active (non-closed) bugs
                 bool hasUnsolvedBugs = project.Bugs.Any(b => b.StatusId != 3);
 
-                if (hasUnsolvedBugs && !forceDelete)
+                if (hasUnsolvedBugs && !forceDeactivate)
                 {
                     return Json(new
                     {
                         success = false,
                         requiresConfirmation = true,
-                        message = "There are assigned but unsolved bugs in this project. Do you want to proceed?"
+                        message = "This project has assigned or unsolved bugs. Do you want to deactivate those bugs as well?",
+                        confirmRequired = true
                     });
                 }
 
-                if (bugIds.Any())
+                // Soft delete the project
+                project.IsActive = false;
+
+                if (forceDeactivate)
                 {
-                    // Step 1: Unassign Bugs from Users
-                    var usersAssignedToBugs = _dbBug.Users.Where(u => bugIds.Contains((int)u.BugId)).ToList();
-                    foreach (var user in usersAssignedToBugs)
+                    // Deactivate bugs as well
+                    foreach (var bug in project.Bugs.Where(b => b.StatusId != 3))
                     {
-                        user.BugId = null; // Unassign bug
+                        bug.IsActive = false;
                     }
-                    _dbBug.SaveChanges(); // Save changes before deleting bugs
-
-                    // Step 2: Delete Attachments linked to these Bugs
-                    var attachmentsToDelete = _dbBug.Attachments.Where(a => bugIds.Contains(a.BugId)).ToList();
-                    _dbBug.Attachments.RemoveRange(attachmentsToDelete);
-                    _dbBug.SaveChanges(); // Save changes after deleting attachments
-
-                    // Step 3: Delete Bugs related to this project
-                    var bugsToDelete = _dbBug.Bugs.Where(b => bugIds.Contains(b.BugId)).ToList();
-                    _dbBug.Bugs.RemoveRange(bugsToDelete);
-                    _dbBug.SaveChanges();
                 }
 
-                // Step 4: Finally, delete the project
-                _dbBug.Projects.Remove(project);
-                int changes = _dbBug.SaveChanges(); // Ensure changes are committed
+                int changes = _dbBug.SaveChanges();
 
                 if (changes > 0)
                 {
                     int userId = (int)HttpContext.Session.GetInt32("UserId");
-                    _auditLogs.AddAuditLogAsync(userId, $"Project '{project.ProjectName}' and its related bugs were deleted by admin.", "Force Delete Project");
+                    _auditLogs.AddAuditLogAsync(userId, $"Project '{project.ProjectName}' was deactivated" +
+                        (forceDeactivate ? " along with active bugs." : "."), "Soft Delete Project");
                 }
 
                 return Json(new
                 {
-                    success = changes > 0,
-                    message = changes > 0 ? "Project and its related data were deleted successfully!" : "No changes made."
+                    success = true,
+                    message = forceDeactivate
+                        ? "Project and its active bugs were deactivated successfully."
+                        : "Project was deactivated successfully."
                 });
             }
             catch (Exception ex)
@@ -382,6 +376,9 @@ namespace Bug_Tracking_System.Controllers
                 return Json(new { success = false, message = "Error: " + ex.Message });
             }
         }
+
+
+
 
         [HttpGet]
         public async Task<IActionResult> ProjectDetails(int id)

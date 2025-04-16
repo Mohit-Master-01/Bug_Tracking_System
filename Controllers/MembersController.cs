@@ -492,9 +492,18 @@ namespace Bug_Tracking_System.Controllers
                 }
 
                 User user = new User();
+                List<int> assignedProjectIds = new List<int>();
+
                 if (id > 0)
                 {
                     user = await _dbBug.Users.FirstOrDefaultAsync(u => u.UserId == id);
+
+                    assignedProjectIds = await _dbBug.UserProjects
+                                        .Where(up => up.UserId == id && up.ProjectId.HasValue)
+                                        .Select(up => up.ProjectId.Value)
+                                        .ToListAsync();
+
+
                 }
 
                 // Fetch roles dynamically excluding Admin (RoleId = 4)
@@ -507,6 +516,9 @@ namespace Bug_Tracking_System.Controllers
                 ViewBag.Projects = new SelectList(await _dbBug.Projects
                                                 .Select(p => new { p.ProjectId, p.ProjectName })
                                                 .ToListAsync(), "ProjectId", "ProjectName");
+
+                ViewBag.AssignedProjects = assignedProjectIds;
+
 
                 return View(user);
             }
@@ -722,7 +734,7 @@ namespace Bug_Tracking_System.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteMember(int id)
+        public async Task<IActionResult> DeleteMember([FromForm] int id)
         {
             var user = _dbBug.Users.FirstOrDefault(u => u.UserId == id);
             if (user == null)
@@ -730,31 +742,13 @@ namespace Bug_Tracking_System.Controllers
                 return NotFound(new { success = false, message = "User not found" });
             }
 
-            // Check if the user has any audit logs
-            if (_dbBug.AuditLogs.Any(a => a.UserId == id))
-            {
-                return BadRequest(new { success = false, message = "Cannot delete. User has audit logs." });
-            }
-
-            // Check if the user is assigned to any project (UserProject table)
-            if (_dbBug.UserProjects.Any(up => up.UserId == id))
-            {
-                return BadRequest(new { success = false, message = "Cannot delete. User is assigned to one or more projects." });
-            }
-
-            // Check if the user has any task assignments
-            if (_dbBug.TaskAssignments.Any(t => t.AssignedTo == id))
-            {
-                return BadRequest(new { success = false, message = "Cannot delete. User has assigned tasks." });
-            }
-
-            // If all checks pass, delete the user
-            _dbBug.Users.Remove(user);
+            user.IsActive = false;
+            _dbBug.Users.Update(user);
             _dbBug.SaveChanges();
 
-            await _auditLogs.AddAuditLogAsync(id, $"{user.UserName} has been deleted.", "Deleted Member");
+            await _auditLogs.AddAuditLogAsync(id, $"{user.UserName} has been deactivated.", "Deactivated Member");
 
-            return Ok(new { success = true, message = "User deleted successfully" });
+            return Ok(new { success = true, message = "User deactivated successfully" });
         }
 
 

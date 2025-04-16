@@ -12,7 +12,7 @@
             <div class="card shadow-lg border-0">
                 <div class="card-header bg-dark text-white">
                     <h5 class="mb-0">@ViewData["Title"]</h5>
-                    
+
                 </div>
 
                 <div class="card-body">
@@ -29,7 +29,7 @@
                             <label asp-for="Email" class="form-label fw-bold"></label>
                             <input asp-for="Email" class="form-control" placeholder="Enter email" required />
                         </div>
-                                                
+
                         <!-- Role Dropdown -->
                         <div class="mb-3">
                             <label asp-for="RoleId" class="form-label fw-bold">Role</label>
@@ -42,13 +42,21 @@
                         <div class="mb-3" id="projectContainer" style="display: none;">
                             <label class="form-label fw-bold">Project(s)</label>
                             <select class="form-control" id="projectDropdown" name="ProjectIds" multiple>
-                                <!-- Options dynamically added via JS -->
+                                @foreach (var project in (SelectList)ViewBag.Projects)
+                                {
+                                    var isSelected = ((List<int>)ViewBag.AssignedProjects).Contains(Convert.ToInt32(project.Value));
+                                    <option value="@project.Value" selected="@(isSelected ? "selected" : null)">
+                                        @project.Text
+                                    </option>
+                                }
                             </select>
+
                             <small class="text-muted">Hold CTRL to select multiple projects.</small>
                         </div>
 
 
-                                                                        
+
+
                         @* <!-- Project Dropdown (Initially Hidden) --> *@
                         @* <div class="mb-3" id="projectContainer" style="display: none;"> *@
                         @*     <label asp-for="ProjectId" class="form-label fw-bold">Project</label> *@

@@ -254,7 +254,10 @@ namespace Bug_Tracking_System.Repositories
                                     .Select(up => new Project
                                     {
                                         ProjectId = up.Project.ProjectId,
-                                        ProjectName = up.Project.ProjectName
+                                        ProjectName = up.Project.ProjectName,
+                                        IsActive = up.Project.IsActive // Include this if needed
+
+
                                     })
                                     .ToList()
                        }).FirstOrDefaultAsync();

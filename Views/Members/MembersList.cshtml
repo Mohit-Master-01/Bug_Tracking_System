@@ -53,7 +53,7 @@
             <button id="exportProductsBtn" class="btn btn-success"><i class="fas fa-file-excel"></i></button>
 
         </div>
-        <div class="card-body">  
+        <div class="card-body">
             <table id="memberTable" class="table table-hover align-middle text-center">
                 <thead class="bg-dark">
                     <tr>
@@ -82,7 +82,7 @@
                                     @((bool)item.IsActive ? "Active" : "Inactive")
                                 </span>
                             </td>
-                           
+
                             <td style="margin-top: 8px;">
                                 @if (ViewBag.PermissionType != "canView")
                                 {
@@ -210,7 +210,7 @@
 
 
                 $(document).ready(function () {
-            $(".delete-member").click(function (e) {
+        $(document).on("click", ".delete-member", function (e) {
                 e.preventDefault();
                 var userId = $(this).data("userid");
 
@@ -229,15 +229,16 @@
                             type: "POST",
                             data: { id: userId },
                             success: function (response) {
-                                Swal.fire({
-                                    title: "Deleted!",
-                                    text: "Member has been removed.",
-                                    icon: "success",
-                                    timer: 2000,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    location.reload();
-                                });
+                                        Swal.fire({
+                                            title: "Deleted!",
+                                            text: "Member has been removed.",
+                                            icon: "success",
+                                            timer: 2000,
+                                            showConfirmButton: false
+                                        }).then(() => {
+                                            $(`a[data-userid="${userId}"]`).closest('tr').fadeOut(500);
+                                        });
+
                             },
                             error: function (xhr) {
                                 let errorMessage = "Something went wrong.";

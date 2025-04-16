@@ -5,356 +5,745 @@
     ViewData["Title"] = "Dashboard";
     var role = Model.Role;
     var hasProject = Model.TotalBugsInCurrentProject > 0; // Check if project is selected and has data
+    var hasBug = Model.MyBugs > 0 && Model.BugActivityTimeline?.Any() == true;
 
 }
+
+<style>
+    .no-data-card {
+        border: 1px solid #dee2e6;
+        border-radius: 1rem;
+        padding: 2rem;
+        text-align: center;
+        background: linear-gradient(145deg, #f8f9fa, #ffffff);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+    }
+
+    .no-data-icon {
+        font-size: 4rem;
+        color: #5e72e4;
+        margin-bottom: 1rem;
+    }
+
+    .no-data-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #32325d;
+    }
+
+    .no-data-text {
+        color: #8898aa;
+        font-size: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .dataTables_length select {
+        padding-right: 25px !important;
+        width: 80px;
+    }
+
+    #dashboard-content {
+
+        padding: 20px;
+        display: block;
+        overflow: visible;
+    }
+
+
+</style>
 
 <!-- Argon Dashboard Layout Container -->
 <div class="container-fluid py-4">
 
-    <!-- ======= Admin Dashboard ======= -->
-    @if (role == 4)
-    {
-        <div class="row">
-            <!-- Card 1 -->
-            <div class="col-xl-4 col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Users</p>
-                                    <h5 class="font-weight-bolder">@Model.TotalUsers</h5>
+    <!-- Screenshot Button -->
+    <div class="mb-3 text-end" style="margin-right:25px">
+        <button id="download-image" class="btn btn-success" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Dashboard Stats As Image">
+            <i class="fas fa-image"></i>
+        </button>
+        <button id="download-pdf" class="btn btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Dashboard Stats As PDF" style="margin-left: 5px">
+            <i class="fas fa-file-pdf"></i>
+        </button>
+    </div>
+
+    <div id="dashboard-content">
+        <!-- ======= Admin Dashboard ======= -->
+        @if (role == 4)
+        {
+            <div class="row">
+                <!-- Card 1 -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card">
+                        <a href="/Members/MembersList">
+                            <div class="card-body p-3">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <div class="numbers">
+                                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Users</p>
+                                            <h5 class="font-weight-bolder">@Model.TotalUsers</h5>
+                                        </div>
+                                    </div>
+                                    <div class="col-4 text-end">
+                                        <div class="icon icon-shape bg-gradient-primary shadow text-center rounded-circle">
+                                            <i class="fas fa-users text-lg opacity-10" aria-hidden="true"></i>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-primary shadow text-center rounded-circle">
-                                    <i class="fas fa-users text-lg opacity-10" aria-hidden="true"></i>
+                        </a>
+                    </div>
+
+                </div>
+
+                <!-- Card 2 -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card">
+                        <a href="/Members/ProjectManagersList">
+
+                            <div class="card-body p-3">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <div class="numbers">
+                                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Project Managers</p>
+                                            <h5 class="font-weight-bolder">@Model.TotalProjectManagers</h5>
+                                        </div>
+                                    </div>
+                                    <div class="col-4 text-end">
+                                        <div class="icon icon-shape bg-gradient-info shadow text-center rounded-circle">
+                                            <i class="fas fa-user-tie text-lg opacity-10" aria-hidden="true"></i>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
-            </div>
 
-            <!-- Card 2 -->
-            <div class="col-xl-4 col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Project Managers</p>
-                                    <h5 class="font-weight-bolder">@Model.TotalProjectManagers</h5>
-                                </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-info shadow text-center rounded-circle">
-                                    <i class="fas fa-user-tie text-lg opacity-10" aria-hidden="true"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 3 -->
-            <div class="col-xl-4 col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Developers</p>
-                                    <h5 class="font-weight-bolder">@Model.TotalDevelopers</h5>
-                                </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-success shadow text-center rounded-circle">
-                                    <i class="fas fa-code text-lg opacity-10" aria-hidden="true"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 4 -->
-            <div class="col-xl-4 col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Testers</p>
-                                    <h5 class="font-weight-bolder">@Model.TotalTesters</h5>
-                                </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-danger shadow text-center rounded-circle">
-                                    <i class="fas fa-bug text-lg opacity-10" aria-hidden="true"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 5 -->
-            <div class="col-xl-4 col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Projects</p>
-                                    <h5 class="font-weight-bolder">@Model.TotalProjects</h5>
-                                </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-warning shadow text-center rounded-circle">
-                                    <i class="fas fa-project-diagram text-lg opacity-10" aria-hidden="true"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 6 -->
-            <div class="col-xl-4 col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Bugs</p>
-                                    <h5 class="font-weight-bolder">@Model.TotalBugs</h5>
-                                </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-secondary shadow text-center rounded-circle">
-                                    <i class="fas fa-bug-slash text-lg opacity-10" aria-hidden="true"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="row">
-            <div class="col-md-6 col-lg-6">
-                <div class="card">
-                    <div class="card-header border-0">
-                        <h3 class="mb-0">Users by Role</h3>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="usersByRoleChart" height="300"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-6">
-                <div class="card">
-                    <div class="card-header border-0">
-                        <h3 class="mb-0">Bugs by Status</h3>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="bugsByStatusChart" height="300"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6 col-lg-6">
-                <div class="card">
-                    <div class="card-header border-0">
-                        <h3 class="mb-0">Bugs by Severity</h3>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="bugsBySeverityChart" height="300"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-6">
-                <div class="card h-100">
-                    <div class="card-header border-0">
-                        <h3 class="mb-0">Bugs Over Time</h3>
-                    </div>
-                    <div class="card-body d-flex align-items-center" style="height: 300px;">
-                        <div style="overflow-x: auto; width: 100%;">
-                            <canvas id="bugsOverTimeChart" style="min-width: 700px; height: 100%;"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    }
-
-    <!-- ======= Project Manager Dashboard ======= -->
-    @if (role == 1)
-    {
-        <div class="row">
-            <!-- My Projects -->
-            <div class="col-xl-4 col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <p class="text-sm mb-0 text-uppercase font-weight-bold">My Projects</p>
-                                <h5 class="font-weight-bolder">@Model.MyProjects</h5>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-warning shadow text-center rounded-circle">
-                                    <i class="fas fa-folder-open text-lg opacity-10"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Bugs in My Projects -->
-            <div class="col-xl-4 col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <p class="text-sm mb-0 text-uppercase font-weight-bold">Bugs in My Projects</p>
-                                <h5 class="font-weight-bolder">@Model.BugsInMyProjects</h5>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-danger shadow text-center rounded-circle">
-                                    <i class="fas fa-bug text-lg opacity-10"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Total Testers -->
-            <div class="col-xl-4 col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Testers</p>
-                                    <h5 class="font-weight-bolder">@Model.TotalTesters</h5>
-                                </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-info shadow text-center rounded-circle">
-                                    <i class="fas fa-users text-lg opacity-10" aria-hidden="true"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            @if (hasProject)
-            {
-                <!-- Developers in Project -->
+                <!-- Card 3 -->
                 <div class="col-xl-4 col-md-6 mb-4">
                     <div class="card">
                         <div class="card-body p-3">
                             <div class="row">
                                 <div class="col-8">
                                     <div class="numbers">
-                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">Developers in Project</p>
-                                        <h5 class="font-weight-bolder">@Model.DevelopersInCurrentProject</h5>
+                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">Developers</p>
+                                        <h5 class="font-weight-bolder">@Model.TotalDevelopers</h5>
                                     </div>
                                 </div>
                                 <div class="col-4 text-end">
                                     <div class="icon icon-shape bg-gradient-success shadow text-center rounded-circle">
-                                        <i class="fas fa-user-cog text-lg opacity-10" aria-hidden="true"></i>
+                                        <i class="fas fa-code text-lg opacity-10" aria-hidden="true"></i>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="numbers">
+                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">Testers</p>
+                                        <h5 class="font-weight-bolder">@Model.TotalTesters</h5>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <div class="icon icon-shape bg-gradient-danger shadow text-center rounded-circle">
+                                        <i class="fas fa-bug text-lg opacity-10" aria-hidden="true"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="numbers">
+                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Projects</p>
+                                        <h5 class="font-weight-bolder">@Model.TotalProjects</h5>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <div class="icon icon-shape bg-gradient-warning shadow text-center rounded-circle">
+                                        <i class="fas fa-project-diagram text-lg opacity-10" aria-hidden="true"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="numbers">
+                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Bugs</p>
+                                        <h5 class="font-weight-bolder">@Model.TotalBugs</h5>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <div class="icon icon-shape bg-gradient-secondary shadow text-center rounded-circle">
+                                        <i class="fas fa-bug-slash text-lg opacity-10" aria-hidden="true"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-6 col-lg-6">
+                    <div class="card">
+                        <div class="card-header border-0">
+                            <h3 class="mb-0">Users by Role</h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="usersByRoleChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-6">
+                    <div class="card">
+                        <div class="card-header border-0">
+                            <h3 class="mb-0">Bugs by Status</h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="bugsByStatusChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-2">
+                <div class="col-md-6 col-lg-6">
+                    <div class="card">
+                        <div class="card-header border-0">
+                            <h3 class="mb-0">Bugs by Severity</h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="bugsBySeverityChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-header border-0">
+                            <h3 class="mb-0">Bugs Over Time</h3>
+                        </div>
+                        <div class="card-body d-flex align-items-center" style="height: 300px;">
+                            <div style="overflow-x: auto; width: 100%;">
+                                <canvas id="bugsOverTimeChart" style="min-width: 700px; height: 100%;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        }
+
+        <!-- ======= Project Manager Dashboard ======= -->
+        @if (role == 1)
+        {
+            <div class="row">
+                <!-- My Projects -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <div class="col-8">
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">My Projects</p>
+                                    <h5 class="font-weight-bolder">@Model.MyProjects</h5>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <div class="icon icon-shape bg-gradient-warning shadow text-center rounded-circle">
+                                        <i class="fas fa-folder-open text-lg opacity-10"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bugs in My Projects -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <div class="col-8">
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Bugs in My Projects</p>
+                                    <h5 class="font-weight-bolder">@Model.BugsInMyProjects</h5>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <div class="icon icon-shape bg-gradient-danger shadow text-center rounded-circle">
+                                        <i class="fas fa-bug text-lg opacity-10"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Testers -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="numbers">
+                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">Testers</p>
+                                        <h5 class="font-weight-bolder">@Model.TotalTesters</h5>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <div class="icon icon-shape bg-gradient-info shadow text-center rounded-circle">
+                                        <i class="fas fa-users text-lg opacity-10" aria-hidden="true"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (hasProject)
+                {
+                    <!-- Developers in Project -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body p-3">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <div class="numbers">
+                                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Developers in Project</p>
+                                            <h5 class="font-weight-bolder">@Model.DevelopersInCurrentProject</h5>
+                                        </div>
+                                    </div>
+                                    <div class="col-4 text-end">
+                                        <div class="icon icon-shape bg-gradient-success shadow text-center rounded-circle">
+                                            <i class="fas fa-user-cog text-lg opacity-10" aria-hidden="true"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+
+
+
+            <!-- Graphs -->
+            @if (hasProject)
+            {
+                <!-- Charts Section -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card shadow">
+                            <div class="card-header border-0">
+                                <h3 class="mb-0">Bugs by Status</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="bugsByStatusChart" style="width:100%; height:250px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card shadow">
+                            <div class="card-header border-0">
+                                <h3 class="mb-0">Bugs by Severity</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="bugsBySeverityChart" style="width:100%; height:250px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="card shadow">
+                            <div class="card-header border-0">
+                                <h3 class="mb-0">Bug Activity Timeline</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="bugTimelineChart" style="width:100%; height:300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row mt-4 mb-4">
+                    <div class="col-md-12">
+                        <div class="card shadow">
+                            <div class="card-body">
+                                <h4>Project Progress</h4>
+                                <div class="progress" style="height:25px; background-color:#f0f0f0;">
+                                    <div class="progress-bar bg-gradient-success"
+                                         role="progressbar"
+                                         style="width:@Model.ProjectProgress%; font-weight:bold; font-size:14px; line-height:25px;"
+                                         aria-valuenow="@Model.ProjectProgress" aria-valuemin="0" aria-valuemax="100">
+                                        @Model.ProjectProgress%
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            }
+            else
+            {
+                <!-- No data UI -->
+                <div class="no-data-card">
+                    <div class="no-data-icon">
+                        <i class="fas fa-bug-slash"></i>
+                    </div>
+                    <div class="no-data-title">
+                        No Bugs Reported Yet In This Project
+                    </div>
+                    <div class="no-data-text">
+                        Great job! Everything seems to be working fine.<br />
+                    </div>
+
+                </div>
+            }
+        }
+
+        @if (role == 2)
+        {
+            <div class="row">
+                <!-- My Projects -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <div class="col-8">
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">My Projects</p>
+                                    <h5 class="font-weight-bolder">@Model.MyProjects</h5>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <div class="icon icon-shape bg-gradient-primary shadow text-center rounded-circle">
+                                        <i class="fas fa-briefcase text-lg opacity-10"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Bugs -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <div class="col-8">
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">My Total Bugs</p>
+                                    <h5 class="font-weight-bolder">@Model.MyBugs</h5>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <div class="icon icon-shape bg-gradient-danger shadow text-center rounded-circle">
+                                        <i class="fas fa-bug text-lg opacity-10"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resolved Bugs -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <div class="col-8">
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">My Total Resolved Bugs</p>
+                                    <h5 class="font-weight-bolder">@Model.ResolvedBugs</h5>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <div class="icon icon-shape bg-gradient-success shadow text-center rounded-circle">
+                                        <i class="fas fa-check-circle text-lg opacity-10"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- In-Progress Bugs -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <div class="col-8">
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">In-Progress Bugs</p>
+                                    <h5 class="font-weight-bolder">@Model.InProgressBugs</h5>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <div class="icon icon-shape bg-gradient-warning shadow text-center rounded-circle">
+                                        <i class="fas fa-spinner text-lg opacity-10"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (hasBug)
+            {
+                <!-- Charts Section -->
+                <div class="row mt-4">
+                    <!-- Bugs by Status (Pie Chart) -->
+                    <div class="col-md-6">
+                        <div class="card shadow" style="width: 100%;">
+                            <div class="card-header border-0 text-center">
+                                <h3 class="mb-0">Bugs by Status</h3>
+                            </div>
+                            <div class="card-body d-flex justify-content-center align-items-center" style="height: 350px;">
+                                <canvas id="bugsByStatusChart" style="width: 300px; height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bugs by Severity (Donut Chart) -->
+                    <div class="col-md-6">
+                        <div class="card shadow" style="width: 100%;">
+                            <div class="card-header border-0 text-center">
+                                <h3 class="mb-0">Bugs by Severity</h3>
+                            </div>
+                            <div class="card-body d-flex justify-content-center align-items-center" style="height: 350px;">
+                                <canvas id="bugsBySeverityChart" style="width: 300px; height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="card shadow">
+                            <div class="card-header border-0">
+                                <h3 class="mb-0">Bug Activity Timeline</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="bugTimelineChart" style="width:100%; height:300px;"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
             }
-        </div>
+            else
+            {
+                <!-- No data UI -->
+                <div class="no-data-card">
+                    <div class="no-data-icon">
+                        <i class="fas fa-bug-slash"></i>
+                    </div>
+                    <div class="no-data-title">
+                        No Bugs Assigned Yet
+                    </div>
+                    <div class="no-data-text">
+                        Awesome! You're up to date.
+                    </div>
+                </div>
+            }
+        }
 
-      
-
-
-        <!-- Graphs -->
-        @if (hasProject)
+        @if (role == 3)
         {
-            <!-- Charts Section -->
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <div class="card shadow">
-                        <div class="card-header border-0">
-                            <h3 class="mb-0">Bugs by Status</h3>
-                        </div>
-                        <div class="card-body">
-                            <canvas id="bugsByStatusChart" style="width:100%; height:250px;"></canvas>
-                        </div>
-                    </div>
-                </div>
+            <div class="row mb-4">
 
-                <div class="col-md-6">
-                    <div class="card shadow">
-                        <div class="card-header border-0">
-                            <h3 class="mb-0">Bugs by Severity</h3>
-                        </div>
-                        <div class="card-body">
-                            <canvas id="bugsBySeverityChart" style="width:100%; height:250px;"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="row mt-4">
-                <div class="col-md-12">
-                    <div class="card shadow">
-                        <div class="card-header border-0">
-                            <h3 class="mb-0">Bug Activity Timeline</h3>
-                        </div>
-                        <div class="card-body">
-                            <canvas id="bugTimelineChart" style="width:100%; height:300px;"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="row mt-4 mb-4">
-                <div class="col-md-12">
-                    <div class="card shadow">
-                        <div class="card-body">
-                            <h4>Project Progress</h4>
-                            <div class="progress" style="height:25px; background-color:#f0f0f0;">
-                                <div class="progress-bar bg-gradient-success"
-                                     role="progressbar"
-                                     style="width:@Model.ProjectProgress%; font-weight:bold; font-size:14px; line-height:25px;"
-                                     aria-valuenow="@Model.ProjectProgress" aria-valuemin="0" aria-valuemax="100">
-                                    @Model.ProjectProgress%
+                <!-- Bugs to Verify -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <div class="col-8">
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Bugs to Verify</p>
+                                    <h5 class="font-weight-bolder">@Model.BugsToVerify</h5>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <div class="icon icon-shape bg-gradient-warning shadow text-center rounded-circle">
+                                        <i class="fas fa-search text-lg opacity-10"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Verified Bugs -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <div class="col-8">
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Verified Bugs</p>
+                                    <h5 class="font-weight-bolder">@Model.VerifiedBugs</h5>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <div class="icon icon-shape bg-gradient-success shadow text-center rounded-circle">
+                                        <i class="fas fa-check-circle text-lg opacity-10"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Bugs  -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <div class="col-8">
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Bugs </p>
+                                    <h5 class="font-weight-bolder">@Model.TotalBugsTested</h5>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <div class="icon icon-shape bg-gradient-primary shadow text-center rounded-circle">
+                                        <i class="fas fa-bug text-lg opacity-10"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
+
+            <!-- Charts Section -->
+            <div class="row mt-4">
+
+                <!-- Bugs by Status (Pie Chart) -->
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow w-100">
+                        <div class="card-header border-0 text-center">
+                            <h3 class="mb-0">Bugs by Status</h3>
+                        </div>
+                        <div class="card-body d-flex justify-content-center align-items-center" style="height: 350px;">
+                            <canvas id="pieChart" style="width: 300px; height: 300px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Severity of Bugs Tested (Donut Chart) -->
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow w-100">
+                        <div class="card-header border-0 text-center">
+                            <h3 class="mb-0">Severity of Bugs Tested</h3>
+                        </div>
+                        <div class="card-body d-flex justify-content-center align-items-center" style="height: 350px;">
+                            <canvas id="donutChart" style="width: 300px; height: 300px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- Bug Verification History (Line Chart Full Width) -->
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header">Bug Verification History</div>
+                        <div class="card-body">
+                            <canvas id="lineChart" style="width: 100%; height: 300px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
         }
-    }
-
-
+    </div>
 </div>
 
 
 
 <!-- Chart Libraries -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+
+<script>
+
+        var role = @Model.Role;
+    var roleName = '';
+
+    switch (role) {
+        case 1:
+            roleName = 'ProjectManager';
+            break;
+        case 2:
+            roleName = 'Developer';
+            break;
+        case 3:
+            roleName = 'Tester';
+            break;
+        case 4:
+            roleName = 'Admin';
+            break;
+        default:
+            roleName = 'User';
+    }
+
+
+       document.getElementById("download-image").addEventListener("click", function () {
+        const element = document.getElementById("dashboard-content");
+
+        html2canvas(element, {
+            scale: 2,
+            useCORS: true
+        }).then(canvas => {
+            const link = document.createElement("a");
+            const fileName = `Bugify_${roleName}_Dashboard.png`;
+            link.download = fileName;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        });
+    });
+
+        document.getElementById("download-pdf").addEventListener("click", function () {
+        const element = document.getElementById("dashboard-content");
+        const fileName = `Bugify_${roleName}_Dashboard.pdf`;
+
+        const opt = {
+            margin:       0.3,
+            filename:     fileName,
+            image:        { type: 'jpeg', quality: 1 },
+            html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+            jsPDF:        { unit: 'pt', format: 'a4', orientation: 'landscape' },
+            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+
+        html2pdf().set(opt).from(element).save();
+    });
+
+
+</script>
+
 
 @using System.Text.Json
 
@@ -429,51 +818,169 @@
     {
         <script>
             const bugsByStatusData = @Html.Raw(JsonSerializer.Serialize(Model.MyBugsByStatus));
-                const bugsBySeverityData = @Html.Raw(JsonSerializer.Serialize(Model.MyBugsBySeverity));
-                const bugTimelineData = @Html.Raw(JsonSerializer.Serialize(Model.BugActivityTimeline));
+            const bugsBySeverityData = @Html.Raw(JsonSerializer.Serialize(Model.MyBugsBySeverity));
+            const bugTimelineData = @Html.Raw(JsonSerializer.Serialize(Model.BugActivityTimeline));
 
             // Bugs by Status Chart
             const statusCtx = document.getElementById('bugsByStatusChart');
             new Chart(statusCtx, {
-                type: 'pie',
-                data: {
-                    labels: Object.keys(bugsByStatusData),
-                    datasets: [{
-                        data: Object.values(bugsByStatusData),
-                        backgroundColor: ['#f5365c', '#5e72e4', '#2dce89', '#fb6340']
-                    }]
-                }
+            type: 'pie',
+            data: {
+            labels: Object.keys(bugsByStatusData),
+            datasets: [{
+            data: Object.values(bugsByStatusData),
+            backgroundColor: ['#f5365c', '#5e72e4', '#2dce89', '#fb6340']
+            }]
+            }
             });
 
             // Bugs by Severity Chart
             const severityCtx = document.getElementById('bugsBySeverityChart');
             new Chart(severityCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(bugsBySeverityData),
-                    datasets: [{
-                        data: Object.values(bugsBySeverityData),
-                        backgroundColor: ['#11cdef', '#2dce89', '#f5365c', '#fb6340']
-                    }]
-                }
+            type: 'doughnut',
+            data: {
+            labels: Object.keys(bugsBySeverityData),
+            datasets: [{
+            data: Object.values(bugsBySeverityData),
+            backgroundColor: ['#11cdef', '#2dce89', '#f5365c', '#fb6340']
+            }]
+            }
             });
 
             // Bug Activity Timeline Chart
             const timelineCtx = document.getElementById('bugTimelineChart');
             new Chart(timelineCtx, {
+            type: 'line',
+            data: {
+            labels: Object.keys(bugTimelineData),
+            datasets: [{
+            label: 'Bugs Created',
+            data: Object.values(bugTimelineData),
+            fill: false,
+            borderColor: '#5e72e4',
+            tension: 0.3
+            }]
+            }
+            });
+        </script>
+
+    }
+
+    @if (role == 2)
+    {
+        <script>
+            // Bugs by Status
+            var statusCtx = document.getElementById('bugsByStatusChart').getContext('2d');
+            new Chart(statusCtx, {
+            type: 'pie',
+            data: {
+            labels: @Html.Raw(Json.Serialize(Model.BugsByStatus.Keys)),
+            datasets: [{
+            data: @Html.Raw(Json.Serialize(Model.BugsByStatus.Values)),
+            backgroundColor: ['#4e73df', '#1cc88a', '#f6c23e', '#e74a3b'],
+            }]
+            }
+            });
+
+            // Bugs by Severity (Donut)
+            var severityCtx = document.getElementById('bugsBySeverityChart').getContext('2d');
+            new Chart(severityCtx, {
+            type: 'doughnut',
+            data: {
+            labels: @Html.Raw(Json.Serialize(Model.BugsBySeverity.Keys)),
+            datasets: [{
+            label: 'Bug Count',
+            data: @Html.Raw(Json.Serialize(Model.BugsBySeverity.Values)),
+            backgroundColor: [
+            '#e74c3c', // red
+            '#f39c12', // orange
+            '#3498db', // blue
+            '#2ecc71', // green
+            '#9b59b6', // purple
+            '#1abc9c'  // teal
+            ]
+            }]
+            },
+            options: {
+            responsive: false,
+            maintainAspectRatio: false,
+            cutout: '60%' // Optional: controls the donut thickness
+            }
+            });
+
+
+
+            var ctx = document.getElementById("bugTimelineChart").getContext("2d");
+            var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+            labels: @Html.Raw(Json.Serialize(Model.BugActivityTimeline.Keys)),
+            datasets: [{
+            label: "Bugs Reported",
+            data: @Html.Raw(Json.Serialize(Model.BugActivityTimeline.Values)),
+            backgroundColor: "rgba(75,192,192,0.4)",
+            borderColor: "rgba(75,192,192,1)",
+            fill: true,
+            tension: 0.4
+            }]
+            },
+            options: {
+            responsive: true,
+            plugins: {
+            legend: {
+            display: true
+            }
+            }
+            }
+            });
+
+        </script>
+    }
+
+    @if (role == 3)
+    {
+        <script>
+            // Bug Verification History - Line Chart
+            const lineCtx = document.getElementById('lineChart').getContext('2d');
+            new Chart(lineCtx, {
                 type: 'line',
                 data: {
-                    labels: Object.keys(bugTimelineData),
+                    labels: @Html.Raw(Json.Serialize(Model.BugVerificationHistory.Keys)),
                     datasets: [{
-                        label: 'Bugs Created',
-                        data: Object.values(bugTimelineData),
+                        label: 'Bugs Verified Over Time',
+                        data: @Html.Raw(Json.Serialize(Model.BugVerificationHistory.Values)),
                         fill: false,
-                        borderColor: '#5e72e4',
+                        borderColor: 'rgb(75, 192, 192)',
                         tension: 0.3
                     }]
                 }
             });
-        </script>
 
+            // Bugs by Status - Pie Chart
+            const pieCtx = document.getElementById('pieChart').getContext('2d');
+            new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(Model.MyBugsByStatus.Keys)),
+                    datasets: [{
+                        data: @Html.Raw(Json.Serialize(Model.MyBugsByStatus.Values)),
+                        backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6c757d']
+                    }]
+                }
+            });
+
+            // Severity of Bugs Tested - Donut Chart
+            const donutCtx = document.getElementById('donutChart').getContext('2d');
+            new Chart(donutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(Model.SeverityOfBugsTested.Keys)),
+                    datasets: [{
+                        data: @Html.Raw(Json.Serialize(Model.SeverityOfBugsTested.Values)),
+                        backgroundColor: ['#17a2b8', '#fd7e14', '#6f42c1', '#e83e8c']
+                    }]
+                }
+            });
+        </script>
     }
 }

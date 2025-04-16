@@ -4,6 +4,7 @@ using Microsoft.Build.Evaluation;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using System.Drawing;
+using System.Linq;
 using X.PagedList;
 using X.PagedList.Extensions;
 
@@ -82,7 +83,7 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
                                 join Roles in _dbBug.Roles on Users.RoleId equals Roles.RoleId
                                 join Projects in _dbBug.Projects on Users.ProjectId equals Projects.ProjectId into projGroup
                                 from project in projGroup.DefaultIfEmpty() // Left Join to include users without projects
-                                where Users.RoleId == 2 // Exclude Admins
+                                where Users.RoleId == 2 && Users.IsActive == true // Exclude Admins
                                 select new User
                                 {
                                     UserId = Users.UserId,
@@ -115,7 +116,7 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
                         from up in _dbBug.UserProjects
                         join user in _dbBug.Users on up.UserId equals user.UserId
                         join role in _dbBug.Roles on user.RoleId equals role.RoleId
-                        where up.ProjectId == projectId && user.RoleId == 2
+                        where up.ProjectId == projectId && user.RoleId == 2 && user.IsActive == true
                         select new User
                         {
                             UserId = user.UserId,
@@ -152,7 +153,7 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
         join Roles in _dbBug.Roles on Users.RoleId equals Roles.RoleId
         join Projects in _dbBug.Projects on Users.ProjectId equals Projects.ProjectId into projGroup
         from project in projGroup.DefaultIfEmpty() // Left Join to include users without projects
-        where Users.RoleId != 4
+        where Users.RoleId != 4 && Users.IsActive == true
         select new User
         {
             UserId = Users.UserId,
@@ -191,7 +192,7 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
                        from Users in _dbBug.Users
                        join Roles in _dbBug.Roles on Users.RoleId equals Roles.RoleId
                        join Projects in _dbBug.Projects on Users.ProjectId equals Projects.ProjectId
-                       where Users.RoleId != 4 && Users.ProjectId == projectId // <-- filter by projectId
+                       where Users.RoleId != 4 && Users.ProjectId == projectId && Users.IsActive == true // <-- filter by projectId
                        select new User
                        {
                            UserId = Users.UserId,
@@ -222,11 +223,12 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
 
         public async Task<List<User>> GetAllProjectManagers()
         {
-            var members = await(
+            var members = await (
                                 from Users in _dbBug.Users
                                 join Roles in _dbBug.Roles on Users.RoleId equals Roles.RoleId
-                                join Projects in _dbBug.Projects on Users.ProjectId equals Projects.ProjectId
-                                where Users.RoleId == 1 // Include Project managers
+                                join Projects in _dbBug.Projects on Users.ProjectId equals Projects.ProjectId into projGroup
+                                from project in projGroup.DefaultIfEmpty() // Left Join to include users without projects
+                                where Users.RoleId == 1 && Users.IsActive == true // Exclude Admins
                                 select new User
                                 {
                                     UserId = Users.UserId,
@@ -242,11 +244,11 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
                                         RoleId = Roles.RoleId,
                                         RoleName = Roles.RoleName
                                     },
-                                    Project = new Models.Project
+                                    Project = project != null ? new Models.Project
                                     {
-                                        ProjectId = Projects.ProjectId,
-                                        ProjectName = Projects.ProjectName,
-                                    }
+                                        ProjectId = project.ProjectId,
+                                        ProjectName = project.ProjectName
+                                    } : null
                                 }
                             ).OrderByDescending(m => m.CreatedDate).ToListAsync();
 
@@ -259,7 +261,7 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
                     from Users in _dbBug.Users
                     join Roles in _dbBug.Roles on Users.RoleId equals Roles.RoleId
                     join Projects in _dbBug.Projects on Users.ProjectId equals Projects.ProjectId
-                    where Users.RoleId == 1 && Users.Project.ProjectId == projectId// Include Project managers
+                    where Users.RoleId == 1 && Users.Project.ProjectId == projectId && Users.IsActive == true// Include Project managers
                     select new User
                     {
                         UserId = Users.UserId,
@@ -298,7 +300,7 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
                                 join Roles in _dbBug.Roles on Users.RoleId equals Roles.RoleId
                                 join Projects in _dbBug.Projects on Users.ProjectId equals Projects.ProjectId into projGroup
                                 from project in projGroup.DefaultIfEmpty() // Left Join to include users without projects
-                                where Users.RoleId == 3 // Exclude Admins
+                                where Users.RoleId == 3 && Users.IsActive == true // Exclude Admins
                                 select new User
                                 {
                                     UserId = Users.UserId,
@@ -331,7 +333,7 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
                         from up in _dbBug.UserProjects
                         join user in _dbBug.Users on up.UserId equals user.UserId
                         join role in _dbBug.Roles on user.RoleId equals role.RoleId
-                        where up.ProjectId == projectId && user.RoleId == 2
+                        where up.ProjectId == projectId && user.RoleId == 2 && user.IsActive == true
                         select new User
                         {
                             UserId = user.UserId,
@@ -408,13 +410,19 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
 
                 if (ProjectIds != null && ProjectIds.Any())
                 {
-                    // Remove old mappings
-                    var oldMappings = _dbBug.UserProjects.Where(up => up.UserId == userId);
-                    _dbBug.UserProjects.RemoveRange(oldMappings);
-                    await _dbBug.SaveChangesAsync();
+                    var existingProjects = await _dbBug.UserProjects
+                        .Where(up => up.UserId == userId)
+                        .Select(up => up.ProjectId)
+                        .ToListAsync();
 
-                    // Add new mappings
-                    foreach (var projectId in ProjectIds)
+                    var newProjectIds = ProjectIds.Except(existingProjects.Select(x => x.Value)).ToList();
+
+                    if (!isNewMember && !newProjectIds.Any())
+                    {
+                        return new { success = false, message = "All selected projects are already assigned to this member." };
+                    }
+
+                    foreach (var projectId in newProjectIds)
                     {
                         var userProject = new UserProject
                         {
@@ -425,6 +433,27 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
                     }
                     await _dbBug.SaveChangesAsync();
                 }
+
+
+                //if (ProjectIds != null && ProjectIds.Any())
+                //{
+                //    // Remove old mappings
+                //    var oldMappings = _dbBug.UserProjects.Where(up => up.UserId == userId);
+                //    _dbBug.UserProjects.RemoveRange(oldMappings);
+                //    await _dbBug.SaveChangesAsync();
+
+                //    // Add new mappings
+                //    foreach (var projectId in ProjectIds)
+                //    {
+                //        var userProject = new UserProject
+                //        {
+                //            UserId = userId,
+                //            ProjectId = projectId
+                //        };
+                //        await _dbBug.UserProjects.AddAsync(userProject);
+                //    }
+                //    await _dbBug.SaveChangesAsync();
+                //}
 
                 return new { success = true, message = isNewMember ? "New member added successfully" : "Member data updated successfully", tempPassword };
             }

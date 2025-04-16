@@ -23,6 +23,8 @@ public partial class Bug
 
     public int? ProjectId { get; set; }
 
+    public bool IsActive { get; set; } 
+
     public virtual ICollection<Attachment> Attachments { get; set; } = new List<Attachment>();
 
     public virtual User CreatedByNavigation { get; set; } = null!;

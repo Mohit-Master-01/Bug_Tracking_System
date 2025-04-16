@@ -86,6 +86,8 @@ public partial class DbBug : DbContext
             entity.Property(e => e.Priority).HasMaxLength(50);
             entity.Property(e => e.Severity).HasMaxLength(50);
             entity.Property(e => e.Title).HasMaxLength(200);
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.Bugs)
                 .HasForeignKey(d => d.CreatedBy)

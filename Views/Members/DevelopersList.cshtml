@@ -128,7 +128,7 @@
                             <th class="text-white">Project</th>
                             <th class="text-white">Joining Date</th>
                             <th class="text-white">Status</th>
-                            <th class="text-white" style="white-space: nowrap; width: 150px;">Actions</th> <!-- Prevents column from breaking -->
+                            <th class="text-white text-center align-middle" style="white-space: nowrap; width: 150px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -149,19 +149,19 @@
                                         @((bool)item.IsActive ? "Active" : "Inactive")
                                     </span>
                                 </td>
-                                <td style="margin-top: 8px;">
+                                <td style="margin-top: 8px;" class="text-center align-middle">
                                     @if (ViewBag.PermissionType != "canView")
                                     {
-                                        <div style="display: flex; gap: 10px; align-items: center;">
+                                        <div style="display: flex; gap: 10px; justify-content: center; align-items: center;">
                                             <a asp-action="SaveMember" asp-route-id="@item.UserId" class="btn btn-warning btn-sm" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                             <a asp-action="MemberDetails" asp-route-id="@item.UserId" class="btn btn-info btn-sm" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="#" class="btn btn-danger btn-sm delete-member" data-userid="@item.UserId" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </a>
+                                            @* <a href="#" class="btn btn-danger btn-sm delete-member" data-userid="@item.UserId" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;"> *@
+                                            @*     <i class="fas fa-trash-alt"></i> *@
+                                            @* </a> *@
                                         </div>
                                     }
                                     else

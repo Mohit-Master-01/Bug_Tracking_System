@@ -95,7 +95,7 @@ namespace Bug_Tracking_System.Repositories.BugsClasses
                 .Include(b => b.Attachments)
                 .Include(b => b.CreatedByNavigation)
                 .Include(b => b.Project)
-                .Where(b => b.ProjectId == projectId)
+                .Where(b => b.ProjectId == projectId && b.IsActive == true)
                 .OrderByDescending(b => b.CreatedDate)
                 .Select(b => new Bug
                 {
@@ -158,7 +158,7 @@ namespace Bug_Tracking_System.Repositories.BugsClasses
                 .Include(b => b.Attachments)
                 .Include(b => b.CreatedByNavigation)
                 .Include(b => b.Project)
-                .Where(b => b.ProjectId == projectId && b.Status.StatusId == 1)
+                .Where(b => b.ProjectId == projectId && b.Status.StatusId == 1 && b.IsActive == true)
                 .OrderByDescending(b => b.CreatedDate)
                 .Select(b => new Bug
                 {
@@ -351,7 +351,7 @@ namespace Bug_Tracking_System.Repositories.BugsClasses
                            .Include(b => b.Attachments)
                            .Include(b => b.CreatedByNavigation)
             .Include(b => b.Project)
-                           .Where(b => b.Status.StatusId == 1)
+                           .Where(b => b.Status.StatusId == 1 && b.IsActive == true)
                            .OrderByDescending(b => b.CreatedDate)
                            .Select(b => new Bug
                            {
@@ -380,6 +380,7 @@ namespace Bug_Tracking_System.Repositories.BugsClasses
                 .Include(b => b.Attachments)
                 .Include(b => b.CreatedByNavigation)
             .Include(b => b.Project)
+            .Where(b => b.IsActive == true)
                 .OrderByDescending(b => b.CreatedDate)
                 .Select(b => new Bug
                 {

@@ -41,58 +41,57 @@
 
     /* Status Colors */
     [data-status="Assigned"]::before {
-    content: "Assigned";
-    background: #00d0e1;
+        content: "Assigned";
+        background: #00d0e1;
     }
 
     [data-status="New"]::before {
-    content: "New";
-    background: #03037a;
+        content: "New";
+        background: #03037a;
     }
 
     /* Badge Styling */
     [data-status]::before {
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-weight: bold;
-    display: inline-block;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        display: inline-block;
     }
 
 
 
     .table th, .table td {
-    text-align: center; /* Align text to center */
-    vertical-align: middle; /* Align items vertically */
-    padding: 10px; /* Add consistent padding */
+        text-align: center; /* Align text to center */
+        vertical-align: middle; /* Align items vertically */
+        padding: 10px; /* Add consistent padding */
     }
 
     td[data-status] {
-    min-width: 100px; /* Ensure uniform column width */
+        min-width: 100px; /* Ensure uniform column width */
     }
 
     td:last-child div {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
     }
 
     .progress {
-    background-color: #e9ecef;
-    border-radius: 4px;
-    overflow: hidden;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
     }
 
     .progress-bar {
-    transition: width 0.5s ease-in-out;
+        transition: width 0.5s ease-in-out;
     }
 
     .completion-text {
-    font-size: 14px;
-    font-weight: bold;
-    margin-top: 5px;
+        font-size: 14px;
+        font-weight: bold;
+        margin-top: 5px;
     }
-
 
 </style>
 
@@ -103,7 +102,7 @@
 
             @if (ViewBag.PermissionType != "canView")
             {
-                <a asp-action="AddOrEditProject" class="btn btn-light btn-sm text-primary">
+                <a asp-action="AddOrEditProject" class="btn btn-light btn-sm text-primary" style=" margin-left: auto; margin-right: 10px;">
                     <i class="fas fa-plus"></i> Add New Project
                 </a>
             }
@@ -137,17 +136,17 @@
                             <td>
                                 <div class="progress" style="height: 8px;">
                                     <div class="progress-bar @(item.Completion == 100 ? "bg-success" : "bg-primary")"
-                                    role="progressbar"
-                                    style="width: @item.Completion%;"
-                                    aria-valuenow="@item.Completion"
-                                    aria-valuemin="0"
-                                    aria-valuemax="100">
+                                         role="progressbar"
+                                         style="width: @item.Completion%;"
+                                         aria-valuenow="@item.Completion"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
                                     </div>
                                 </div>
                                 <span class="completion-text">@item.Completion%</span>
                             </td>
 
-                            <td style ="margin-top: 8px;">
+                            <td style="margin-top: 8px;">
                                 @if (ViewBag.PermissionType != "canView")
                                 {
 
@@ -164,9 +163,9 @@
                                         </a>
 
                                         <button class="btn btn-primary btn-sm update-completion"
-                                        data-project-id="@item.ProjectId"
-                                        data-completion="@item.Completion"
-                                        style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;"
+                                                data-project-id="@item.ProjectId"
+                                                data-completion="@item.Completion"
+                                                style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 6px;"
                                         @(item.Completion == 100 ? "disabled" : "")>
                                             <i class="fas fa-bars"></i>
                                         </button>
@@ -276,57 +275,56 @@
             });
         });
 
-            $(document).ready(function () {
+        $(document).ready(function () {
             $(".delete-project").click(function (e) {
                 e.preventDefault();
 
                 var projectId = $(this).data("project-id");
 
-                // First AJAX request to check if unsolved bugs exist
+                // Initial request to check for active bugs
                 $.ajax({
                     type: "POST",
                     url: "/Projects/DeleteProject",
                     data: { projectId: projectId },
                     dataType: "json",
                     success: function (response) {
-                        if (!response.success) {
-                            // If there are unsolved bugs, show confirmation
+                        if (response.requiresConfirmation) {
                             Swal.fire({
-                                title: "Bugs Found!",
+                                title: "Active Bugs Found",
                                 text: response.message,
                                 icon: "warning",
                                 showCancelButton: true,
-                                confirmButtonText: "Yes, delete anyway",
+                                confirmButtonText: "Yes, deactivate all",
                                 cancelButtonText: "Cancel"
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    // User confirmed, send second request to force delete
+                                    // User confirmed - deactivate both project and bugs
                                     $.ajax({
                                         type: "POST",
                                         url: "/Projects/DeleteProject",
-                                        data: { projectId: projectId, forceDelete: true },
+                                        data: { projectId: projectId, forceDeactivate: true },
                                         dataType: "json",
-                                        success: function (deleteResponse) {
+                                        success: function (finalResponse) {
                                             Swal.fire({
-                                                title: "Deleted!",
-                                                text: deleteResponse.message,
+                                                title: "Success",
+                                                text: finalResponse.message,
                                                 icon: "success",
-                                                timer: 1500,
+                                                timer: 2000,
                                                 showConfirmButton: false
                                             }).then(() => {
                                                 location.reload();
                                             });
                                         },
                                         error: function () {
-                                            Swal.fire("Error", "Failed to delete project.", "error");
+                                            Swal.fire("Error", "Failed to deactivate project and bugs.", "error");
                                         }
                                     });
                                 }
                             });
-                        } else {
-                            // If no unsolved bugs, proceed with deletion
+                        } else if (response.success) {
+                            // No active bugs, just a normal deactivation
                             Swal.fire({
-                                title: "Deleted!",
+                                title: "Success",
                                 text: response.message,
                                 icon: "success",
                                 timer: 1500,
@@ -334,14 +332,17 @@
                             }).then(() => {
                                 location.reload();
                             });
+                        } else {
+                            Swal.fire("Error", response.message, "error");
                         }
                     },
                     error: function () {
-                        Swal.fire("Error", "Failed to delete project.", "error");
+                        Swal.fire("Error", "Failed to process request.", "error");
                     }
                 });
             });
         });
+
 
     </script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
