@@ -88,9 +88,41 @@
             <div class="card">
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                     <h6>Audit Logs</h6>
-                    <button class="btn btn-danger btn-sm" onclick="clearLogs()">Clear Logs</button>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <!-- Screenshot Button -->
+                        <button id="download-image" class="btn btn-success btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Audit Log Stats As Image">
+                            <i class="fas fa-image"></i>
+                        </button>
+
+                        <!-- PDF Button -->
+                        <button id="download-pdf" class="btn btn-danger btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Audit Log Stats As PDF">
+                            <i class="fas fa-file-pdf"></i>
+                        </button>
+
+                        <!-- Clear Logs -->
+                        <button class="btn btn-danger btn-sm" onclick="clearLogs()">Clear Logs</button>
+                    </div>
                 </div>
+
                 <div class="card-body px-3 py-3">
+
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Date From</label>
+                            <input type="date" id="fromDate" class="form-control" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Date To</label>
+                            <input type="date" id="toDate" class="form-control" />
+                        </div>
+
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button id="applyFilter" class="btn btn-primary me-2" style="margin:unset">Apply</button>
+                            <button id="clearFilter" class="btn btn-secondary" style="margin:unset">Clear</button>
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
                         <table id="auditLogTable" class="table align-items-center mb-0">
                             <thead>
@@ -108,7 +140,11 @@
                                         <td>@log.User.UserName</td>
                                         <td>@log.Action</td>
                                         <td>@log.ModuleName</td>
-                                        <td>@log.ActionDate.ToString("yyyy-MM-dd | HH:mm:ss")</td>
+                                        <td>
+                                            <span data-order="@log.ActionDate.ToString("yyyy-MM-ddTHH:mm")">
+                                                @log.ActionDate.ToString("dd-MM-yyyy | HH:mm")
+                                            </span>
+                                        </td>
                                     </tr>
                                 }
                             </tbody>
@@ -119,29 +155,31 @@
         </div>
     </div>
 
-    <!-- Charts Section -->
-    <div class="charts-section">
-        <!-- Pie Chart - Module Usage -->
-        <div class="card chart-card">
-            <div class="card-header pb-0">
-                <h6>Module Usage</h6>
-            </div>
-            <div class="card-body">
-                <div class="chart-container" style="max-width: 350px; margin: 0 auto;">
-                    <canvas id="modulePieChart"></canvas>
+    <div id="dashboard-content">
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <!-- Pie Chart - Module Usage -->
+            <div class="card chart-card">
+                <div class="card-header pb-0">
+                    <h6>Module Usage</h6>
                 </div>
+                <div class="card-body">
+                    <div class="chart-container" style="max-width: 350px; margin: 0 auto;">
+                        <canvas id="modulePieChart"></canvas>
+                    </div>
 
+                </div>
             </div>
-        </div>
 
-        <!-- Curve Graph - Peak Login Hours -->
-        <div class="card chart-card">
-            <div class="card-header pb-0">
-                <h6>Peak Login Hours (Curve)</h6>
-            </div>
-            <div class="card-body">
-                <div class="chart-scroll-container">
-                    <canvas id="peakHoursChart"></canvas>
+            <!-- Curve Graph - Peak Login Hours -->
+            <div class="card chart-card">
+                <div class="card-header pb-0">
+                    <h6>Peak Login Hours (Curve)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-scroll-container">
+                        <canvas id="peakHoursChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -155,10 +193,15 @@
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+
 
 <script>
-    // DataTables Initialization
-    $('#auditLogTable').DataTable({
+      // DataTables Initialization
+    var table = $('#auditLogTable').DataTable({
         "order": [[3, "desc"]],
         "paging": true,
         "searching": true,
@@ -169,6 +212,75 @@
             }
         }
     });
+
+    // Add custom filtering function to DataTables
+    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+        const fromDate = $('#fromDate').val();
+        const toDate = $('#toDate').val();
+
+        const $row = $(table.row(dataIndex).node());
+        const joinDateText = $row.find('td:eq(3)').text().split('|')[0].trim();
+
+        if (!joinDateText) return false;
+
+        const parts = joinDateText.split('-'); // dd-MM-yyyy
+        const rowDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+        const from = fromDate ? new Date(fromDate) : null;
+        const to = toDate ? new Date(toDate) : null;
+
+        if ((from && rowDate < from) || (to && rowDate > to)) {
+            return false;
+        }
+
+        return true;
+    });
+
+    // Apply Filter
+    $('#applyFilter').on('click', function () {
+        table.draw();
+    });
+
+    // Clear Filter
+    $('#clearFilter').on('click', function () {
+        $('#roleFilter').val('');
+        $('#fromDate').val('');
+        $('#toDate').val('');
+        table.draw();
+    });
+
+    
+
+       document.getElementById("download-image").addEventListener("click", function () {
+        const element = document.getElementById("dashboard-content");
+
+        html2canvas(element, {
+            scale: 2,
+            useCORS: true
+        }).then(canvas => {
+            const link = document.createElement("a");
+            const fileName = `Bugify_AuditLog.png`;
+            link.download = fileName;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        });
+    });
+
+        document.getElementById("download-pdf").addEventListener("click", function () {
+        const element = document.getElementById("dashboard-content");
+        const fileName = `Bugify_AuditLog.pdf`;
+
+        const opt = {
+            margin:       0.3,
+            filename:     fileName,
+            image:        { type: 'jpeg', quality: 1 },
+            html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+            jsPDF:        { unit: 'pt', format: 'a4', orientation: 'landscape' },
+            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+
+        html2pdf().set(opt).from(element).save();
+    });
+
 
     // Chart Data
     var moduleLabels = @Html.Raw(JsonConvert.SerializeObject(moduleLabels));

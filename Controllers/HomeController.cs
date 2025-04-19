@@ -20,6 +20,8 @@ namespace Bug_Tracking_System.Controllers
             return View();
         }
 
+
+
         public IActionResult Index()
         {
             return View();

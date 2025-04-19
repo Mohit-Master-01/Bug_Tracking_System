@@ -110,12 +110,29 @@
     </div>
 
     <div class="card shadow-lg border-0">
-        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <div class="card-header text-white d-flex justify-content-between align-items-center">
             <h4 class="mb-0">Tester's List</h4>
             <button id="exportProductsBtn" class="btn btn-success"><i class="fas fa-file-excel"></i></button>
 
         </div>
         <div class="card-body">
+            
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label">Joining Date From</label>
+                    <input type="date" id="fromDate" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Joining Date To</label>
+                    <input type="date" id="toDate" class="form-control" />
+                </div>
+
+                <div class="col-md-3 d-flex align-items-end">
+                    <button id="applyFilter" class="btn btn-primary me-2" style="margin:unset">Apply</button>
+                    <button id="clearFilter" class="btn btn-secondary" style="margin:unset">Clear</button>
+                </div>
+            </div>
+            
             <div class="table-responsive">
                 <table id="testersTable" class="table table-hover align-middle text-center">
                     <thead class="bg-dark">
@@ -142,7 +159,11 @@
                                 <td>@item.Email</td>
                                 <td>@(item.Role?.RoleName ?? "Not Assigned")</td>
                                 <td>@(item.Project?.ProjectName ?? "Not Assigned")</td>
-                                <td>@item.CreatedDate?.ToString("dd-MM-yyyy | HH:mm")</td>
+                                <td>
+                                    <span data-order="@item.CreatedDate?.ToString("yyyy-MM-ddTHH:mm")">
+                                        @item.CreatedDate?.ToString("dd-MM-yyyy | HH:mm")
+                                    </span>
+                                </td>
                                 <td>
                                     <span class="badge @((bool)item.IsActive ? "bg-success" : "bg-danger")">
                                         @((bool)item.IsActive ? "Active" : "Inactive")
@@ -188,10 +209,13 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+
 
     <script>
                     // DataTables Initialization
-        $('#testersTable').DataTable({
+                // DataTables Initialization
+        var testersTable = $('#testersTable').DataTable({
             "order": [[3, "desc"]],
             "paging": true,
             "searching": true,
@@ -202,6 +226,38 @@
                 }
             }
         });
+
+        // Filtering for Testers Table
+        $('#applyFilter').on('click', function () {
+            const fromDate = $('#fromDate').val();
+            const toDate = $('#toDate').val();
+
+            testersTable.draw();
+        });
+
+        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+            if (settings.nTable.id !== 'testersTable') return true;
+
+            const fromDate = $('#fromDate').val();
+            const toDate = $('#toDate').val();
+            const joinDateText = data[5].split('|')[0].trim(); // Column 5
+
+            if (!joinDateText) return true;
+
+            const [day, month, year] = joinDateText.split('-');
+            const joinDate = new Date(`${year}-${month}-${day}`);
+            if (fromDate && joinDate < new Date(fromDate)) return false;
+            if (toDate && joinDate > new Date(toDate)) return false;
+
+            return true;
+        });
+
+        $('#clearFilter').on('click', function () {
+            $('#fromDate').val('');
+            $('#toDate').val('');
+            testersTable.draw();
+        });
+
 
 
             document.getElementById("exportProductsBtn").addEventListener("click", function () {
@@ -247,5 +303,4 @@
     </script>
 
     <script src="~/js/Members.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 }

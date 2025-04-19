@@ -36,15 +36,15 @@ namespace Bug_Tracking_System.Repositories
             switch (role)
             {
                 case 4:
-                    dto.TotalUsers = await _dbBug.Users.Where(u => u.RoleId != 4).CountAsync();
-                    dto.TotalProjectManagers = await _dbBug.Users.CountAsync(u => u.Role.RoleId == 1);
-                    dto.TotalDevelopers = await _dbBug.Users.CountAsync(u => u.Role.RoleId == 2);
-                    dto.TotalTesters = await _dbBug.Users.CountAsync(u => u.Role.RoleId == 3);
-                    dto.TotalProjects = await _dbBug.Projects.CountAsync();
-                    dto.TotalBugs = await _dbBug.Bugs.CountAsync();
+                    dto.TotalUsers = await _dbBug.Users.Where(u => u.RoleId != 4 && u.IsActive == true).CountAsync();
+                    dto.TotalProjectManagers = await _dbBug.Users.CountAsync(u => u.Role.RoleId == 1 && u.IsActive == true);
+                    dto.TotalDevelopers = await _dbBug.Users.CountAsync(u => u.Role.RoleId == 2 && u.IsActive == true);
+                    dto.TotalTesters = await _dbBug.Users.CountAsync(u => u.Role.RoleId == 3 && u.IsActive == true);
+                    dto.TotalProjects = await _dbBug.Projects.CountAsync(p => p.IsActive == true);
+                    dto.TotalBugs = await _dbBug.Bugs.CountAsync(b => b.IsActive == true);
 
                     dto.UsersByRole = await _dbBug.Users
-                        .Where(u => u.RoleId !=4)
+                        .Where(u => u.RoleId !=4 && u.IsActive == true)
                         .GroupBy(u => u.Role.RoleName)
                         .ToDictionaryAsync(g => g.Key, g => g.Count());
 

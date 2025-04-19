@@ -56,15 +56,15 @@
                     <!-- Added ms-auto class to move items to the right -->
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link me-2" href="~/Account/Registration">
-                                <i class="fas fa-user-circle opacity-6 me-1"></i>
-                                Sign Up
+                            <a class="nav-link me-2 @((ViewData["Title"]?.ToString() == "Registration" ? "text-white" : "text-dark"))" href="~/Account/Registration">
+                                <i class="fas fa-user-circle opacity-6 me-1 @((ViewData["Title"]?.ToString() == "Registration" ? "text-white" : "text-dark"))"></i>
+                                <b>Sign Up</b>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link me-2" href="~/Account/Login">
-                                <i class="fas fa-key opacity-6 me-1"></i>
-                                Sign In
+                            <a class="nav-link me-2 @((ViewData["Title"]?.ToString() == "Registration" ? "text-white" : "text-dark"))" href="~/Account/Login">
+                                <i class="fas fa-key opacity-6 me-1 @((ViewData["Title"]?.ToString() == "Registration" ? "text-white" : "text-dark"))"></i>
+                                <b>Sign In</b>
                             </a>
                         </li>
                     </ul>

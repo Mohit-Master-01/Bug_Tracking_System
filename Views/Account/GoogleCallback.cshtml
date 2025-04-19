@@ -1,0 +1,71 @@
+﻿﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Google Sign-In</title>
+</head>
+<body>
+    <div class="text-center mt-5">
+        <p>Signing you in via Google... Please wait.</p>
+    </div>
+
+    <script>
+        // Immediately fetch JSON from backend
+        fetch("/account/google-callback")
+            .then(res => res.json())
+            .then(data => {
+                if(!data.success && !data.redirect)
+                {
+                    showToast(data.message, "error")
+                }
+                if (data.success && data.redirect) {
+                    window.location.href = data.redirect;
+                }
+                else if (!data.success && data.redirect) {
+                    window.location.href = data.redirect;
+                }
+                else if (!data.success) {
+                    setTimeout(() => {
+                        window.location.href = "/account/login"; // fallback
+                    }, 3000);
+                }
+            })
+            .catch(err => {
+                alert("Unknown error occurred")
+                console.error(err);
+                window.location.href = "/account/login";
+            });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function showToast(message, icon = 'success') {
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: icon,
+            title: message,
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            customClass: {
+              popup: 'custom-toast-popup',
+              title: 'custom-toast-title'
+            },
+            iconColor: icon === 'success' ? '#28a745' :
+                      icon === 'error'   ? '#dc3545' :
+                      icon === 'warning' ? '#ffc107' : '#17a2b8',
+            didOpen: (toast) => {
+              toast.addEventListener('mouseenter', Swal.stopTimer);
+              toast.addEventListener('mouseleave', Swal.resumeTimer);
+            }
+          });
+        }
+    </script>
+
+</body>
+</html>

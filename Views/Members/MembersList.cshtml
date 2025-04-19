@@ -54,6 +54,35 @@
 
         </div>
         <div class="card-body">
+
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label">Filter by Role</label>
+                    <select id="roleFilter" class="form-select">
+                        <option value="">All Roles</option>
+                        @foreach (var role in (SelectList)ViewBag.Roles)
+                        {
+                            <option value="@role.Text">@role.Text</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Joining Date From</label>
+                    <input type="date" id="fromDate" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Joining Date To</label>
+                    <input type="date" id="toDate" class="form-control" />
+                </div>
+
+                <div class="col-md-3 d-flex align-items-end">
+                    <button id="applyFilter" class="btn btn-primary me-2" style="margin:unset">Apply</button>
+                    <button id="clearFilter" class="btn btn-secondary" style="margin:unset">Clear</button>
+                </div>
+            </div>
+
+
             <table id="memberTable" class="table table-hover align-middle text-center">
                 <thead class="bg-dark">
                     <tr>
@@ -76,7 +105,11 @@
                             <td>@item.UserName</td>
                             <td>@item.Email</td>
                             <td>@(item.Role?.RoleName ?? "Not Assigned")</td>
-                            <td>@item.CreatedDate?.ToString("dd-MM-yyyy | HH:mm")</td>
+                            <td>
+                                <span data-order="@item.CreatedDate?.ToString("yyyy-MM-ddTHH:mm")">
+                                    @item.CreatedDate?.ToString("dd-MM-yyyy | HH:mm")
+                                </span>
+                            </td>
                             <td>
                                 <span class="badge @((bool)item.IsActive ? "bg-success" : "bg-danger")">
                                     @((bool)item.IsActive ? "Active" : "Inactive")
@@ -148,11 +181,26 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-            // DataTables Initialization
-        $('#memberTable').DataTable({
+        //     DataTables Initialization
+        // $('#memberTable').DataTable({
+        //     "order": [[3, "desc"]],
+        //     "paging": true,
+        //     "searching": true,
+        //     "language": {
+        //         "paginate": {
+        //             "previous": "<",
+        //             "next": ">"
+        //         }
+        //     }
+        // });
+
+
+                   // DataTables Initialization
+        var memberTable = $('#memberTable').DataTable({
             "order": [[3, "desc"]],
             "paging": true,
             "searching": true,
@@ -163,6 +211,44 @@
                 }
             }
         });
+
+        // Apply Filter Button
+        $('#applyFilter').on('click', function () {
+            memberTable.draw(); // Redraw to trigger filtering
+        });
+
+        // Native Filtering Logic
+        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+            if (settings.nTable.id !== 'memberTable') return true;
+
+            const selectedRole = $('#roleFilter').val().toLowerCase();
+            const fromDate = $('#fromDate').val();
+            const toDate = $('#toDate').val();
+
+            const role = data[3].toLowerCase(); // Role at column index 3
+            const joinDateText = data[4].split('|')[0].trim(); // Join Date at column 4 (dd-MM-yyyy)
+
+            if (!joinDateText) return true;
+
+            const [day, month, year] = joinDateText.split('-');
+            const joinDate = new Date(`${year}-${month}-${day}`);
+
+            if (fromDate && joinDate < new Date(fromDate)) return false;
+            if (toDate && joinDate > new Date(toDate)) return false;
+            if (selectedRole && role !== selectedRole) return false;
+
+            return true;
+        });
+
+        // Clear Filter Button
+        $('#clearFilter').on('click', function () {
+            $('#roleFilter').val('');
+            $('#fromDate').val('');
+            $('#toDate').val('');
+            memberTable.draw(); // Redraw to remove filters
+        });
+
+       
 
              $(document).ready(function () {
             $('.toggle-restriction').click(function (e) {
@@ -258,6 +344,5 @@
     </script>
 
 
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script src="~/js/Members.js"></script>
 }

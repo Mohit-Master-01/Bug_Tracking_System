@@ -22,6 +22,8 @@ public partial class User
 
     public DateTime? CreatedDate { get; set; }
 
+    public DateTime? LastLogin { get; set; }
+
     public bool? IsActive { get; set; }
 
     public string? Otp { get; set; }
@@ -55,6 +57,8 @@ public partial class User
     public int? BugId { get; set; }
 
     public bool IsRestricted { get; set; }
+
+    public bool? IsGoogleAccount {  get; set; }  
 
     [JsonIgnore]
     public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();

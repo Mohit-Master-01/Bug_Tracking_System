@@ -114,36 +114,53 @@ namespace Bug_Tracking_System.Repositories.BugsClasses
 
             return bugs;
         }
-    
+
 
         public async Task<Bug> GetBugById(int bugId)
         {
             var bug = await _dbBug.Bugs
-       .Include(b => b.Attachments)
-       .Include(b => b.CreatedByNavigation)
-       .Include(b => b.Project)
-       .Include(b => b.Status)
-       .FirstOrDefaultAsync(b => b.BugId == bugId);
+                .Include(b => b.Attachments)
+                .Include(b => b.CreatedByNavigation)
+                .Include(b => b.Project)
+                .Include(b => b.Status)
+                .FirstOrDefaultAsync(b => b.BugId == bugId);
 
             if (bug != null)
             {
-                return new Bug
-                {
-                    BugId = bug.BugId,
-                    Title = bug.Title,
-                    Description = bug.Description,
-                    CreatedDate = bug.CreatedDate,
-                    Priority = bug.Priority,  // Ensure this is not null
-                    Severity = bug.Severity,  // Ensure this is not null
-                    Status = bug.Status,  // Handle null status
-                    CreatedByNavigation = bug.CreatedByNavigation,
-                    Project = bug.Project,
-                    Attachments = bug.Attachments
-                };
-            }
-            return null;
+                // Get task assignment details for this bug (if exists)
+                var taskAssignment = await (
+                    from task in _dbBug.TaskAssignments
+                    join assignedTo in _dbBug.Users on task.AssignedTo equals assignedTo.UserId
+                    join projectManager in _dbBug.Users on task.ProjectManagerId equals projectManager.UserId
+                    where task.BugId == bugId
+                    select new
+                    {
+                        AssignedTo = assignedTo,
+                        ProjectManager = projectManager,
+                        CompletionDate = task.CompletionDate
+                    }
+                ).FirstOrDefaultAsync();
 
+                // Attach TaskAssignment details to bug's TaskAssignments collection if exists
+                if (taskAssignment != null)
+                {
+                    bug.TaskAssignments = new List<TaskAssignment>
+            {
+                new TaskAssignment
+                {
+                    AssignedToNavigation = taskAssignment.AssignedTo,
+                    ProjectManager = taskAssignment.ProjectManager,
+                    CompletionDate = taskAssignment.CompletionDate ?? null
+                }
+            };
+                }
+
+                return bug;
+            }
+
+            return null;
         }
+
 
         public async Task<List<User>> GetDevelopers()
         {
@@ -196,10 +213,12 @@ namespace Bug_Tracking_System.Repositories.BugsClasses
                     existingBug.StatusId = bug.StatusId;
                     existingBug.CreatedBy = bug.CreatedBy;
                     existingBug.CreatedDate = DateTime.Now;
+                    existingBug.IsActive = true;
                 }
                 else
                 {
                     bug.CreatedDate = DateTime.Now;
+                    bug.IsActive = true;
                     _dbBug.Bugs.Add(bug);
                 }
 

@@ -58,7 +58,7 @@
                         setTimeout(() => { window.location.href = "/Account/Login"; }, 2000);
                     } else {
                         showToast("error", "Invalid OTP. Please try again.");
-                    }
+                    }   
                 },
                 complete: function () {
                     btnNext.prop("disabled", false);

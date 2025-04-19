@@ -1,8 +1,15 @@
-﻿using Bug_Tracking_System.Models;
+﻿using Bug_Tracking_System.DTOs;
+using Bug_Tracking_System.Models;
+using Bug_Tracking_System.Repositories;
 using Bug_Tracking_System.Repositories.Interfaces;
 using DocumentFormat.OpenXml.InkML;
 using DocumentFormat.OpenXml.Office.CoverPageProps;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Calendar.v3.Data;
+using Google.Apis.Calendar.v3;
+using Google.Apis.Services;
+using Google.Apis.Util.Store;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -25,8 +32,9 @@ namespace Bug_Tracking_System.Controllers
         private readonly IExportRepos _export;
         private readonly IImportRepos _import;
         private readonly IAuditLogsRepos _auditLog;
-
-        public BugsController(IEmailSenderRepos emailSender, IAuditLogsRepos auditLog, IImportRepos import, IExportRepos export, IAccountRepos acc, DbBug dbBug, IBugRepos bug, INotificationRepos notification, IPermissionHelperRepos permission, ISidebarRepos sidebar) : base(sidebar)
+        private readonly GoogleCalendarService _calendarService;
+        private readonly IWebHostEnvironment _env;
+        public BugsController(IEmailSenderRepos emailSender, IWebHostEnvironment webHostEnvironment, IAuditLogsRepos auditLog, IImportRepos import, IExportRepos export, IAccountRepos acc, DbBug dbBug, IBugRepos bug, INotificationRepos notification, IPermissionHelperRepos permission, GoogleCalendarService calendarService, ISidebarRepos sidebar) : base(sidebar)
         {
             _dbBug = dbBug;
             _bug = bug;
@@ -37,6 +45,8 @@ namespace Bug_Tracking_System.Controllers
             _export = export;
             _import = import;
             _auditLog = auditLog;
+            _calendarService = calendarService;
+            _env = webHostEnvironment;
         }
 
         // Public method to get user permission
@@ -64,7 +74,7 @@ namespace Bug_Tracking_System.Controllers
 
                     int? roleId = HttpContext.Session.GetInt32("UserRoleId");
 
-                    if ((currentProjectId == null || currentProjectId == 0) && roleId != 4) // Only validate projectId if not admin
+                    if ((currentProjectId == null || currentProjectId == 0) && roleId != 4 && roleId != 3) // Only validate projectId if not admin
                     {
                         TempData["Error"] = "Please select a project first.";
                         return RedirectToAction("Index", "Home");
@@ -72,7 +82,7 @@ namespace Bug_Tracking_System.Controllers
 
                     List<Bug> bugs;
 
-                    if (roleId == 4) // Admin
+                    if (roleId == 4 || roleId == 3) // Admin
                     {
                         // Fetch all unassigned bugs for admin
                         bugs = await _bug.GetAllBugs(); // You can create this method if not existing
@@ -186,7 +196,65 @@ namespace Bug_Tracking_System.Controllers
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "BugListReports.xlsx");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> AddBugToGoogleCalendar(int bugId)
+        {
+            try
+            {
+                var bug = await _bug.GetBugById(bugId);
+                if (bug == null)
+                    return Json(new { success = false, message = "Bug not found" });
 
+                // 1. Load credentials
+                string credentialsPath = Path.Combine(_env.ContentRootPath, "credentials.json");
+                UserCredential credential;
+
+                using (var stream = new FileStream(credentialsPath, FileMode.Open, FileAccess.Read))
+                {
+                    string tokenPath = Path.Combine(_env.ContentRootPath, "token.json");
+                    credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+                        GoogleClientSecrets.FromStream(stream).Secrets,
+                        new[] { CalendarService.Scope.Calendar },
+                        "user",
+                        CancellationToken.None,
+                        new FileDataStore(tokenPath, true));
+                }
+
+                // 2. Create the Calendar Service
+                var calendarService = new CalendarService(new BaseClientService.Initializer()
+                {
+                    HttpClientInitializer = credential,
+                    ApplicationName = "Bug Tracking Calendar",
+                });
+
+                // 3. Prepare the Event
+                Event newEvent = new Event()
+                {
+                    Summary = bug.Title,
+                    Description = bug.Description,
+                    Start = new EventDateTime()
+                    {
+                        DateTime = DateTime.Now,
+                        TimeZone = "Asia/Kolkata"
+                    },
+                    End = new EventDateTime()
+                    {
+                        DateTime = DateTime.Now.AddHours(1),
+                        TimeZone = "Asia/Kolkata"
+                    }
+                };
+
+                // 4. Insert the Event
+                var request = calendarService.Events.Insert(newEvent, "primary");
+                await request.ExecuteAsync();
+
+                return Json(new { success = true, message = "Bug event added to Google Calendar" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error: " + ex.Message });
+            }
+        }
 
         [HttpGet]
         public async Task<IActionResult> BugDetails(int id)
@@ -204,6 +272,8 @@ namespace Bug_Tracking_System.Controllers
                     return NotFound();
                 }
 
+               
+
                 ViewBag.StatusList = new SelectList(await _dbBug.BugStatuses.ToListAsync(), "StatusId", "StatusName");
 
                 return View(bug);
@@ -213,6 +283,8 @@ namespace Bug_Tracking_System.Controllers
                 return RedirectToAction("UnauthorisedAccess", "Error");
             }
         }
+
+
 
         [HttpGet]
         public async Task<IActionResult> SaveBug(int? id)
@@ -585,6 +657,24 @@ namespace Bug_Tracking_System.Controllers
                 return Json(new { success = false, message = "User session expired. Please log in again." });
             }
 
+            var bugid = await _bug.GetBugById(bugId);
+            var developerid = await _acc.GetUserById(developerId);
+
+            if (bugid == null || developerid == null)
+            {
+                await _auditLog.AddAuditLogAsync(userId.Value, $"Attempted to assign Bug ID {bugId} to Developer ID {developerId}, but bug or developer was not found.", "Assign Bug");
+
+                return Json(new { success = false, message = "Invalid bug or developer selected." });
+            }
+
+            // 🚨 Validate Project Match
+            if (bugid.ProjectId != developerid.ProjectId)
+            {
+                await _auditLog.AddAuditLogAsync(userId.Value, $"Attempted to assign Bug ID {bugId} to Developer ID {developerId}, but developer not in same project.", "Assign Bug");
+
+                return Json(new { success = false, message = "This developer is not assigned to the same project as this bug. Assignment denied." });
+            }
+
             var success = await _bug.AssignBugToDeveloper(bugId, developerId, userId.Value);
 
             if (success)
@@ -604,6 +694,9 @@ namespace Bug_Tracking_System.Controllers
 
                     await _emailSender.SendEmailAsync(developer.Email, "New Bug Assigned - Bugify", emailBody, "AssignBug");
                 }
+
+                await _notification.AddNotification(userId.Value, 1, "You have been assigned a new bug!", bugId, "Bug");
+
 
                 await _auditLog.AddAuditLogAsync(userId.Value, $"Bug ID {bugId} assigned to Developer ID {developerId}", "Assign Bug");
 

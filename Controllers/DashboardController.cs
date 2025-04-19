@@ -77,8 +77,15 @@ namespace Bug_Tracking_System.Controllers
             return View(dashboardData);
         }
 
+        public IActionResult Documentation()
+        {
 
-        
+            ViewBag.Breadcrumb = "Help & Documentation";            
+            ViewBag.PageTitle = "Help & Documentation";
+
+                return View();
+        }
+
 
     }
 }

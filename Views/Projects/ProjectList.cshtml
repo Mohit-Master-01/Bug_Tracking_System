@@ -110,6 +110,24 @@
 
         </div>
         <div class="card-body">
+
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label">Joining Date From</label>
+                    <input type="date" id="fromDate" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Joining Date To</label>
+                    <input type="date" id="toDate" class="form-control" />
+                </div>
+
+                <div class="col-md-3 d-flex align-items-end">
+                    <button id="applyFilter" class="btn btn-primary me-2" style="margin:unset">Apply</button>
+                    <button id="clearFilter" class="btn btn-secondary" style="margin:unset">Clear</button>
+                </div>
+            </div>
+
+
             <table id="projectTable" class="table table-hover align-middle text-center">
                 <thead class="bg-dark">
                     <tr>
@@ -128,7 +146,11 @@
                         <tr>
                             <td>@item.ProjectName</td>
                             <td>@item.Description</td>
-                            <td>@item.CreatedDate?.ToString("dd-MM-yyyy | HH:mm")</td>
+                            <td>
+                                <span data-order="@item.CreatedDate?.ToString("yyyy-MM-ddTHH:mm")">
+                                    @item.CreatedDate?.ToString("dd-MM-yyyy | HH:mm")
+                                </span>
+                            </td>
                             <td data-status="@item.Status"></td>
                             <td>@item.CreatedByNavigation?.UserName</td>
 
@@ -197,6 +219,8 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+
 
     <script src="~/js/Projects.js"></script>
     <!-- Include SweetAlert -->
@@ -204,8 +228,7 @@
     <!-- SweetAlert2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-             // DataTables Initialization
-        $('#projectTable').DataTable({
+              var projectTable = $('#projectTable').DataTable({
             "order": [[3, "desc"]],
             "paging": true,
             "searching": true,
@@ -217,7 +240,39 @@
             }
         });
 
-            document.getElementById("exportProductsBtn").addEventListener("click", function () {
+        $('#applyFilter').on('click', function () {
+            const fromDate = $('#fromDate').val();
+            const toDate = $('#toDate').val();
+
+            projectTable.draw();
+        });
+
+        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+            if (settings.nTable.id !== 'projectTable') return true;
+
+            const fromDate = $('#fromDate').val();
+            const toDate = $('#toDate').val();
+            const joinDateText = data[2].split('|')[0].trim(); // Column 2
+
+            if (!joinDateText) return true;
+
+            const [day, month, year] = joinDateText.split('-');
+            const joinDate = new Date(`${year}-${month}-${day}`);
+            if (fromDate && joinDate < new Date(fromDate)) return false;
+            if (toDate && joinDate > new Date(toDate)) return false;
+
+            return true;
+        });
+
+        $('#clearFilter').on('click', function () {
+            $('#fromDate').val('');
+            $('#toDate').val('');
+            projectTable.draw();
+        });
+
+
+
+             document.getElementById("exportProductsBtn").addEventListener("click", function () {
                     window.location.href = "/Bugs/ExportBugList";
         });
 
@@ -345,5 +400,4 @@
 
 
     </script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 }

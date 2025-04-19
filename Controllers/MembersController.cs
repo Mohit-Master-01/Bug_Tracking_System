@@ -56,6 +56,10 @@ namespace Bug_Tracking_System.Controllers
                 ViewBag.PageTitle = "Members List";
                 ViewBag.Breadcrumb = "Reports";
                 var members = await _member.GetAllMembers();
+
+                var roles = await _dbBug.Roles.Where(r => r.IsActive == true).ToListAsync(); // Fetch roles
+                ViewBag.Roles = new SelectList(roles, "RoleId", "RoleName");
+
                 return View(members);
             }
             else
@@ -245,7 +249,7 @@ namespace Bug_Tracking_System.Controllers
                     int? currentProjectId = HttpContext.Session.GetInt32("CurrentProjectId");
                     int? roleId = HttpContext.Session.GetInt32("UserRoleId");
 
-                    if ((currentProjectId == null || currentProjectId == 0) && roleId != 4)
+                    if ((currentProjectId == null || currentProjectId == 0) && roleId != 4 && roleId != 3)
                     {
                         TempData["Error"] = "Please select a project first.";
                         return RedirectToAction("Index", "Home");
@@ -253,7 +257,7 @@ namespace Bug_Tracking_System.Controllers
 
                     List<User> Developers;
 
-                    if (roleId == 4) // Admin
+                    if (roleId == 4 || roleId == 3) // Admin
                     {
                         Developers = await _member.GetAllDevelopers();
                     }

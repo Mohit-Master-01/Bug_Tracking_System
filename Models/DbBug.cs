@@ -249,12 +249,16 @@ public partial class DbBug : DbContext
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.LastLogin)
+                .HasColumnType("datetime")
+                .IsRequired(false);
             entity.Property(e => e.Email).HasMaxLength(100);
             entity.Property(e => e.FirstName).HasMaxLength(100);
             entity.Property(e => e.GitHubProfile).HasMaxLength(255);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.IsAdmin).HasDefaultValue(false);
             entity.Property(e => e.IsEmailVerified).HasDefaultValue(false);
+            entity.Property(e => e.IsGoogleAccount).HasDefaultValue(false);
             entity.Property(e => e.LastName).HasMaxLength(100);
             entity.Property(e => e.LinkedInProfile).HasMaxLength(255);
             entity.Property(e => e.Otp)

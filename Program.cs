@@ -7,18 +7,12 @@ using Bug_Tracking_System.Repositories.Interfaces;
 using Bug_Tracking_System.Repositories.MembersClasses;
 using Bug_Tracking_System.Repositories.ProjectsClasses;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Mail;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add Authentication
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/Account/Login"; // Set your login page
-        options.AccessDeniedPath = "/Account/AccessDenied";
-    });
 
 builder.Services.AddAuthorization();
 
@@ -44,6 +38,7 @@ builder.Services.AddScoped<IPermissionHelperRepos, PermissionHelperClassRepos>()
 builder.Services.AddScoped<IImportRepos, ImportClassRepos>();
 builder.Services.AddScoped<IExportRepos, ExportClassRepos>();
 builder.Services.AddScoped<IDashboardRepos, DashboardClassRepos>();
+builder.Services.AddScoped<GoogleCalendarService>();
 
 
 
@@ -62,6 +57,28 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true; // Ensures cookie is essential
 });
 builder.Services.AddHttpContextAccessor();
+
+
+builder.Services.AddHttpClient();
+
+// Add Authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+})
+.AddCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+})
+.AddGoogle(options =>
+{
+    options.ClientId = "141974506519-j9agl9t56nbp7p47pgtgoba3f0g7q788.apps.googleusercontent.com";
+    options.ClientSecret = "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";
+    options.CallbackPath = "/signin-google"; // or whatever you’ve set
+});
+
 
 
 var app = builder.Build();

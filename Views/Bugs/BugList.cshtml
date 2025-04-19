@@ -188,6 +188,36 @@
 
 
                 <div class="card-body">
+
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <select id="severityFilter" class="form-select" style="width: 150px;">
+                                <option value="">All Severities</option>
+                                <option value="Critical">Critical</option>
+                                <option value="Major">Major</option>
+                                <option value="Minor">Minor</option>
+                                <option value="Low">Low</option>
+                            </select>
+
+                            <select id="priorityFilter" class="form-select" style="width: 150px;">
+                                <option value="">All Priorities</option>
+                                <option value="Highest">Highest</option>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                                <option value="Lowest">Lowest</option>
+                            </select>
+
+                            <select id="statusFilter" class="form-select" style="width: 150px;">
+                                <option value="">All Statuses</option>
+                                @foreach (var status in ViewBag.StatusList)
+                                {
+                                    <option value="@status.Text">@status.Text</option>
+                                }
+                            </select>
+                        </div>
+
+
+
                     <div class="table-responsive">
                         <table id="bugTable" class="table align-items-center table-flush">
                             <thead class="thead-light">
@@ -296,18 +326,44 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-             // DataTables Initialization
-        $('#bugTable').DataTable({
-            "order": [[3, "desc"]],
-            "paging": true,
-            "searching": true,
-            "language": {
-                "paginate": {
-                    "previous": "<",
-                    "next": ">"
+                          $(document).ready(function () {
+            var table = $('#bugTable').DataTable({
+                "order": [[3, "desc"]],
+                "paging": true,
+                "searching": true,
+                "language": {
+                    "paginate": {
+                        "previous": "<",
+                        "next": ">"
+                    }
                 }
-            }
+            });
+
+            // Custom filter function for Severity, Priority, and Status
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                var severity = $('#severityFilter').val();
+                var priority = $('#priorityFilter').val();
+                var status = $('#statusFilter').val();
+
+                var rowSeverity = $(table.row(dataIndex).node()).find('td[data-severity]').attr('data-severity');
+                var rowPriority = $(table.row(dataIndex).node()).find('td[data-priority]').attr('data-priority');
+                var rowStatus = $(table.row(dataIndex).node()).find('td .status-btn').text().trim();
+
+                if ((severity === "" || rowSeverity === severity) &&
+                    (priority === "" || rowPriority === priority) &&
+                    (status === "" || rowStatus === status)) {
+                    return true;
+                }
+
+                return false;
+            });
+
+            // Re-draw table on filter change
+            $('#severityFilter, #priorityFilter, #statusFilter').on('change', function () {
+                table.draw();
+            });
         });
+
 
 
                 document.getElementById("exportProductsBtn").addEventListener("click", function () {

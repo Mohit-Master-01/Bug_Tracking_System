@@ -5,6 +5,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System.Globalization;
+using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
 
 namespace Bug_Tracking_System.Controllers
 {
@@ -18,8 +24,9 @@ namespace Bug_Tracking_System.Controllers
         private readonly ILoginRepos _login;
         private readonly IMemoryCache _memoryCache;
         private readonly IAuditLogsRepos _auditLogs;
+        private readonly HttpClient _httpClient;
 
-        public AccountController(IAccountRepos acc,ILogger<AccountController> logger, DbBug dbBug, IEmailSenderRepos emailSender, ILoginRepos login,IMemoryCache memoryCache, IAuditLogsRepos auditLogs)
+        public AccountController(IAccountRepos acc, HttpClient httpClient, ILogger<AccountController> logger, DbBug dbBug, IEmailSenderRepos emailSender, ILoginRepos login,IMemoryCache memoryCache, IAuditLogsRepos auditLogs)
         {
             _acc = acc;
             _logger = logger;
@@ -28,6 +35,7 @@ namespace Bug_Tracking_System.Controllers
             _login = login;
             _memoryCache = memoryCache;
             _auditLogs = auditLogs;
+            _httpClient = httpClient;
         }
 
         public async Task<IActionResult> Index()
@@ -35,6 +43,108 @@ namespace Bug_Tracking_System.Controllers
             Console.WriteLine(HttpContext.Session.GetString("Cred"));
             return View();
         }
+
+
+        public IActionResult GoogleDetails(string email)
+        {
+            var model = new GoogleSignupModel { Email = email };
+            return View(model);
+        }
+
+        [HttpGet("login-google")]
+        public IActionResult LoginWithGoogle()
+        {
+            var redirectUrl = Url.Action("GoogleCallback", "Account");
+            var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+        }
+
+
+        [HttpGet("account/google-callback-view")]
+        public IActionResult GoogleCallback()
+        {
+            return View("GoogleCallback", new object()); // This is your Razor view with JS
+        }
+
+        [HttpGet("account/google-callback")]
+        public async Task<IActionResult> GoogleResponse() //ye method mujhe pakka nai pata barabar hai ya nahi iska code
+        {
+            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            if (!result.Succeeded || result.Principal == null)
+            {
+                return Json(new { success = false, message = "Google authentication failed. Please try again." });
+            }
+
+            var email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
+            var name = result.Principal.Identity.Name;
+
+            var user = await _dbBug.Users.FirstOrDefaultAsync(u => u.Email == email);
+            HttpContext.Session.SetString("GoogleEmail", email ?? "");
+
+
+            if (user != null && user.IsGoogleAccount == true)
+            {
+                // Session Setup
+                HttpContext.Session.SetInt32("UserId", user.UserId);
+                HttpContext.Session.SetInt32("UserRoleId", (int)user.RoleId);
+                HttpContext.Session.SetString("UserEmail", email ?? "");
+
+                // Optional: Update login time
+                user.LastLogin = DateTime.UtcNow;
+                _dbBug.Users.Update(user);
+                await _dbBug.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Login successful!", redirect = Url.Action("Dashboard", "Dashboard") });
+            }
+
+            // New Google user (Only Admins can register)
+            return Json(new
+            {
+                success = true,
+                message = "Google account not found. Please complete your registration.",
+                redirect = Url.Action("Registration", "Account", new { email })
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GoogleDetails(GoogleSignupModel model)
+        {
+            // Check if username already exists
+            bool usernameExists = _dbBug.Users.Any(u => u.UserName == model.Username);
+            if (usernameExists)
+            { 
+                return Json(new { success = false, message = "Username Already Exists" });
+            }
+
+            // Create temp password
+            string tempPassword = Guid.NewGuid().ToString();
+
+            // Create user
+            var user = new User
+            {
+                Email = model.Email,
+                UserName = model.Username,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(tempPassword),
+                IsGoogleAccount = true,
+                IsEmailVerified = true,
+                CreatedDate = DateTime.UtcNow,
+                RoleId = 4
+            };
+
+            HttpContext.Session.SetString("UserEmail", model.Email);
+            HttpContext.Session.SetInt32("UserId", user.UserId);
+            HttpContext.Session.SetInt32("UserRoleId", (int)user.RoleId);
+
+
+            _dbBug.Users.Add(user);
+            await _dbBug.SaveChangesAsync();
+            TempData["google-toast"] = "Account Created Successfully using Google!";
+            TempData["google-toastType"] = "success";
+
+            return Json(new { success = true, message = "Account Created Successfully" });
+        }
+
 
         [HttpGet, ActionName("Registration")]
         public async Task<IActionResult> AddUserRegister()
@@ -95,6 +205,21 @@ namespace Bug_Tracking_System.Controllers
         [HttpGet]
         public async Task<IActionResult> OtpCheck()
         {
+            var email = HttpContext.Session.GetString("UserEmail");
+            var isEmailVerified = _dbBug.Users.Where(x => x.Email == email).Select(y => y.IsEmailVerified).FirstOrDefault();
+            if ((bool)isEmailVerified)
+            {
+                int roleid = (int)HttpContext.Session.GetInt32("UserRoleId");
+                int userId = (int)HttpContext.Session.GetInt32("UserId");
+                var userImage = HttpContext.Session.GetString("UserImage"); // Fallback to default image if null
+
+                if (roleid > 0 && userId > 0)
+                {
+                    return RedirectToAction("Dashboard", "Dashboard");
+                }
+                return RedirectToAction("Login", "Account");
+
+            }
             return View();
         }
 

@@ -10,11 +10,13 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
     {
         private readonly DbBug _bug;
         private readonly IEmailSenderRepos _emailSender;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AccountClassRepos(DbBug bug, IEmailSenderRepos emailSender)
+        public AccountClassRepos(DbBug bug, IEmailSenderRepos emailSender, IHttpContextAccessor httpContextAccessor)
         {
             _bug = bug;
             _emailSender = emailSender;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<object> AddUserRegister(User users, IFormFile? ImageFile)
@@ -23,13 +25,19 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
 
             users.CreatedDate = DateTime.Now;
             users.IsActive = true; // Activate the user by default
+            string msg = "Successfully Registered";
+            string? gmail = _httpContextAccessor.HttpContext.Session.GetString("GoogleEmail");
+            users.IsEmailVerified = true;
+            if(gmail == null)
+            {
+                users.Otp = _emailSender.GenerateOtp();
+                users.OtpExpiry = DateTime.Now.AddMinutes(5);
 
-            users.Otp = _emailSender.GenerateOtp();
-            users.OtpExpiry = DateTime.Now.AddMinutes(5);
-            users.IsEmailVerified = false;
-            string subj = "OTP Verification!!!";
-            await _emailSender.SendEmailAsync(users.Email, subj, users.Otp,"Registration");
-
+                users.IsEmailVerified = false;
+                string subj = "OTP Verification!!!";
+                await _emailSender.SendEmailAsync(users.Email, subj, users.Otp,"Registration");
+                msg = "Check your email for the OTP verification";
+            }
             if (ImageFile == null)
             {
                 users.ProfileImage = GenerateDefaultProfileImage(users.UserName);
@@ -37,7 +45,7 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
 
             await _bug.Users.AddAsync(users);
             await _bug.SaveChangesAsync();
-            return new { success = true, message = "Check your email for the OTP verification" };
+            return new { success = true, message =  msg};
         }
 
         public string GenerateDefaultProfileImage(string userName)

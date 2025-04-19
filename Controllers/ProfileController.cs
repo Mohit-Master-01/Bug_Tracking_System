@@ -88,7 +88,7 @@ namespace Bug_Tracking_System.Controllers
                     int? currentProjectId = HttpContext.Session.GetInt32("CurrentProjectId");
                     int? roleId = HttpContext.Session.GetInt32("UserRoleId");
 
-                    if ((currentProjectId == null || currentProjectId == 0) && roleId != 4)
+                    if ((currentProjectId == null || currentProjectId == 0) && roleId != 4 && roleId != 3)
                     {
                         TempData["Error"] = "Please select a project first.";
                         return RedirectToAction("Index", "Home");
@@ -96,7 +96,7 @@ namespace Bug_Tracking_System.Controllers
 
                     List<User> members;
 
-                    if (roleId == 4) // Admin
+                    if (roleId == 4 || roleId == 3) // Admin
                     {
                         members = await _member.GetAllMembers();
                     }
@@ -167,7 +167,7 @@ namespace Bug_Tracking_System.Controllers
 
                     // Stats
                     ViewBag.TotalProjects = projects.Count;
-                    ViewBag.ActiveProjects = projects.Count(p => p.Status == "In Progress" || p.Status == "Active");
+                    ViewBag.ActiveProjects = projects.Count(p => p.Completion != 100);
                     ViewBag.CompletedProjects = projects.Count(p => p.Completion == 100);
                     ViewBag.ProjectsThisMonth = projects.Count(p =>
                                                     p.CreatedDate.HasValue &&

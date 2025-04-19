@@ -6,7 +6,64 @@
     var role = Model.Role;
     var hasProject = Model.TotalBugsInCurrentProject > 0; // Check if project is selected and has data
     var hasBug = Model.MyBugs > 0 && Model.BugActivityTimeline?.Any() == true;
+    var userName = Context.Session.GetString("UserName");
 
+    var hour = DateTime.Now.Hour;
+    var greeting = hour < 12 ? "Good Morning" :
+                   hour < 18 ? "Good Afternoon" : "Good Evening";
+
+    var quote = "Keep pushing forward!"; // Default fallback
+
+    var adminQuotes = new[] {
+        "Leadership is not about being in charge. It’s about taking care of those in your charge.",
+        "Data is your map, and vision is your compass.",
+        "Make decisions that scale.",
+        "Empower your team, not micromanage them.",
+        "Every small system improvement today avoids chaos tomorrow."
+    };
+
+    var managerQuotes = new[] {
+        "A project well planned is a project half done.",
+        "Behind every great team is a great manager.",
+        "Deadlines are closer than they appear—keep your team aligned.",
+        "Communication is your best tool.",
+        "Meetings without purpose are just group confusion."
+    };
+
+    var devQuotes = new[] {
+        "One bug at a time, one win at a time.",
+        "Your code speaks louder than your résumé.",
+        "Today’s commit is tomorrow’s legacy.",
+        "Break the code, fix the bug, learn the lesson.",
+        "Write code that even your future self understands."
+    };
+
+    var testerQuotes = new[] {
+        "Every failed test is a step closer to perfection.",
+        "Be the last line of defense against bugs.",
+        "Think like a user, test like a hacker.",
+        "Your job is to break things—beautifully.",
+        "Bugs fear you—and that’s your power."
+    };
+
+    var rng = new Random();
+
+    if (role == 4)
+    {
+        quote = adminQuotes[rng.Next(adminQuotes.Length)];
+    }
+    else if (role == 1)
+    {
+        quote = managerQuotes[rng.Next(managerQuotes.Length)];
+    }
+    else if (role == 2)
+    {
+        quote = devQuotes[rng.Next(devQuotes.Length)];
+    }
+    else if (role == 3)
+    {
+        quote = testerQuotes[rng.Next(testerQuotes.Length)];
+    }
 }
 
 <style>
@@ -43,28 +100,33 @@
     }
 
     #dashboard-content {
-
         padding: 20px;
         display: block;
         overflow: visible;
     }
-
 
 </style>
 
 <!-- Argon Dashboard Layout Container -->
 <div class="container-fluid py-4">
 
-    <!-- Screenshot Button -->
-    <div class="mb-3 text-end" style="margin-right:25px">
-        <button id="download-image" class="btn btn-success" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Dashboard Stats As Image">
-            <i class="fas fa-image"></i>
-        </button>
-        <button id="download-pdf" class="btn btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Dashboard Stats As PDF" style="margin-left: 5px">
-            <i class="fas fa-file-pdf"></i>
-        </button>
-    </div>
+    <div class="d-flex justify-content-between align-items-center px-4 py-3 rounded">
+        <!-- Greeting Section -->
+        <div>
+            <h3 class="text-white fw-bold mb-1">@greeting, @userName!</h3>
+            <p class="text-xs text-light fst-italic mb-0">💡 Quote: "@quote"</p>
+        </div>
 
+        <!-- Button Section -->
+        <div class="text-end">
+            <button id="download-image" class="btn btn-success" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Dashboard Stats As Image">
+                <i class="fas fa-image"></i>
+            </button>
+            <button id="download-pdf" class="btn btn-danger ms-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Dashboard Stats As PDF">
+                <i class="fas fa-file-pdf"></i>
+            </button>
+        </div>
+    </div>
     <div id="dashboard-content">
         <!-- ======= Admin Dashboard ======= -->
         @if (role == 4)
@@ -121,84 +183,92 @@
                 <!-- Card 3 -->
                 <div class="col-xl-4 col-md-6 mb-4">
                     <div class="card">
-                        <div class="card-body p-3">
-                            <div class="row">
-                                <div class="col-8">
-                                    <div class="numbers">
-                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">Developers</p>
-                                        <h5 class="font-weight-bolder">@Model.TotalDevelopers</h5>
+                        <a href="/Members/DevelopersList">
+                            <div class="card-body p-3">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <div class="numbers">
+                                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Developers</p>
+                                            <h5 class="font-weight-bolder">@Model.TotalDevelopers</h5>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <div class="icon icon-shape bg-gradient-success shadow text-center rounded-circle">
-                                        <i class="fas fa-code text-lg opacity-10" aria-hidden="true"></i>
+                                    <div class="col-4 text-end">
+                                        <div class="icon icon-shape bg-gradient-success shadow text-center rounded-circle">
+                                            <i class="fas fa-code text-lg opacity-10" aria-hidden="true"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
 
                 <!-- Card 4 -->
                 <div class="col-xl-4 col-md-6 mb-4">
                     <div class="card">
-                        <div class="card-body p-3">
-                            <div class="row">
-                                <div class="col-8">
-                                    <div class="numbers">
-                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">Testers</p>
-                                        <h5 class="font-weight-bolder">@Model.TotalTesters</h5>
+                        <a href="/Members/TestersList">
+                            <div class="card-body p-3">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <div class="numbers">
+                                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Testers</p>
+                                            <h5 class="font-weight-bolder">@Model.TotalTesters</h5>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <div class="icon icon-shape bg-gradient-danger shadow text-center rounded-circle">
-                                        <i class="fas fa-bug text-lg opacity-10" aria-hidden="true"></i>
+                                    <div class="col-4 text-end">
+                                        <div class="icon icon-shape bg-gradient-danger shadow text-center rounded-circle">
+                                            <i class="fas fa-bug text-lg opacity-10" aria-hidden="true"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
 
                 <!-- Card 5 -->
                 <div class="col-xl-4 col-md-6 mb-4">
                     <div class="card">
-                        <div class="card-body p-3">
-                            <div class="row">
-                                <div class="col-8">
-                                    <div class="numbers">
-                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Projects</p>
-                                        <h5 class="font-weight-bolder">@Model.TotalProjects</h5>
+                        <a href="/Projects/ProjectList">
+                            <div class="card-body p-3">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <div class="numbers">
+                                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Projects</p>
+                                            <h5 class="font-weight-bolder">@Model.TotalProjects</h5>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <div class="icon icon-shape bg-gradient-warning shadow text-center rounded-circle">
-                                        <i class="fas fa-project-diagram text-lg opacity-10" aria-hidden="true"></i>
+                                    <div class="col-4 text-end">
+                                        <div class="icon icon-shape bg-gradient-warning shadow text-center rounded-circle">
+                                            <i class="fas fa-project-diagram text-lg opacity-10" aria-hidden="true"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
 
                 <!-- Card 6 -->
                 <div class="col-xl-4 col-md-6 mb-4">
                     <div class="card">
-                        <div class="card-body p-3">
-                            <div class="row">
-                                <div class="col-8">
-                                    <div class="numbers">
-                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Bugs</p>
-                                        <h5 class="font-weight-bolder">@Model.TotalBugs</h5>
+                        <a href="/Bugs/BugList">
+                            <div class="card-body p-3">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <div class="numbers">
+                                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Bugs</p>
+                                            <h5 class="font-weight-bolder">@Model.TotalBugs</h5>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <div class="icon icon-shape bg-gradient-secondary shadow text-center rounded-circle">
-                                        <i class="fas fa-bug-slash text-lg opacity-10" aria-hidden="true"></i>
+                                    <div class="col-4 text-end">
+                                        <div class="icon icon-shape bg-gradient-secondary shadow text-center rounded-circle">
+                                            <i class="fas fa-bug-slash text-lg opacity-10" aria-hidden="true"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -261,59 +331,65 @@
                 <!-- My Projects -->
                 <div class="col-xl-4 col-md-6 mb-4">
                     <div class="card">
-                        <div class="card-body p-3">
-                            <div class="row">
-                                <div class="col-8">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">My Projects</p>
-                                    <h5 class="font-weight-bolder">@Model.MyProjects</h5>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <div class="icon icon-shape bg-gradient-warning shadow text-center rounded-circle">
-                                        <i class="fas fa-folder-open text-lg opacity-10"></i>
+                        <a href="/Profile/MyProjects">
+                            <div class="card-body p-3">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">My Projects</p>
+                                        <h5 class="font-weight-bolder">@Model.MyProjects</h5>
+                                    </div>
+                                    <div class="col-4 text-end">
+                                        <div class="icon icon-shape bg-gradient-warning shadow text-center rounded-circle">
+                                            <i class="fas fa-folder-open text-lg opacity-10"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
 
                 <!-- Bugs in My Projects -->
                 <div class="col-xl-4 col-md-6 mb-4">
                     <div class="card">
-                        <div class="card-body p-3">
-                            <div class="row">
-                                <div class="col-8">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Bugs in My Projects</p>
-                                    <h5 class="font-weight-bolder">@Model.BugsInMyProjects</h5>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <div class="icon icon-shape bg-gradient-danger shadow text-center rounded-circle">
-                                        <i class="fas fa-bug text-lg opacity-10"></i>
+                        <a href="/Bugs/BugList">
+                            <div class="card-body p-3">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">Bugs in My Projects</p>
+                                        <h5 class="font-weight-bolder">@Model.BugsInMyProjects</h5>
+                                    </div>
+                                    <div class="col-4 text-end">
+                                        <div class="icon icon-shape bg-gradient-danger shadow text-center rounded-circle">
+                                            <i class="fas fa-bug text-lg opacity-10"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
 
                 <!-- Total Testers -->
                 <div class="col-xl-4 col-md-6 mb-4">
                     <div class="card">
-                        <div class="card-body p-3">
-                            <div class="row">
-                                <div class="col-8">
-                                    <div class="numbers">
-                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">Testers</p>
-                                        <h5 class="font-weight-bolder">@Model.TotalTesters</h5>
+                        <a href="/Members/TestersList">
+                            <div class="card-body p-3">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <div class="numbers">
+                                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Testers</p>
+                                            <h5 class="font-weight-bolder">@Model.TotalTesters</h5>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <div class="icon icon-shape bg-gradient-info shadow text-center rounded-circle">
-                                        <i class="fas fa-users text-lg opacity-10" aria-hidden="true"></i>
+                                    <div class="col-4 text-end">
+                                        <div class="icon icon-shape bg-gradient-info shadow text-center rounded-circle">
+                                            <i class="fas fa-users text-lg opacity-10" aria-hidden="true"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
 
@@ -322,21 +398,23 @@
                     <!-- Developers in Project -->
                     <div class="col-xl-4 col-md-6 mb-4">
                         <div class="card">
-                            <div class="card-body p-3">
-                                <div class="row">
-                                    <div class="col-8">
-                                        <div class="numbers">
-                                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Developers in Project</p>
-                                            <h5 class="font-weight-bolder">@Model.DevelopersInCurrentProject</h5>
+                            <a href="/Members/DevelopersList">
+                                <div class="card-body p-3">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <div class="numbers">
+                                                <p class="text-sm mb-0 text-uppercase font-weight-bold">Developers in Project</p>
+                                                <h5 class="font-weight-bolder">@Model.DevelopersInCurrentProject</h5>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-4 text-end">
-                                        <div class="icon icon-shape bg-gradient-success shadow text-center rounded-circle">
-                                            <i class="fas fa-user-cog text-lg opacity-10" aria-hidden="true"></i>
+                                        <div class="col-4 text-end">
+                                            <div class="icon icon-shape bg-gradient-success shadow text-center rounded-circle">
+                                                <i class="fas fa-user-cog text-lg opacity-10" aria-hidden="true"></i>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                     </div>
                 }
@@ -431,76 +509,84 @@
                 <!-- My Projects -->
                 <div class="col-xl-4 col-md-6 mb-4">
                     <div class="card">
-                        <div class="card-body p-3">
-                            <div class="row">
-                                <div class="col-8">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">My Projects</p>
-                                    <h5 class="font-weight-bolder">@Model.MyProjects</h5>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <div class="icon icon-shape bg-gradient-primary shadow text-center rounded-circle">
-                                        <i class="fas fa-briefcase text-lg opacity-10"></i>
+                        <a href="/Profile/MyProjects">
+                            <div class="card-body p-3">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">My Projects</p>
+                                        <h5 class="font-weight-bolder">@Model.MyProjects</h5>
+                                    </div>
+                                    <div class="col-4 text-end">
+                                        <div class="icon icon-shape bg-gradient-primary shadow text-center rounded-circle">
+                                            <i class="fas fa-briefcase text-lg opacity-10"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
 
                 <!-- My Bugs -->
                 <div class="col-xl-4 col-md-6 mb-4">
                     <div class="card">
-                        <div class="card-body p-3">
-                            <div class="row">
-                                <div class="col-8">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">My Total Bugs</p>
-                                    <h5 class="font-weight-bolder">@Model.MyBugs</h5>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <div class="icon icon-shape bg-gradient-danger shadow text-center rounded-circle">
-                                        <i class="fas fa-bug text-lg opacity-10"></i>
+                        <a href="/Bugs/BugList">
+                            <div class="card-body p-3">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">My Total Bugs</p>
+                                        <h5 class="font-weight-bolder">@Model.MyBugs</h5>
+                                    </div>
+                                    <div class="col-4 text-end">
+                                        <div class="icon icon-shape bg-gradient-danger shadow text-center rounded-circle">
+                                            <i class="fas fa-bug text-lg opacity-10"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
 
                 <!-- Resolved Bugs -->
                 <div class="col-xl-4 col-md-6 mb-4">
                     <div class="card">
-                        <div class="card-body p-3">
-                            <div class="row">
-                                <div class="col-8">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">My Total Resolved Bugs</p>
-                                    <h5 class="font-weight-bolder">@Model.ResolvedBugs</h5>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <div class="icon icon-shape bg-gradient-success shadow text-center rounded-circle">
-                                        <i class="fas fa-check-circle text-lg opacity-10"></i>
+                        <a href="/Bugs/BugList">
+                            <div class="card-body p-3">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">My Total Resolved Bugs</p>
+                                        <h5 class="font-weight-bolder">@Model.ResolvedBugs</h5>
+                                    </div>
+                                    <div class="col-4 text-end">
+                                        <div class="icon icon-shape bg-gradient-success shadow text-center rounded-circle">
+                                            <i class="fas fa-check-circle text-lg opacity-10"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
 
                 <!-- In-Progress Bugs -->
                 <div class="col-xl-4 col-md-6 mb-4">
                     <div class="card">
-                        <div class="card-body p-3">
-                            <div class="row">
-                                <div class="col-8">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">In-Progress Bugs</p>
-                                    <h5 class="font-weight-bolder">@Model.InProgressBugs</h5>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <div class="icon icon-shape bg-gradient-warning shadow text-center rounded-circle">
-                                        <i class="fas fa-spinner text-lg opacity-10"></i>
+                        <a href="/Bugs/BugList">
+                            <div class="card-body p-3">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">In-Progress Bugs</p>
+                                        <h5 class="font-weight-bolder">@Model.InProgressBugs</h5>
+                                    </div>
+                                    <div class="col-4 text-end">
+                                        <div class="icon icon-shape bg-gradient-warning shadow text-center rounded-circle">
+                                            <i class="fas fa-spinner text-lg opacity-10"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -574,57 +660,63 @@
                 <!-- Bugs to Verify -->
                 <div class="col-xl-4 col-md-6 mb-4">
                     <div class="card">
-                        <div class="card-body p-3">
-                            <div class="row">
-                                <div class="col-8">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Bugs to Verify</p>
-                                    <h5 class="font-weight-bolder">@Model.BugsToVerify</h5>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <div class="icon icon-shape bg-gradient-warning shadow text-center rounded-circle">
-                                        <i class="fas fa-search text-lg opacity-10"></i>
+                        <a href="/Bugs/BugList">
+                            <div class="card-body p-3">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">Bugs to Verify</p>
+                                        <h5 class="font-weight-bolder">@Model.BugsToVerify</h5>
+                                    </div>
+                                    <div class="col-4 text-end">
+                                        <div class="icon icon-shape bg-gradient-warning shadow text-center rounded-circle">
+                                            <i class="fas fa-search text-lg opacity-10"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
 
                 <!-- Verified Bugs -->
                 <div class="col-xl-4 col-md-6 mb-4">
                     <div class="card">
-                        <div class="card-body p-3">
-                            <div class="row">
-                                <div class="col-8">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Verified Bugs</p>
-                                    <h5 class="font-weight-bolder">@Model.VerifiedBugs</h5>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <div class="icon icon-shape bg-gradient-success shadow text-center rounded-circle">
-                                        <i class="fas fa-check-circle text-lg opacity-10"></i>
+                        <a href="/Bugs/BugList">
+                            <div class="card-body p-3">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">Verified Bugs</p>
+                                        <h5 class="font-weight-bolder">@Model.VerifiedBugs</h5>
+                                    </div>
+                                    <div class="col-4 text-end">
+                                        <div class="icon icon-shape bg-gradient-success shadow text-center rounded-circle">
+                                            <i class="fas fa-check-circle text-lg opacity-10"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
 
                 <!-- Total Bugs  -->
                 <div class="col-xl-4 col-md-6 mb-4">
                     <div class="card">
-                        <div class="card-body p-3">
-                            <div class="row">
-                                <div class="col-8">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Bugs </p>
-                                    <h5 class="font-weight-bolder">@Model.TotalBugsTested</h5>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <div class="icon icon-shape bg-gradient-primary shadow text-center rounded-circle">
-                                        <i class="fas fa-bug text-lg opacity-10"></i>
+                        <a href="/Bugs/BugList">
+                            <div class="card-body p-3">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Bugs </p>
+                                        <h5 class="font-weight-bolder">@Model.TotalBugsTested</h5>
+                                    </div>
+                                    <div class="col-4 text-end">
+                                        <div class="icon icon-shape bg-gradient-primary shadow text-center rounded-circle">
+                                            <i class="fas fa-bug text-lg opacity-10"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
 
