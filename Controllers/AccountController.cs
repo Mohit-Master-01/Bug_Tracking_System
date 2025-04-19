@@ -79,6 +79,10 @@ namespace Bug_Tracking_System.Controllers
             var email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
             var name = result.Principal.Identity.Name;
 
+            // 🟢 Get Google Access Token
+            var accessToken = result.Properties.GetTokenValue("access_token");
+            HttpContext.Session.SetString("GoogleAccessToken", accessToken ?? "");
+
             var user = await _dbBug.Users.FirstOrDefaultAsync(u => u.Email == email);
             HttpContext.Session.SetString("GoogleEmail", email ?? "");
 
@@ -89,6 +93,9 @@ namespace Bug_Tracking_System.Controllers
                 HttpContext.Session.SetInt32("UserId", user.UserId);
                 HttpContext.Session.SetInt32("UserRoleId", (int)user.RoleId);
                 HttpContext.Session.SetString("UserEmail", email ?? "");
+                HttpContext.Session.SetString("UserImage", user.ProfileImage);
+
+
 
                 // Optional: Update login time
                 user.LastLogin = DateTime.UtcNow;
@@ -135,6 +142,7 @@ namespace Bug_Tracking_System.Controllers
             HttpContext.Session.SetString("UserEmail", model.Email);
             HttpContext.Session.SetInt32("UserId", user.UserId);
             HttpContext.Session.SetInt32("UserRoleId", (int)user.RoleId);
+
 
 
             _dbBug.Users.Add(user);

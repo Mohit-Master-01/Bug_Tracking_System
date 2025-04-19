@@ -77,6 +77,11 @@ builder.Services.AddAuthentication(options =>
     options.ClientId = "141974506519-j9agl9t56nbp7p47pgtgoba3f0g7q788.apps.googleusercontent.com";
     options.ClientSecret = "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";
     options.CallbackPath = "/signin-google"; // or whatever you’ve set
+
+    options.Scope.Add("https://www.googleapis.com/auth/calendar");
+
+    options.SaveTokens = true; // ?? REQUIRED for access_token   
+
 });
 
 

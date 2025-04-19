@@ -205,29 +205,22 @@ namespace Bug_Tracking_System.Controllers
                 if (bug == null)
                     return Json(new { success = false, message = "Bug not found" });
 
-                // 1. Load credentials
-                string credentialsPath = Path.Combine(_env.ContentRootPath, "credentials.json");
-                UserCredential credential;
+                // 1. Get access token from session
+                string accessToken = HttpContext.Session.GetString("GoogleAccessToken");
+                if (string.IsNullOrEmpty(accessToken))
+                    return Json(new { success = false, message = "Access token is missing. Please login again via Google." });
 
-                using (var stream = new FileStream(credentialsPath, FileMode.Open, FileAccess.Read))
-                {
-                    string tokenPath = Path.Combine(_env.ContentRootPath, "token.json");
-                    credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                        GoogleClientSecrets.FromStream(stream).Secrets,
-                        new[] { CalendarService.Scope.Calendar },
-                        "user",
-                        CancellationToken.None,
-                        new FileDataStore(tokenPath, true));
-                }
+                // 2. Set up the credential using the token
+                var credential = GoogleCredential.FromAccessToken(accessToken);
 
-                // 2. Create the Calendar Service
+                // 3. Create the Calendar Service
                 var calendarService = new CalendarService(new BaseClientService.Initializer()
                 {
                     HttpClientInitializer = credential,
                     ApplicationName = "Bug Tracking Calendar",
                 });
 
-                // 3. Prepare the Event
+                // 4. Prepare the Event
                 Event newEvent = new Event()
                 {
                     Summary = bug.Title,
@@ -244,7 +237,7 @@ namespace Bug_Tracking_System.Controllers
                     }
                 };
 
-                // 4. Insert the Event
+                // 5. Insert the Event into user's primary calendar
                 var request = calendarService.Events.Insert(newEvent, "primary");
                 await request.ExecuteAsync();
 
@@ -255,6 +248,7 @@ namespace Bug_Tracking_System.Controllers
                 return Json(new { success = false, message = "Error: " + ex.Message });
             }
         }
+
 
         [HttpGet]
         public async Task<IActionResult> BugDetails(int id)
