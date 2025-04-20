@@ -67,7 +67,7 @@ namespace Bug_Tracking_System.Controllers
         }
 
         [HttpGet("account/google-callback")]
-        public async Task<IActionResult> GoogleResponse() //ye method mujhe pakka nai pata barabar hai ya nahi iska code
+        public async Task<IActionResult> GoogleResponse() 
         {
             var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -91,6 +91,7 @@ namespace Bug_Tracking_System.Controllers
             {
                 // Session Setup
                 HttpContext.Session.SetInt32("UserId", user.UserId);
+                HttpContext.Session.SetString("UserName", user.UserName);
                 HttpContext.Session.SetInt32("UserRoleId", (int)user.RoleId);
                 HttpContext.Session.SetString("UserEmail", email ?? "");
                 HttpContext.Session.SetString("UserImage", user.ProfileImage);
@@ -214,22 +215,28 @@ namespace Bug_Tracking_System.Controllers
         public async Task<IActionResult> OtpCheck()
         {
             var email = HttpContext.Session.GetString("UserEmail");
-            var isEmailVerified = _dbBug.Users.Where(x => x.Email == email).Select(y => y.IsEmailVerified).FirstOrDefault();
-            if ((bool)isEmailVerified)
+            var isEmailVerified = _dbBug.Users
+                .Where(x => x.Email == email)
+                .Select(y => y.IsEmailVerified)
+                .FirstOrDefault();
+
+            // Check for null before using the value
+            if (isEmailVerified.HasValue && isEmailVerified.Value)
             {
-                int roleid = (int)HttpContext.Session.GetInt32("UserRoleId");
-                int userId = (int)HttpContext.Session.GetInt32("UserId");
-                var userImage = HttpContext.Session.GetString("UserImage"); // Fallback to default image if null
+                int? roleid = HttpContext.Session.GetInt32("UserRoleId");
+                int? userId = HttpContext.Session.GetInt32("UserId");
+                var userImage = HttpContext.Session.GetString("UserImage");
 
                 if (roleid > 0 && userId > 0)
                 {
                     return RedirectToAction("Dashboard", "Dashboard");
                 }
                 return RedirectToAction("Login", "Account");
-
             }
+
             return View();
         }
+
 
         [HttpPost]
         public async Task<IActionResult> OtpCheck(User users)

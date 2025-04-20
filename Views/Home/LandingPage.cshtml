@@ -30,8 +30,19 @@
   <link rel="stylesheet" href="~/HomeAssets/plugins/fancybox/jquery.fancybox.min.css">
   <link rel="stylesheet" href="~/HomeAssets/plugins/aos/aos.css">
 
+  <!-- Font Awesome 5 CDN -->
+
+
   <!-- CUSTOM CSS -->
   <link href="~/HomeAssets/css/style.css" rel="stylesheet">
+
+  <style>
+
+		.bg-1 {
+			background: url(https://blackwhite.pictures/media/c/2205/nature-green-insect-fauna-invertebrate-1198.jpg) fixed no-repeat;
+			background-size: cover;
+		}
+	  </style>
 </head>
 
 <body class="body-wrapper" data-spy="scroll" data-target=".privacy-nav">
@@ -40,9 +51,11 @@
 <nav class="navbar main-nav navbar-expand-lg px-2 px-sm-0 py-2 py-lg-0">
   <div class="container">
 
-
-      <img src="~/images/ladybug_2820811.png" width="35" height="35" class="navbar-brand-img h-100" alt="main_logo">
-      <span class="font-weight-bold" style="font-size:large">Bugify</span>
+	  <a href="/Home/LandingPage">
+		  <img src="~/images/ladybug_2820811.png" width="35" height="35" class="navbar-brand-img h-100" alt="main_logo">
+		  <span class="font-weight-bold" style="font-size:large">Bugify</span>
+	  </a>
+      
 
 
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
@@ -134,19 +147,18 @@
 		<div class="shape" data-aos="fade-down-left" data-aos-duration="500" data-aos-delay="0"></div>
 	</div>
 	<div class="container">
-		<div class="row align-items-center">
-			<div class="col-md-6 order-2 order-md-1 text-center text-md-left">
-				<h1 class="text-white font-weight-bold mb-4">Showcase your app with Small Apps</h1>
-				<p class="text-white mb-5">Besides its beautiful design. Laapp is an incredibly rich core framework for you to
-					showcase your App.</p>
-				<a href="~/Account/Registration" class="btn btn-main-md">Get Started</a>
-			</div>
-			<div class="col-md-6 text-center order-1 order-md-2">
-			   <img class="img-fluid floating-bug" src="~/HomeAssets/images/SearchBug.png" alt="screenshot">
-			</div>
-
+	<div class="row align-items-center">
+		<div class="col-md-6 order-2 order-md-1 text-center text-md-left">
+			<h1 class="text-white font-weight-bold mb-4">Track, Manage, and Squash Bugs Effortlessly</h1>
+			<p class="text-white mb-5">Welcome to your all-in-one bug tracking platform—built for developers, project managers, and QA teams to collaborate in real-time and ensure smoother releases.</p>
+			<a href="~/Account/Registration" class="btn btn-main-md">Get Started</a>
+		</div>
+		<div class="col-md-6 text-center order-1 order-md-2">
+			<img class="img-fluid floating-bug" src="~/HomeAssets/images/SearchBug.png" alt="Bug Tracker">
 		</div>
 	</div>
+</div>
+
 </section>
 <!--====  End of Hero Section https://www.bugzilla.org/assets/img/running-fg.svg ====-->
 
@@ -154,29 +166,33 @@
 	<div class="container">
 		<div class="rounded shadow p-5 bg-white">
 			<div class="row">
+				<!-- Real-Time Bug Tracking -->
 				<div class="col-lg-4 col-md-6 mt-5 mt-md-0 text-center">
-					<i class="ti-paint-bucket text-primary h1"></i>
-					<h3 class="mt-4 text-capitalize h5 ">themes made easy</h3>
-					<p class="regular text-muted">Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam non, recusandae
-						tempore ipsam dignissimos molestias.</p>
+					<i class="fas fa-bug text-primary h1"></i>
+					<h3 class="mt-4 text-capitalize h5">Real-Time Bug Tracking</h3>
+					<p class="regular text-muted">Capture, assign, and resolve bugs instantly with live updates and smart notifications—never miss a critical issue again.</p>
 				</div>
+
+				<!-- Project-Based Workspaces -->
 				<div class="col-lg-4 col-md-6 mt-5 mt-md-0 text-center">
-					<i class="ti-shine text-primary h1"></i>
-					<h3 class="mt-4 text-capitalize h5 ">powerful design</h3>
-					<p class="regular text-muted">Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam non, recusandae
-						tempore ipsam dignissimos molestias.</p>
+					<i class="fas fa-project-diagram text-primary h1"></i>
+					<h3 class="mt-4 text-capitalize h5">Project-Based Workspaces</h3>
+					<p class="regular text-muted">Keep things organized by managing multiple projects with role-based access, timeline tracking, and developer assignments.</p>
 				</div>
+
+				<!-- Insightful Reports & Stats -->
 				<div class="col-lg-4 col-md-12 mt-5 mt-lg-0 text-center">
-					<i class="ti-thought text-primary h1"></i>
-					<h3 class="mt-4 text-capitalize h5 ">creative content</h3>
-					<p class="regular text-muted">Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam non, recusandae
-						tempore ipsam dignissimos molestias.</p>
-					</p>
+					<i class="fas fa-chart-line text-primary h1"></i>
+					<h3 class="mt-4 text-capitalize h5">Insightful Reports & Stats</h3>
+					<p class="regular text-muted">Get performance insights, bug trends, and team statistics—downloadable as PDF or Excel, perfect for reviews and planning.</p>
 				</div>
 			</div>
 		</div>
 	</div>
 </section>
+
+
+
 
 <!--==================================
 =            Feature Grid            =
@@ -185,375 +201,272 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-lg-6 ml-auto justify-content-center">
-				<!-- Feature Mockup -->
 				<div class="image-content" data-aos="fade-right">
-					<img class="img-fluid" src="~/HomeAssets/images/feature/feature-new-01.jpg" alt="iphone">
-				</div>
+						<img class="img-fluid"
+							 src="https://img.freepik.com/free-vector/software-tester-concept-illustration_114360-12815.jpg?t=st=1745148176~exp=1745151776~hmac=2f66a9c990589cfb46eb01903e139c684a8fafb90cf2fa26814e9fa6e00b2eab&w=1380" />
+					</div>
 			</div>
 			<div class="col-lg-6 mr-auto align-self-center">
 				<div class="feature-content">
-					<!-- Feature Title -->
-					<h2>Increase your productivity with <a
-							href="https://themefisher.com/products/small-apps-free-app-landing-page-template/">Small Apps</a></h2>
-					<!-- Feature Description -->
-					<p class="desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-						labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-						aliquip ex ea commodo consequat.</p>
+					<h2>Stay on Top of Every Issue, Always</h2>
+					<p class="desc">Monitor bug progress across teams and projects with customizable dashboards, intuitive charts, and live activity logs. Everything you need to resolve faster and smarter.</p>
 				</div>
-				<!-- Testimonial Quote -->
 				<div class="testimonial">
-					<p>
-						"InVision is a window into everything that's being designed at Twitter. It gets all of our best work in one
-						place."
-					</p>
+					<p>"With this system, our dev team cut resolution time by 40%. It’s like having a smart assistant for bug tracking!"</p>
 					<ul class="list-inline meta">
 						<li class="list-inline-item">
-							<img src="~/HomeAssets/images/testimonial/feature-testimonial-thumb.jpg" alt="">
+							<img src="~/HomeAssets/images/testimonial/feature-testimonial-thumb.jpg" alt="Testimonial">
 						</li>
-						<li class="list-inline-item">Jonathon Andrew , Themefisher.com</li>
+						<li class="list-inline-item">Sarah Mitchell, QA Lead at DevSphere</li>
 					</ul>
 				</div>
 			</div>
 		</div>
 	</div>
 </section>
+
 
 <section class="feature section pt-0">
 	<div class="container">
 		<div class="row">
 			<div class="col-lg-6 ml-auto align-self-center">
 				<div class="feature-content">
-					<!-- Feature Title -->
-					<h2>Increase your productivity with <a
-							href="https://themefisher.com/products/small-apps-free-app-landing-page-template/">Small Apps</a></h2>
-					<!-- Feature Description -->
-					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-						dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
-						ea commodo consequat.</p>
+					<h2>Built for Developers, Managers & Testers</h2>
+					<p>Whether you're logging bugs, assigning tasks, or generating performance reports—our system adapts to your workflow. Streamline collaboration with role-specific features and easy communication.</p>
 				</div>
-				<!-- Testimonial Quote -->
 				<div class="testimonial">
-					<p>
-						"InVision is a window into everything that's being designed at Twitter. It gets all of our best work in one
-						place."
-					</p>
+					<p>"We’ve tried multiple platforms—this is the only one that fits all roles in our SDLC without bloat."</p>
 					<ul class="list-inline meta">
 						<li class="list-inline-item">
-							<img src="~/HomeAssets/images/testimonial/feature-testimonial-thumb.jpg" alt="">
+							<img src="~/HomeAssets/images/testimonial/feature-testimonial-thumb.jpg" alt="Testimonial">
 						</li>
-						<li class="list-inline-item">Jonathon Andrew , Themefisher.com</li>
+						<li class="list-inline-item">Amit Verma, Senior Developer at CodeNest</li>
 					</ul>
 				</div>
 			</div>
 			<div class="col-lg-6 mr-auto justify-content-center">
-				<!-- Feature mockup -->
 				<div class="image-content" data-aos="fade-left">
-					<img class="img-fluid" src="~/HomeAssets/images/feature/feature-new-02.jpg" alt="ipad">
+						<img class="img-fluid" src="https://img.freepik.com/free-vector/user-interface-development-isometric-concept-with-young-woman-creating-custom-design-mobile-application-vector-illustration_1284-72341.jpg?uid=R81254081&ga=GA1.1.301261840.1707239702&semt=ais_hybrid&w=740" alt="Role Based Access">
 				</div>
 			</div>
 		</div>
 	</div>
 </section>
+
 <!--====  End of Feature Grid  ====-->
 
 <!--==============================
 =            Services            =
 ===============================-->
-<section class="service section bg-gray">
-	<div class="container-fluid p-0">
-		<div class="row">
-			<div class="col-lg-12">
-				<div class="section-title">
-					<h2>An Interface For Lifestyle</h2>
-					<p><a href="https://themefisher.com/products/small-apps-free-app-landing-page-template/">Small Apps</a> makes
-						it easy to stay on top of your Life Style. No late tasks. No gimmicks.</p>
+	<section class="service section bg-gray">
+		<div class="container-fluid p-0">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="section-title">
+						<h2>Empowering You With Powerful Features</h2>
+						<p>Our Bug Tracking System is packed with advanced tools to supercharge your productivity—<strong>from smart integrations to secure role-based control</strong>.</p>
+					</div>
 				</div>
 			</div>
-		</div>
-		<div class="row no-gutters">
-			<div class="col-lg-6 align-self-center">
-				<!-- Feature Image -->
-				<div class="service-thumb left" data-aos="fade-right">
-					<img class="img-fluid" src="~/HomeAssets/images/feature/iphone-ipad.jpg" alt="iphone-ipad">
+			<div class="row no-gutters">
+				<div class="col-lg-6 align-self-center">
+					<!-- Feature Image -->
+					<div class="service-thumb left" data-aos="fade-right">
+						<img class="img-fluid" src="https://img.freepik.com/free-vector/features-overview-concept-illustration_114360-1481.jpg?t=st=1745148480~exp=1745152080~hmac=40e7a3ec1d02dd2021b4357026b1d44790fde57437781751de6f16e8e62c9894&w=826" alt="Bug Tracking System Interface">
+					</div>
 				</div>
-			</div>
-			<div class="col-lg-5 mr-auto align-self-center">
-				<div class="service-box">
-					<div class="row align-items-center">
-						<div class="col-md-6 col-xs-12">
-							<!-- Service 01 -->
-							<div class="service-item">
-								<!-- Icon -->
-								<i class="ti-bookmark"></i>
-								<!-- Heading -->
-								<h3>Easy Prototyping</h3>
-								<!-- Description -->
-								<p>Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Curabitur aliquet quam id dui</p>
+				<div class="col-lg-5 mr-auto align-self-center">
+					<div class="service-box">
+						<div class="row align-items-center">
+							<div class="col-md-6 col-xs-12">
+								<div class="service-item">
+									<i class="ti-settings"></i>
+									<h3>Effortless Setup</h3>
+									<p>Get your workspace up and running in minutes with zero coding skills required. Clean, intuitive design that just works.</p>
+								</div>
 							</div>
-						</div>
-						<div class="col-md-6 col-xs-12">
-							<!-- Service 01 -->
-							<div class="service-item">
-								<!-- Icon -->
-								<i class="ti-pulse"></i>
-								<!-- Heading -->
-								<h3>Sensor Bridge</h3>
-								<!-- Description -->
-								<p>Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Curabitur aliquet quam id dui</p>
+							<div class="col-md-6 col-xs-12">
+								<div class="service-item">
+									<i class="ti-calendar"></i>
+									<h3>Google Calendar Sync</h3>
+									<p>Seamlessly sync bug deadlines with Google Calendar. Never miss a fix with calendar-based bug scheduling and alerts.</p>
+								</div>
 							</div>
-						</div>
-						<div class="col-md-6 col-xs-12">
-							<!-- Service 01 -->
-							<div class="service-item">
-								<!-- Icon -->
-								<i class="ti-bar-chart"></i>
-								<!-- Heading -->
-								<h3>Strategist</h3>
-								<!-- Description -->
-								<p>Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Curabitur aliquet quam id dui</p>
+							<div class="col-md-6 col-xs-12">
+								<div class="service-item">
+									<i class="ti-key"></i>
+									<h3>Email-Based Access</h3>
+									<p>Secure role-based login system using email credentials with Google login support for Admins and easy role onboarding.</p>
+								</div>
 							</div>
-						</div>
-						<div class="col-md-6 col-xs-12">
-							<!-- Service 01 -->
-							<div class="service-item">
-								<!-- Icon -->
-								<i class="ti-panel"></i>
-								<!-- Heading -->
-								<h3>Art Direction</h3>
-								<!-- Description -->
-								<p>Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Curabitur aliquet quam id dui</p>
+							<div class="col-md-6 col-xs-12">
+								<div class="service-item">
+									<i class="ti-bell"></i>
+									<h3>Real-Time Alerts</h3>
+									<p>Receive instant notifications for new bugs, status updates, or project changes—stay in the loop 24/7.</p>
+								</div>
 							</div>
-						</div>
+							<div class="col-md-6 col-xs-12">
+								<div class="service-item">
+									<i class="ti-pie-chart"></i>
+									<h3>Insightful Dashboards</h3>
+									<p>Powerful, role-specific dashboards packed with statistics, visual charts, reports, and export tools for smarter decision-making.</p>
+								</div>
+							</div>
+							<div class="col-md-6 col-xs-12">
+								<div class="service-item">
+									<i class="ti-lock"></i>
+									<h3>Secure Role Management</h3>
+									<p>Granular access control ensures each user only sees what's relevant to them—Admins, Project Managers, Developers, and Testers.</p>
+								</div>
+							</div>
+							<div class="col-md-6 col-xs-12">
+								<div class="service-item">
+									<i class="ti-upload"></i>
+									<h3>Bulk Import with Images</h3>
+									<p>Import bugs and members via Excel, attach bug screenshots through ZIP, and map data in seconds—streamline onboarding.</p>
+								</div>
+							</div>
+							<div class="col-md-6 col-xs-12">
+								<div class="service-item">
+									<i class="ti-layout-grid2"></i>
+									<h3>Calendar View</h3>
+									<p>Visualize bugs with FullCalendar integration. Assign, update, or resolve bugs directly from the calendar interface.</p>
+								</div>
+							</div>
+							<div class="col-md-12 col-xs-12">
+								<div class="service-item">
+									<i class="ti-stats-up"></i>
+									<h3>Performance Reports</h3>
+									<p>Monitor productivity, bug trends, and project health. Export reports in PDF/Excel with filters by date, project, and role.</p>
+								</div>
+							</div>
+						</div> <!-- end row -->
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-</section>
+	</section>
+
 <!--====  End of Services  ====-->
 
 
 <!--=================================
 =            Video Promo            =
 ==================================-->
-<section class="video-promo section bg-1">
-	<div class="container">
-		<div class="row">
-			<div class="col-lg-12">
-				<div class="content-block">
-					<!-- Heading -->
-					<h2>Watch Our Promo Video</h2>
-					<!-- Promotional Speech -->
-					<p>Vivamus suscipit tortor eget felis porttitor volutpat. Curabitur arcu erat, accumsan id imperdiet et,
-						porttitor at sem. Vivamus </p>
-					<!-- Popup Video -->
-					<a data-fancybox href="https://www.youtube.com/watch?v=jrkvirglgaQ">
-						<i class="ti-control-play video"></i>
-					</a>
-				</div>
-			</div>
-		</div>
-	</div>
-</section>
-<!--====  End of Video Promo  ====-->
+	<section class="video-promo section bg-1">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="content-block text-center">
+						<!-- Heading -->
+						<h2>See How Our Bug Tracking System Works</h2>
 
-<!--=================================
-=            Testimonial            =
-==================================-->
-<section class="section testimonial" id="testimonial">
-	<div class="container">
-		<div class="row">
-			<div class="col-lg-12">
-				<!-- Testimonial Slider -->
-				<div class="testimonial-slider owl-carousel owl-theme">
-					<!-- Testimonial 01 -->
-					<div class="item">
-						<div class="block shadow">
-							<!-- Speech -->
-							<p>
-								Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Donec sollicitudin molestie malesuada.
-								Donec sollicitudin molestie malesuada. Pellentesque in ipsum id orci porta dapibus. Lorem ipsum dolor
-								sit amet, consectetur adipiscing elit. Pellentesque in ipsum id orci porta dapibus. Quisque velit nisi,
-								pretium ut lacinia in, elementum id enim.
-							</p>
-							<!-- Person Thumb -->
-							<div class="image">
-								<img src="~/HomeAssets/images/testimonial/feature-testimonial-thumb.jpg" alt="image">
-							</div>
-							<!-- Name and Company -->
-							<cite>Abraham Linkon , Themefisher.com</cite>
-						</div>
-					</div>
-					<!-- Testimonial 01 -->
-					<div class="item">
-						<div class="block shadow">
-							<!-- Speech -->
-							<p>
-								Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Donec sollicitudin molestie malesuada.
-								Donec sollicitudin molestie malesuada. Pellentesque in ipsum id orci porta dapibus. Lorem ipsum dolor
-								sit amet, consectetur adipiscing elit. Pellentesque in ipsum id orci porta dapibus. Quisque velit nisi,
-								pretium ut lacinia in, elementum id enim.
-							</p>
-							<!-- Person Thumb -->
-							<div class="image">
-								<img src="~/HomeAssets/images/testimonial/feature-testimonial-thumb.jpg" alt="image">
-							</div>
-							<!-- Name and Company -->
-							<cite>Abraham Linkon , Themefisher.com</cite>
-						</div>
-					</div>
-					<!-- Testimonial 01 -->
-					<div class="item">
-						<div class="block shadow">
-							<!-- Speech -->
-							<p>
-								Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Donec sollicitudin molestie malesuada.
-								Donec sollicitudin molestie malesuada. Pellentesque in ipsum id orci porta dapibus. Lorem ipsum dolor
-								sit amet, consectetur adipiscing elit. Pellentesque in ipsum id orci porta dapibus. Quisque velit nisi,
-								pretium ut lacinia in, elementum id enim.
-							</p>
-							<!-- Person Thumb -->
-							<div class="image">
-								<img src="~/HomeAssets/images/testimonial/feature-testimonial-thumb.jpg" alt="image">
-							</div>
-							<!-- Name and Company -->
-							<cite>Abraham Linkon , Themefisher.com</cite>
-						</div>
-					</div>
-					<!-- Testimonial 01 -->
-					<div class="item">
-						<div class="block shadow">
-							<!-- Speech -->
-							<p>
-								Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Donec sollicitudin molestie malesuada.
-								Donec sollicitudin molestie malesuada. Pellentesque in ipsum id orci porta dapibus. Lorem ipsum dolor
-								sit amet, consectetur adipiscing elit. Pellentesque in ipsum id orci porta dapibus. Quisque velit nisi,
-								pretium ut lacinia in, elementum id enim.
-							</p>
-							<!-- Person Thumb -->
-							<div class="image">
-								<img src="~/HomeAssets/images/testimonial/feature-testimonial-thumb.jpg" alt="image">
-							</div>
-							<!-- Name and Company -->
-							<cite>Abraham Linkon , Themefisher.com</cite>
-						</div>
+						<!-- Promotional Speech -->
+						<p>Discover how our powerful and easy-to-use platform helps teams track bugs, manage tasks, and collaborate efficiently. Whether you're a Project Manager, Developer, or Tester — we've got the tools to streamline your workflow and deliver better software faster.</p>
+
+						<!-- Popup Video -->
+						<a data-fancybox href="https://www.youtube.com/watch?v=jrkvirglgaQ">
+							<i class="ti-control-play video"></i>
+						</a>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-</section>
-<!--====  End of Testimonial  ====-->
+	</section>
+
+<!--====  End of Video Promo  ====-->
 
 <section class="call-to-action-app section bg-blue">
 	<div class="container">
 		<div class="row">
-			<div class="col-lg-12">
-				<h2>It's time to change your mind</h2>
-				<p>Download over 2 million humans .Get <a href="https://themefisher.com/products/small-apps-free-app-landing-page-template/">Small Apps</a> free forever!
-					<br>We say you won’t look back.</p>
-				<ul class="list-inline">
-					<li class="list-inline-item">
-						<a href="" class="btn btn-rounded-icon">
-							<i class="ti-apple"></i>
-							Iphone
-						</a>
-					</li>
-					<li class="list-inline-item">
-						<a href="" class="btn btn-rounded-icon">
-							<i class="ti-android"></i>
-							Android
-						</a>
-					</li>
-					<li class="list-inline-item">
-						<a href="" class="btn btn-rounded-icon">
-							<i class="ti-microsoft-alt"></i>
-							Windows
-						</a>
-					</li>
-				</ul>
+			<div class="col-lg-12 text-center text-white">
+				<h2>Ready to Take Control of Your Workflow?</h2>
+				<p>Join thousands of professionals optimizing their bug tracking and project management.
+					<br><strong><a href="#">Start free today</a></strong> — no credit card required.</p>
 			</div>
 		</div>
 	</div>
 </section>
+
 
 <!--============================
 =            Footer            =
 =============================-->
 <footer>
-  <div class="footer-main">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-4 col-md-12 m-md-auto align-self-center">
-          <div class="block">
-            <a href="index.html"><img src="~/HomeAssets/images/logo-alt.png" alt="footer-logo"></a>
-            <!-- Social Site Icons -->
-            <ul class="social-icon list-inline">
-              <li class="list-inline-item">
-                <a href="https://www.facebook.com/themefisher"><i class="ti-facebook"></i></a>
-              </li>
-              <li class="list-inline-item">
-                <a href="https://twitter.com/themefisher"><i class="ti-twitter"></i></a>
-              </li>
-              <li class="list-inline-item">
-                <a href="https://www.instagram.com/themefisher/"><i class="ti-instagram"></i></a>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="col-lg-2 col-md-3 col-6 mt-5 mt-lg-0">
-          <div class="block-2">
-            <!-- heading -->
-            <h6>Product</h6>
-            <!-- links -->
-            <ul>
-              <li><a href="team.html">Teams</a></li>
-              <li><a href="blog.html">Blogs</a></li>
-              <li><a href="FAQ.html">FAQs</a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="col-lg-2 col-md-3 col-6 mt-5 mt-lg-0">
-          <div class="block-2">
-            <!-- heading -->
-            <h6>Resources</h6>
-            <!-- links -->
-            <ul>
-              <li><a href="sign-up.html">Singup</a></li>
-              <li><a href="sign-in.html">Login</a></li>
-              <li><a href="blog.html">Blog</a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="col-lg-2 col-md-3 col-6 mt-5 mt-lg-0">
-          <div class="block-2">
-            <!-- heading -->
-            <h6>Company</h6>
-            <!-- links -->
-            <ul>
-              <li><a href="career.html">Career</a></li>
-              <li><a href="contact.html">Contact</a></li>
-              <li><a href="team.html">Investor</a></li>
-              <li><a href="privacy.html">Terms</a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="col-lg-2 col-md-3 col-6 mt-5 mt-lg-0">
-          <div class="block-2">
-            <!-- heading -->
-            <h6>Company</h6>
-            <!-- links -->
-            <ul>
-              <li><a href="about.html">About</a></li>
-              <li><a href="contact.html">Contact</a></li>
-              <li><a href="team.html">Team</a></li>
-              <li><a href="privacy-policy.html">Privacy Policy</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+@*   <div class="footer-main"> *@
+@*     <div class="container"> *@
+@*       <div class="row"> *@
+@*         <div class="col-lg-4 col-md-12 m-md-auto align-self-center"> *@
+@*           <div class="block"> *@
+@*             <a href="index.html"><img src="~/HomeAssets/images/logo-alt.png" alt="footer-logo"></a> *@
+@*             <!-- Social Site Icons --> *@
+@*             <ul class="social-icon list-inline"> *@
+@*               <li class="list-inline-item"> *@
+@*                 <a href="https://www.facebook.com/themefisher"><i class="ti-facebook"></i></a> *@
+@*               </li> *@
+@*               <li class="list-inline-item"> *@
+@*                 <a href="https://twitter.com/themefisher"><i class="ti-twitter"></i></a> *@
+@*               </li> *@
+@*               <li class="list-inline-item"> *@
+@*                 <a href="https://www.instagram.com/themefisher/"><i class="ti-instagram"></i></a> *@
+@*               </li> *@
+@*             </ul> *@
+@*           </div> *@
+@*         </div> *@
+@*         <div class="col-lg-2 col-md-3 col-6 mt-5 mt-lg-0"> *@
+@*           <div class="block-2"> *@
+@*             <!-- heading --> *@
+@*             <h6>Product</h6> *@
+@*             <!-- links --> *@
+@*             <ul> *@
+@*               <li><a href="team.html">Teams</a></li> *@
+@*               <li><a href="blog.html">Blogs</a></li> *@
+@*               <li><a href="FAQ.html">FAQs</a></li> *@
+@*             </ul> *@
+@*           </div> *@
+@*         </div> *@
+@*         <div class="col-lg-2 col-md-3 col-6 mt-5 mt-lg-0"> *@
+@*           <div class="block-2"> *@
+@*             <!-- heading --> *@
+@*             <h6>Resources</h6> *@
+@*             <!-- links --> *@
+@*             <ul> *@
+@*               <li><a href="sign-up.html">Singup</a></li> *@
+@*               <li><a href="sign-in.html">Login</a></li> *@
+@*               <li><a href="blog.html">Blog</a></li> *@
+@*             </ul> *@
+@*           </div> *@
+@*         </div> *@
+@*         <div class="col-lg-2 col-md-3 col-6 mt-5 mt-lg-0"> *@
+@*           <div class="block-2"> *@
+@*             <!-- heading --> *@
+@*             <h6>Company</h6> *@
+@*             <!-- links --> *@
+@*             <ul> *@
+@*               <li><a href="career.html">Career</a></li> *@
+@*               <li><a href="contact.html">Contact</a></li> *@
+@*               <li><a href="team.html">Investor</a></li> *@
+@*               <li><a href="privacy.html">Terms</a></li> *@
+@*             </ul> *@
+@*           </div> *@
+@*         </div> *@
+@*         <div class="col-lg-2 col-md-3 col-6 mt-5 mt-lg-0"> *@
+@*           <div class="block-2"> *@
+@*             <!-- heading --> *@
+@*             <h6>Company</h6> *@
+@*             <!-- links --> *@
+@*             <ul> *@
+@*               <li><a href="about.html">About</a></li> *@
+@*               <li><a href="contact.html">Contact</a></li> *@
+@*               <li><a href="team.html">Team</a></li> *@
+@*               <li><a href="privacy-policy.html">Privacy Policy</a></li> *@
+@*             </ul> *@
+@*           </div> *@
+@*         </div> *@
+@*       </div> *@
+@*     </div> *@
+@*   </div> *@
 
     <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
     <df-messenger intent="WELCOME"
@@ -563,13 +476,22 @@
                   chat-icon="https://img.icons8.com/?size=100&id=79708&format=png&color=FFFFFF">
     </df-messenger>
 
-  <div class="text-center bg-dark py-4">
-    <small class="text-secondary">Copyright &copy; <script>document.write(new Date().getFullYear())</script>. Designed &amp; Developed by <a href="https://themefisher.com/">Themefisher</a></small class="text-secondary">
-  </div>
+ <div class="text-center bg-dark py-4">
+	<small class="text-secondary">
+		Copyright &copy; 
+		<script>document.write(new Date().getFullYear())</script>. All rights reserved.
+		Built with by <a href="#">Mohit Mitesh Master</a>.
+	</small>
+</div>
 
-	<div class="text-center bg-dark py-1">
-   <small> <p>Distributed By <a href="https://themewagon.com/">Themewagon</a></p></small class="text-secondary">
-  </div>
+
+		<div class="text-center bg-dark py-1">
+			<small class="text-secondary">
+				<a href="#">Bugify</a> The Bug Tracking Sytem.
+				Customized and enhanced by <strong>Mohit Mitesh Master</strong>.
+			</small>
+		</div>
+
 </footer>
 
 
@@ -578,6 +500,8 @@
     <i class="ti-angle-up"></i>
   </div>
   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
   <!-- JAVASCRIPTS -->
   <script src="~/HomeAssets/plugins/jquery/jquery.min.js"></script>
   <script src="~/HomeAssets/plugins/bootstrap/bootstrap.min.js"></script>

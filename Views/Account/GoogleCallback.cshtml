@@ -1,69 +1,111 @@
-﻿﻿@{
+﻿@{
     Layout = null;
 }
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Google Sign-In</title>
+    <title>Signing in via Google | Bug Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Argon Dashboard CSS -->
+    <link href="~/argon-dashboard/assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
+    <link href="~/argon-dashboard/assets/vendor/nucleo/css/nucleo.css" rel="stylesheet" />
+    <link href="~/argon-dashboard/assets/vendor/fontawesome/fontawesome-free/css/all.min.css" rel="stylesheet" />
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body {
+            background-color: #f8f9fe;
+        }
+
+        .center-box {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            color: #5e72e4;
+        }
+
+        .custom-toast-popup {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        .custom-toast-title {
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
-    <div class="text-center mt-5">
-        <p>Signing you in via Google... Please wait.</p>
+
+    <div class="center-box">
+        <div class="mb-3">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Signing in...</span>
+            </div>
+        </div>
+        <h4 class="text-dark">Signing you in via Google</h4>
+        <p class="text-muted">Please wait while we verify your credentials...</p>
     </div>
 
     <script>
-        // Immediately fetch JSON from backend
         fetch("/account/google-callback")
             .then(res => res.json())
             .then(data => {
-                if(!data.success && !data.redirect)
-                {
-                    showToast(data.message, "error")
+                if (!data.success && !data.redirect) {
+                    showToast(data.message || "Google login failed.", "error");
                 }
+
                 if (data.success && data.redirect) {
                     window.location.href = data.redirect;
-                }
-                else if (!data.success && data.redirect) {
+                } else if (!data.success && data.redirect) {
                     window.location.href = data.redirect;
-                }
-                else if (!data.success) {
+                } else if (!data.success) {
                     setTimeout(() => {
-                        window.location.href = "/account/login"; // fallback
+                        window.location.href = "/account/login";
                     }, 3000);
                 }
             })
             .catch(err => {
-                alert("Unknown error occurred")
+                showToast("An unexpected error occurred.", "error");
                 console.error(err);
-                window.location.href = "/account/login";
+                setTimeout(() => {
+                    window.location.href = "/account/login";
+                }, 3000);
             });
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script>
         function showToast(message, icon = 'success') {
-          Swal.fire({
-            toast: true,
-            position: 'top-end',
-            icon: icon,
-            title: message,
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            customClass: {
-              popup: 'custom-toast-popup',
-              title: 'custom-toast-title'
-            },
-            iconColor: icon === 'success' ? '#28a745' :
-                      icon === 'error'   ? '#dc3545' :
-                      icon === 'warning' ? '#ffc107' : '#17a2b8',
-            didOpen: (toast) => {
-              toast.addEventListener('mouseenter', Swal.stopTimer);
-              toast.addEventListener('mouseleave', Swal.resumeTimer);
-            }
-          });
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: icon,
+                title: message,
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                customClass: {
+                    popup: 'custom-toast-popup',
+                    title: 'custom-toast-title'
+                },
+                iconColor: icon === 'success' ? '#2dce89' :
+                           icon === 'error'   ? '#f5365c' :
+                           icon === 'warning' ? '#fb6340' : '#11cdef',
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer);
+                    toast.addEventListener('mouseleave', Swal.resumeTimer);
+                }
+            });
         }
     </script>
 
