@@ -18,7 +18,7 @@
                         window.location.href = "/Projects/ProjectList";
                     }, 2000); // Redirect after 2 seconds
                 } else {
-                    showToast("error", response.message || "Something went wrong!");
+                    showToast("error", response.message);
                 }
             },
             error: function (xhr, status, error) {
@@ -106,17 +106,17 @@
     //    });
     //});
 
-    function showToast(message, type) {
-        Toastify({
-            text: message,
-            duration: 3000,
-            close: true,
-            gravity: "top",
-            position: "right",
-            backgroundColor: type === "success" ? "green" : "red",
-            stopOnFocus: true
-        }).showToast();
-    }
+    //function showToast(message, type) {
+    //    Toastify({
+    //        text: message,
+    //        duration: 3000,
+    //        close: true,
+    //        gravity: "top",
+    //        position: "right",
+    //        backgroundColor: type === "success" ? "green" : "red",
+    //        stopOnFocus: true
+    //    }).showToast();
+    //}
 
     
 

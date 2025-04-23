@@ -103,6 +103,8 @@ namespace Bug_Tracking_System.Controllers
                 _dbBug.Users.Update(user);
                 await _dbBug.SaveChangesAsync();
 
+                await _auditLogs.AddAuditLogAsync(user.UserId, $"User '{user.UserName}' logged in using Google account.", "Google Login");
+
                 return Json(new { success = true, message = "Login successful!", redirect = Url.Action("Dashboard", "Dashboard") });
             }
 
@@ -308,118 +310,138 @@ namespace Bug_Tracking_System.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginModel login)
         {
-            string RedirectTo = "Dashboard";
-
-            const int maxAttempts = 5; //Maximum allowed attempts
-            const int lockoutDurationSeconds = 300; //Lockout duration in seconds
-
-            //Define cache keys for tracking attempts and lockout status
-            var attemptKey = $"LoginAttempts_{login.EmailOrUsername}";
-            var lockoutKey = $"Lockout_{login.EmailOrUsername}";
-
-            //Check if the user is locked out
-            if(_memoryCache.TryGetValue(lockoutKey, out DateTime lockoutEndTime) && lockoutEndTime > DateTime.Now)
+            try
             {
-                var remainingTime = (int)(lockoutEndTime - DateTime.Now).TotalSeconds;
+                string RedirectTo = "Dashboard";
 
-                // ✅ Log lockout event
-                await _auditLogs.AddAuditLogAsync(0, $"Account locked for {login.EmailOrUsername}. Try again in {remainingTime} seconds.","Login");
+                const int maxAttempts = 5; //Maximum allowed attempts
+                const int lockoutDurationSeconds = 300; //Lockout duration in seconds
 
-                return Json(new { success = false, message = $"Account is locked. Try again in {remainingTime} seconds." });
-            }
-
-            //Authenticate the user
-            var result = await _login.AuthenticateUser(login.EmailOrUsername, login.Password);
-                      
-            //Set session if login was successful
-            if (((dynamic)result).success)
-            {
-                //Fetch user details and set session variables
-                string email = await _acc.fetchEmail(login.EmailOrUsername);
-                HttpContext.Session.SetString("UserEmail", email);
-
-
-
-                var data = await _acc.GetUserDataByEmail(email);
-
-                // ✅ Restriction Check BEFORE session is created
-                if (data.IsRestricted)
+                //Define cache keys for tracking attempts and lockout status
+                var attemptKey = $"LoginAttempts_{login.EmailOrUsername}";
+                var lockoutKey = $"Lockout_{login.EmailOrUsername}";
+                                
+                //Check if the user is locked out
+                if (_memoryCache.TryGetValue(lockoutKey, out DateTime lockoutEndTime) && lockoutEndTime > DateTime.Now)
                 {
-                    await _auditLogs.AddAuditLogAsync(data.UserId, $"Restricted user {data.UserName} attempted to login.", "Login");
-                    return Json(new { success = false, message = "Your account has been restricted. Please contact the administrator." });
+                    var remainingTime = (int)(lockoutEndTime - DateTime.Now).TotalSeconds;
+
+                    // ✅ Log lockout event
+                    await _auditLogs.AddAuditLogAsync(0, $"Account locked for {login.EmailOrUsername}. Try again in {remainingTime} seconds.", "Login");
+
+                    return Json(new { success = false, message = $"Account is locked. Try again in {remainingTime} seconds." });
                 }
 
+                // Check if user exists by Email or Username
+                var isUser = await _dbBug.Users
+                    .FirstOrDefaultAsync(u => u.Email == login.EmailOrUsername || u.UserName == login.EmailOrUsername);
 
-                //Successful login
-                HttpContext.Session.SetString("Cred", login.EmailOrUsername);
-
-                if(login.RememberMe)
+                if (isUser == null)
                 {
-                    var options = new CookieOptions
+                    return Json(new { success = false, message = "User not found. Please check your credentials." });
+                }
+
+                //Authenticate the user
+                var result = await _login.AuthenticateUser(login.EmailOrUsername, login.Password);
+
+
+                //Set session if login was successful
+                if (((dynamic)result).success)
+                {
+                    //Fetch user details and set session variables
+                    string email = await _acc.fetchEmail(login.EmailOrUsername);
+                    HttpContext.Session.SetString("UserEmail", email);
+
+
+                    var data = await _acc.GetUserDataByEmail(email);
+
+
+                    // ✅ Restriction Check BEFORE session is created
+                    if (data.IsRestricted)
                     {
-                        Expires = DateTime.Now.AddDays(7), // Cookie expiration time
-                        HttpOnly = true,                      // Secure the cookie
-                        Secure = true                         // Use HTTPS
-                    };
-
-                    Response.Cookies.Append("RememberMe_Email", login.EmailOrUsername, options);
-                    Response.Cookies.Append("RememberMe_Password", login.Password, options);
-
-                }
-                else
-                {
-                    Response.Cookies.Delete("RememberMe_Email");
-                    Response.Cookies.Delete("RememberMe_Password");
-                }
+                        await _auditLogs.AddAuditLogAsync(data.UserId, $"Restricted user {data.UserName} attempted to login.", "Login");
+                        return Json(new { success = false, message = "Your account has been restricted. Please contact the administrator." });
+                    }
 
 
-                int id = data.UserId;
-                HttpContext.Session.SetInt32("UserId", id);
-                HttpContext.Session.SetInt32("UserRoleId", (int)data.RoleId);
-                HttpContext.Session.SetString("UserName", data.UserName);
-                HttpContext.Session.SetString("UserImage", data.ProfileImage); // Assuming ProfileImage is a filename
+                    //Successful login
+                    HttpContext.Session.SetString("Cred", login.EmailOrUsername);
 
-                // ✅ Log successful login
-                await _auditLogs.AddAuditLogAsync(id, $"User {data.UserName} logged in successfully.","Login");
-
-                //Determine redirection based on user verification
-                if (data.RoleId != 4)
-                {
-                    if(await _acc.IsVerified(login.EmailOrUsername))
+                    if (login.RememberMe)
                     {
-                        if(data.RoleId != 4)
+                        var options = new CookieOptions
                         {
-                            RedirectTo = "Dashboard";
-                        }
+                            Expires = DateTime.Now.AddDays(7), // Cookie expiration time
+                            HttpOnly = true,                      // Secure the cookie
+                            Secure = true                         // Use HTTPS
+                        };
+
+                        Response.Cookies.Append("RememberMe_Email", login.EmailOrUsername, options);
+                        Response.Cookies.Append("RememberMe_Password", login.Password, options);
+
                     }
                     else
                     {
-                        RedirectTo = "OtpCheck";
+                        Response.Cookies.Delete("RememberMe_Email");
+                        Response.Cookies.Delete("RememberMe_Password");
                     }
-                }
 
-                if(RedirectTo == "OtpCheck")
-                {
-                    var user = await _dbBug.Users.FirstOrDefaultAsync(u => u.Email == email);
-                    if(user != null)
+
+                    int id = data.UserId;
+                    HttpContext.Session.SetInt32("UserId", id);
+                    HttpContext.Session.SetInt32("UserRoleId", (int)data.RoleId);
+                    HttpContext.Session.SetString("UserName", data.UserName);
+                    HttpContext.Session.SetString("UserImage", data.ProfileImage); // Assuming ProfileImage is a filename
+
+                    // ✅ Log successful login
+                    await _auditLogs.AddAuditLogAsync(id, $"User {data.UserName} logged in successfully.", "Login");
+
+                    //Determine redirection based on user verification
+                    if (data.RoleId != 4)
                     {
-                        user.Otp = _emailSender.GenerateOtp();
-                        user.OtpExpiry = DateTime.Now.AddMinutes(5);
-                        await _emailSender.SendEmailAsync(user.Email, "OTP Verification", user.Otp, "Registration");
-                        await _dbBug.SaveChangesAsync();
+                        if (await _acc.IsVerified(login.EmailOrUsername))
+                        {
+                            if (data.RoleId != 4)
+                            {
+                                RedirectTo = "Dashboard";
+                            }
+                        }
+                        else
+                        {
+                            RedirectTo = "OtpCheck";
+                        }
                     }
+
+                    if (RedirectTo == "OtpCheck")
+                    {
+                        var user = await _dbBug.Users.FirstOrDefaultAsync(u => u.Email == email);
+                        if (user != null)
+                        {
+                            user.Otp = _emailSender.GenerateOtp();
+                            user.OtpExpiry = DateTime.Now.AddMinutes(5);
+                            await _emailSender.SendEmailAsync(user.Email, "OTP Verification", user.Otp, "Registration");
+                            await _dbBug.SaveChangesAsync();
+                        }
+                    }
+
+                    //Reset login attempts after successful login
+                    _memoryCache.Remove(attemptKey);
+
+                    return Ok(new { success = true, message = "You are successfully logged in" });
                 }
 
-                //Reset login attempts after successful login
-                _memoryCache.Remove(attemptKey);
-
-                return Ok(new { success = true, message = "You are successfully logged in" });
+                else
+                {
+                    return Json(new { success = false, message = ((dynamic)result).message });
+                }
             }
-
-            else
+            catch(Exception ex)
             {
-                 return Json(new { success = false, message = ((dynamic)result).message });
+                // Optional: Log this exception
+                await _auditLogs.AddAuditLogAsync(0, $"Login error: {ex.Message}", "Login");
+                return Json(new { success = false, message = "An unexpected error occurred. Please try again later." });
             }
+            
 
         }
 

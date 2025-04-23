@@ -189,6 +189,12 @@ namespace Bug_Tracking_System.Repositories.ProjectsClasses
             return project;
         }
 
+        public async Task<bool> IsProjectExist(string projectname, int? projectId = null)
+        {
+            return await _dbBug.Projects
+                .AnyAsync(p => p.ProjectName == projectname && (!projectId.HasValue || p.ProjectId != projectId.Value));
+        }
+
         public async Task<object> UpdateStatus(int projectId, bool status)
         {
             var project = await _dbBug.Projects.FindAsync(projectId);

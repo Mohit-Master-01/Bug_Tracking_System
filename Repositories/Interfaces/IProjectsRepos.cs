@@ -15,6 +15,8 @@ namespace Bug_Tracking_System.Repositories.Interfaces
 
         Task<object> AddOrEditProject(Project projects);
 
+        Task<bool> IsProjectExist(string projectname, int? projectId = null);
+
         Task<bool> DeleteProject(int projectId);
 
         Task<List<Project>> GetUnassignedProjects();  // ✅ Get all unassigned (new) bugs

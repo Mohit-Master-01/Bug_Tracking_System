@@ -58,12 +58,35 @@
                                             <p><a href="~/Account/ForgotPassword" class="hover-a">Forgot Password?</a></p>
                                         </div>
                                     </div>
-                                    <div class="form-sociallink text-center">
-                                        <a href="/login-google" class="google-btn w-100 d-flex align-items-center justify-content-center p-2 rounded">
-                                            
-                                            Sign Up using Google
+
+                                    <div class="text-center my-4">
+                                        <a href="/login-google"
+                                           class="btn d-flex align-items-center justify-content-center rounded-pill w-100 px-4 py-2 shadow-sm"
+                                           style="background: linear-gradient(to right, #f5f6fa, #fff); border: 1px solid #dee2e6; transition: all 0.3s ease;">
+
+                                            <img src="https://img.icons8.com/color/24/000000/google-logo.png"
+                                                 class="me-2" alt="Google logo" style="width: 22px; height: 22px;">
+
+                                            <span class="text-dark fw-semibold fs-8">
+                                                Sign Up with Google
+                                            </span>
                                         </a>
                                     </div>
+
+                                    <style>
+                                        a.btn:hover {
+                                            background: linear-gradient(to right, #fff, #f5f6fa);
+                                            transform: translateY(-2px);
+                                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                                        }
+
+                                        a.btn:active {
+                                            transform: scale(0.98);
+                                            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+                                        }
+                                    </style>
+
+
                                         <div class="text-center">
                                         <button type="submit" id="btnLogin" class="btn btn-lg bg-gradient-dark btn-lg w-100 mt-2 mb-0">
                                                 <span class="spinner-border spinner-border-sm d-none" id="btnLoader" role="status" aria-hidden="true"></span>

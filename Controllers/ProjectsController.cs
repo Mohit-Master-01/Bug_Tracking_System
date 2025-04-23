@@ -91,6 +91,7 @@ namespace Bug_Tracking_System.Controllers
         [HttpPost,ActionName("AddOrEditProject")]
         public async Task<IActionResult> AddOrEditProject(Project projects)
         {
+
             // Ensure CreatedBy is always set before saving
             if (projects.CreatedBy == 0)
             {
@@ -114,6 +115,13 @@ namespace Bug_Tracking_System.Controllers
 
             try
             {
+                if (await _project.IsProjectExist(projects.ProjectName, projects.ProjectId))
+                {
+                    return Json(new { success = false, message = $"{projects.ProjectName} already exists." });
+                }
+
+
+
                 int userId = 2018;
 
                 var result = await _project.AddOrEditProject(projects);

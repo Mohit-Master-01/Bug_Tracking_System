@@ -59,6 +59,21 @@
                             return;
                         }
 
+                        else if(clickedDate > today)
+                        {
+                             Toastify({
+                                 text: "You cannot report bugs for future dates.",
+                                 duration: 3000,
+                                 close: true,
+                                 gravity: "top",
+                                 position: "right",
+                                 backgroundColor: "#dc3545", // Bootstrap red
+                                 stopOnFocus: true
+                             }).showToast();
+
+                             return;
+                        }
+
                         window.location.href = '/Bugs/SaveBug?date=' + info.dateStr;
        },
                 eventClick: function (info) {

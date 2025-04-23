@@ -6,7 +6,7 @@
 }
 
 <style>
-
+   
     .no-data-card {
         border: 1px solid #dee2e6;
         border-radius: 1rem;
@@ -96,6 +96,8 @@
         margin-top: 5px;
     }
 
+    
+
 </style>
 
 <div class="container-fluid" style="font-size: small">
@@ -121,28 +123,35 @@
                             <tbody>
                                 @foreach (var item in Model)
                                 {
-                                    <tr>
-                                        <td>@item.ProjectName</td>
-                                        <td style="padding-top: 29px;">@Html.Raw(item.Description)</td>
-                                        <td>@item.CreatedDate?.ToString("dd-MM-yyyy HH:mm")</td>
-                                        
-                                        <td data-status="@item.Status"></td>
+                                    <tr class="align-middle">
+                                        <td style="vertical-align: middle;">@item.ProjectName</td>
 
-                                        <!-- Completion Progress Bar -->
-                                        <td>
-                                            <div class="progress" style="height: 8px; margin-left: 55px;">
-                                                <div class="progress-bar @(item.Completion == 100 ? "bg-success" : "bg-primary")"
-                                                     role="progressbar"
-                                                     style="width: @item.Completion%;"
-                                                     aria-valuenow="@item.Completion"
-                                                     aria-valuemin="0"
-                                                     aria-valuemax="100">
-                                                </div>
-                                            </div>
-                                            <span class="completion-text">@item.Completion%</span>
+                                        <!-- Set a fixed max-width and wrap text in description -->
+                                        <td style="vertical-align: middle; max-width: 300px; word-wrap: break-word; white-space: normal;">
+                                            @Html.Raw(item.Description)
                                         </td>
 
-                                        <td>
+                                        <td style="vertical-align: middle;">@item.CreatedDate?.ToString("dd-MM-yyyy HH:mm")</td>
+
+                                        <td style="vertical-align: middle;" data-status="@item.Status"></td>
+
+                                        <!-- Progress bar: vertically center it and text -->
+                                        <td style="vertical-align: middle;">
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress" style="height: 8px; width: 100px;">
+                                                    <div class="progress-bar @(item.Completion == 100 ? "bg-success" : "bg-primary")"
+                                                         role="progressbar"
+                                                         style="width: @item.Completion%;"
+                                                         aria-valuenow="@item.Completion"
+                                                         aria-valuemin="0"
+                                                         aria-valuemax="100">
+                                                    </div>
+                                                </div>
+                                                <span class="ms-2">@item.Completion%</span>
+                                            </div>
+                                        </td>
+
+                                        <td style="vertical-align: middle;">
                                             <a asp-action="AssignProject" asp-route-id="@item.ProjectId" class="btn btn-sm btn-primary">
                                                 <i class="ni ni-send"></i> Assign Project
                                             </a>
@@ -150,6 +159,7 @@
                                     </tr>
                                 }
                             </tbody>
+
                         </table>
                     </div>
                 </div>

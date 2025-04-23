@@ -23,18 +23,18 @@
         quill.root.innerHTML = descriptionValue;
     }
 
-    // Sync Quill editor content to hidden input before form submit
-    $("form").on("submit", function () {
-        $("#Description").val(quill.root.innerHTML);
+    //// Sync Quill editor content to hidden input before form submit
+    //$("form").on("submit", function () {
+    //    $("#Description").val(quill.root.innerHTML);
 
-        // Perform front-end validation
-        if (!validateForm()) {
-            return false;  // Prevent form submission
-        }
-    });
+    //    // Perform front-end validation
+    //    if (!validateForm()) {
+    //        return false;  // Prevent form submission
+    //    }
+    //});
 
     // Sync Quill editor content to hidden input before form submit
-    $("BugForm").on("submit", function () {
+    $("#BugForm").on("submit", function () {
         $("#Description").val(quill.root.innerHTML);
 
         // Perform front-end validation
@@ -72,10 +72,12 @@
         }
     });
 
-    // Form Validation
+
+
+    // Full Form Validation
     function validateForm() {
         let isValid = true;
-        $(".error-message").remove(); // Clear previous errors
+        $(".error-message").remove();
 
         let title = $("#Title").val().trim();
         let description = quill.root.innerHTML.trim();
@@ -114,9 +116,43 @@
             isValid = false;
         }
 
+        // Attachments validation
+        if (!validateAttachments()) {
+            isValid = false;
+        }
+
         if (isValid) {
             showToast("Bug report saved successfully!", "success");
         }
+
+        return isValid;
+    }
+
+    // Attachment Validation Function
+    function validateAttachments() {
+        let isValid = true;
+        let allowedExtensions = [".jpg", ".jpeg", ".png", ".pdf", ".docx"];
+        let maxFileSize = 5 * 1024 * 1024; // 5MB
+
+        $(".attachment-input").each(function () {
+            let files = $(this).prop("files");
+            if (files.length > 0) {
+                for (let i = 0; i < files.length; i++) {
+                    let file = files[i];
+                    let fileExtension = "." + file.name.split('.').pop().toLowerCase();
+
+                    if (!allowedExtensions.includes(fileExtension)) {
+                        showToast(`Invalid file type: ${file.name}`, "error");
+                        isValid = false;
+                    }
+
+                    if (file.size > maxFileSize) {
+                        showToast(`File too large: ${file.name}`, "error");
+                        isValid = false;
+                    }
+                }
+            }
+        });
 
         return isValid;
     }
