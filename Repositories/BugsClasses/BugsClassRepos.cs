@@ -9,6 +9,7 @@ using X.PagedList;
 using X.PagedList.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.Build.Evaluation;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 
 namespace Bug_Tracking_System.Repositories.BugsClasses
@@ -18,62 +19,87 @@ namespace Bug_Tracking_System.Repositories.BugsClasses
         private readonly DbBug _dbBug;
         private readonly IWebHostEnvironment _env;
         private readonly INotificationRepos _notification;
+        private readonly IAuditLogsRepos _auditLogs;
 
 
-        public BugsClassRepos(DbBug dbBug, INotificationRepos notification,  IWebHostEnvironment env)
+        public BugsClassRepos(DbBug dbBug, IAuditLogsRepos auditLogs, INotificationRepos notification,  IWebHostEnvironment env)
         {
             _dbBug = dbBug;       
             _env = env;
             _notification = notification;
+            _auditLogs = auditLogs;
         }
 
-        
+
         public async Task<bool> AssignBugToDeveloper(int bugId, int developerId, int assignedBy)
         {
-            var user = await _dbBug.Users.FirstOrDefaultAsync(u => u.UserId == developerId);
-            if (user == null) return false;
-
-            var bug = await _dbBug.Bugs.FindAsync(bugId);
-            if (bug == null) return false;
-
-            var assignment = new TaskAssignment
+            try
             {
-                BugId = bugId,
-                AssignedTo = developerId,
-                AssignedBy = assignedBy,
-                ProjectManagerId = assignedBy, // 🔹 Provide a default or correct value
-                AssignedDate = DateTime.Now,
-                CompletionDate = null, // 🔹 If nullable, set explicitly
-                ProjectId = bug.ProjectId // 🔹 Ensure it matches related bug project
-            };
+                // 🔍 Fetch Bug along with Project and TaskAssignments in one go
+                var bug = await _dbBug.Bugs
+                    .Include(b => b.TaskAssignments)
+                    .FirstOrDefaultAsync(b => b.BugId == bugId);
 
-            await _dbBug.TaskAssignments.AddAsync(assignment);
+                if (bug == null) return false;
 
-            // Update Bug Status
-            var assignedStatus = await _dbBug.BugStatuses
-                .Where(s => s.StatusId == 2) // Status: Assigned
-                .Select(s => s.StatusId)
-                .FirstOrDefaultAsync();
+                // 🔍 Check Developer Exists
+                var developer = await _dbBug.Users
+                    .FirstOrDefaultAsync(u => u.UserId == developerId);
 
-            if (assignedStatus > 0)
-            {
-                bug.StatusId = assignedStatus;
+                var assigner = await _dbBug.Users.FirstOrDefaultAsync(u => u.UserId == assignedBy);
+
+
+                if (developer == null) return false;
+
+                // 🔥 Create Assignment
+                var assignment = new TaskAssignment
+                {
+                    BugId = bugId,
+                    AssignedTo = developerId,
+                    AssignedBy = assignedBy,
+                    ProjectManagerId = assignedBy,
+                    ProjectId = bug.ProjectId,
+                    AssignedDate = DateTime.UtcNow,
+                    CompletionDate = null
+                };
+
+                // ✅ Attach assignment via navigation property
+                bug.TaskAssignments.Add(assignment);
+
+                // ✅ Update Bug Status to "Assigned" (StatusId = 2)
+                bug.StatusId = await _dbBug.BugStatuses
+                    .Where(s => s.StatusId == 2)
+                    .Select(s => s.StatusId)
+                    .FirstOrDefaultAsync();
+
+                // 🛠 (Optional) Update developer's latest BugId if needed
+                developer.BugId = bugId;
+
+                // 🚀 Save all together
+                await _dbBug.SaveChangesAsync();
+
+                // 🔔 Send Notification (Post Save)
+                await _notification.AddNotification(
+                    userId: developerId,
+                    type: 1,
+                    message: "A new bug has been assigned to you!",
+                    relatedId: bugId,
+                moduleType: "Bug"
+                );
+
+                await _auditLogs.AddAuditLogAsync(assignedBy, $"Bug ID {bugId} assigned to Developer ID {developerId}", "Assign Bug");
+
+
+                return true;
             }
-
-            user.BugId = bugId;
-
-            await _dbBug.SaveChangesAsync();
-
-            await _notification.AddNotification(
-            userId: developerId,
-            type: 1,
-            message: "A new bug has been assigned to you!",
-            relatedId: bugId,
-            moduleType: "Bug"
-            );
-
-            return true;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in AssignBugToDeveloper: {ex.Message}");
+                return false;
+            }
         }
+
+
 
         public async Task<bool> DeleteBug(int bugId)
         {

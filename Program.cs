@@ -24,7 +24,12 @@ builder.Services.AddSingleton<IEmailSenderRepos, EmailSenderClassRepos>(); // Em
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddSignalR();
+
+builder.Services.AddSignalR()
+        .AddHubOptions<NotificationHub>(options => {
+            options.ClientTimeoutInterval = TimeSpan.FromMinutes(1); // optional tuning
+        });
+
 builder.Services.AddScoped<IAccountRepos, AccountClassRepos>();
 builder.Services.AddScoped<ILoginRepos, LoginClassRepos>();
 builder.Services.AddScoped<ISidebarRepos, SidebarClassRepos>();

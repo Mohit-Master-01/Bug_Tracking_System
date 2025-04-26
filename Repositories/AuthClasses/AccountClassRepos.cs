@@ -166,6 +166,7 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
         public async Task<User> GetUserById(int userId)
         {
             return await _bug.Users
+                .Include(u => u.UserProjects)   
                 .Where(u => u.UserId == userId)
                 .FirstOrDefaultAsync();
         }

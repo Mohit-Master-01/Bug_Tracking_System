@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Bug_Tracking_System.Controllers
 {
-    [Authorize]
+    
     public class NotificationController : BaseController
     {
         private readonly INotificationRepos _notification;
@@ -55,16 +55,19 @@ namespace Bug_Tracking_System.Controllers
             return Ok(new { success = true });
         }
 
-        [HttpGet,ActionName("Notifications")]
+        [HttpGet, ActionName("Notifications")]
         public async Task<IActionResult> GetUnreadNotifications()
         {
             try
             {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userId))
-                    return Unauthorized(new { error = "User not authenticated" });
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                var notifications = await _notification.GetNotificationByIdAsync(int.Parse(userId));
+                if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out var userId))
+                {
+                    return Unauthorized(new { error = "User not authenticated" });
+                }
+
+                var notifications = await _notification.GetNotificationByIdAsync(userId);
                 return Json(notifications);
             }
             catch (Exception ex)
@@ -74,15 +77,32 @@ namespace Bug_Tracking_System.Controllers
         }
 
 
+
+
         [HttpGet]
         public async Task<IActionResult> GetUnreadCount()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
+            try
+            {
+                if (!User.Identity.IsAuthenticated)
+                {
+                    return Json(new { count = 0 }); // return 0 if not authenticated
+                }
 
-            int count = await _notification.GetUnreadNotificationCountAsync(int.Parse(userId));
-            return Json(new { count = count }); // Ensure "count" key is present in response
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out var userId))
+                {
+                    return Json(new { count = 0 });
+                }
+
+                int count = await _notification.GetUnreadNotificationCountAsync(userId);
+                return Json(new { count = count });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
         }
 
     }

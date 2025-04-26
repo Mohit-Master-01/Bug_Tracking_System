@@ -5,15 +5,20 @@
 
     async function fetchNotifications() {
         try {
-            const response = await fetch('/Notification/GetUnreadNotifications');
+            const response = await fetch('/Notification/Notifications', {
+                method: 'GET',
+                credentials: 'include'
+            });
 
             if (!response.ok) {
-                throw new Error(`Server error: ${response.status}`);
+                console.warn(`Server error: ${response.status}`);
+                return; // Just exit silently, don't crash
             }
 
-            const contentType = response.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                throw new Error("Invalid response format");
+            const contentType = response.headers.get("content-type") || "";
+            if (!contentType.includes("application/json")) {
+                console.warn("Invalid response format (not JSON)");
+                return;
             }
 
             const notifications = await response.json();
@@ -36,13 +41,25 @@
         }
     }
 
-
     async function updateNotificationCount() {
         try {
-            const response = await fetch('/Notification/GetUnreadCount');
-            const data = await response.json();
+            const response = await fetch('/Notification/GetUnreadCount', {
+                method: 'GET',
+                credentials: 'include'
+            });
 
-            console.log("Notification count:", data.count); // Debugging
+            if (!response.ok) {
+                console.warn(`Server error: ${response.status}`);
+                return;
+            }
+
+            const contentType = response.headers.get("content-type") || "";
+            if (!contentType.includes("application/json")) {
+                console.warn("Invalid response format (not JSON)");
+                return;
+            }
+
+            const data = await response.json();
 
             if (data.count > 0) {
                 notificationCount.style.display = "inline";
@@ -57,19 +74,44 @@
 
     notificationList.addEventListener("click", async function (event) {
         if (event.target.classList.contains("notification-item")) {
+            event.preventDefault();
             const notificationId = event.target.getAttribute("data-id");
 
             try {
-                await fetch(`/Notification/MarkAsRead?notificationId=${notificationId}`, { method: "POST" });
-                fetchNotifications(); // Refresh notifications after marking as read
-                updateNotificationCount();
+                await fetch(`/Notification/MarkAsRead?notificationId=${notificationId}`, {
+                    method: "POST",
+                    credentials: 'include'
+                });
+                await fetchNotifications();
+                await updateNotificationCount();
             } catch (error) {
                 console.error("Error marking notification as read:", error);
             }
         }
     });
 
-    notificationDropdown.addEventListener("click", fetchNotifications);
-    fetchNotifications(); // Initial Load
-    updateNotificationCount(); // Update Count on Page Load
+    notificationDropdown.addEventListener("click", function (event) {
+        event.preventDefault();
+        fetchNotifications();
+    });
+
+    fetchNotifications();
+    updateNotificationCount();
+
+    // === SignalR Real-Time Setup ===
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/NotificationHub")
+        .build();
+
+    connection.start()
+        .then(() => {
+            console.log("SignalR Connected to NotificationHub!");
+        })
+        .catch(err => console.error("SignalR Connection Error: ", err));
+
+    connection.on("ReceiveNotification", function (message) {
+        console.log("New notification received:", message);
+        fetchNotifications();
+        updateNotificationCount();
+    });
 });

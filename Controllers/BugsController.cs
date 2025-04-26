@@ -109,7 +109,7 @@ namespace Bug_Tracking_System.Controllers
             }
         }
 
-      
+
         //[HttpGet]
         //public async Task<IActionResult> BugList(int? page)
         //{
@@ -234,6 +234,23 @@ namespace Bug_Tracking_System.Controllers
                     {
                         DateTime = DateTime.Now.AddHours(1),
                         TimeZone = "Asia/Kolkata"
+                    },
+                    Reminders = new Event.RemindersData()
+                    {
+                        UseDefault = false, // 👈 Do NOT use default reminders
+                        Overrides = new List<EventReminder>()
+                        {
+                            new EventReminder()
+                            {
+                                Method = "popup", // or "email" if you want email notification
+                                Minutes = 30      // 👈 Reminder 15 minutes before
+                            },
+                            new EventReminder()
+                            {
+                                Method = "email", // Send an email
+                                Minutes = 30
+                            }
+                        }
                     }
                 };
 
@@ -266,7 +283,7 @@ namespace Bug_Tracking_System.Controllers
                     return NotFound();
                 }
 
-               
+
 
                 ViewBag.StatusList = new SelectList(await _dbBug.BugStatuses.ToListAsync(), "StatusId", "StatusName");
 
@@ -644,60 +661,76 @@ namespace Bug_Tracking_System.Controllers
         [HttpPost]
         public async Task<IActionResult> AssignBug(int bugId, int developerId)
         {
-            int? userId = HttpContext.Session.GetInt32("UserId");
-
-            if (userId == null)
+            try
             {
-                return Json(new { success = false, message = "User session expired. Please log in again." });
-            }
+                int? userId = HttpContext.Session.GetInt32("UserId");
 
-            var bugid = await _bug.GetBugById(bugId);
-            var developerid = await _acc.GetUserById(developerId);
-
-            if (bugid == null || developerid == null)
-            {
-                await _auditLog.AddAuditLogAsync(userId.Value, $"Attempted to assign Bug ID {bugId} to Developer ID {developerId}, but bug or developer was not found.", "Assign Bug");
-
-                return Json(new { success = false, message = "Invalid bug or developer selected." });
-            }
-
-            // 🚨 Validate Project Match
-            if (bugid.ProjectId != developerid.ProjectId)
-            {
-                await _auditLog.AddAuditLogAsync(userId.Value, $"Attempted to assign Bug ID {bugId} to Developer ID {developerId}, but developer not in same project.", "Assign Bug");
-
-                return Json(new { success = false, message = "This developer is not assigned to the same project as this bug. Assignment denied." });
-            }
-
-            var success = await _bug.AssignBugToDeveloper(bugId, developerId, userId.Value);
-
-            if (success)
-            {
-                var bug = await _bug.GetBugById(bugId);
-                var developer = await _acc.GetUserById(developerId);
-                var manager = await _acc.GetUserById(userId.Value);
-
-                if (bug != null && developer != null && manager != null)
+                if (userId == null)
                 {
-                    string emailBody = $@"
+                    return Json(new { success = false, message = "User session expired. Please log in again." });
+                }
+
+                var bugid = await _dbBug.Bugs
+                            .Include(b => b.Project)
+                            .Include(b => b.TaskAssignments)
+                                .ThenInclude(t => t.AssignedToNavigation) // or AssignedByNavigation, if needed
+                            .Where(b => b.BugId == bugId)
+                            .FirstOrDefaultAsync();
+
+
+                var developerid = await _acc.GetUserById(developerId);
+
+                if (bugid == null || developerid == null)
+                {
+                    await _auditLog.AddAuditLogAsync(userId.Value, $"Attempted to assign Bug ID {bugId} to Developer ID {developerId}, but bug or developer was not found.", "Assign Bug");
+
+                    return Json(new { success = false, message = "Invalid bug or developer selected." });
+                }
+
+                // ✅ Check if developer is assigned to the same project
+                bool isInSameProject = developerid.UserProjects?.Any(up => up.ProjectId == bugid.ProjectId) == true;
+
+                if (!isInSameProject)
+                {
+                    await _auditLog.AddAuditLogAsync(userId.Value, $"Attempted to assign Bug ID {bugId} to Developer ID {developerId}, but developer is not assigned to this project.", "Assign Bug");
+
+                    return Json(new { success = false, message = "This developer is not assigned to the same project as this bug. Assignment denied." });
+                }
+
+
+                var success = await _bug.AssignBugToDeveloper(bugId, developerId, userId.Value);
+
+                if (success)
+                {
+                    var bug = await _bug.GetBugById(bugId);
+                    var developer = await _acc.GetUserById(developerId);
+                    var manager = await _acc.GetUserById(userId.Value);
+
+                    if (bug != null && developer != null && manager != null)
+                    {
+                        string emailBody = $@"
                 <p><b>Bug Title:</b> {bug.Title}</p>
                 <p><b>Assigned By:</b> {manager.UserName}</p>
                 <p><b>Reported Date:</b> {bug.CreatedDate:yyyy-MM-dd}</p>
                 <p><b>Description:</b> {bug.Description}</p>
             ";
 
-                    await _emailSender.SendEmailAsync(developer.Email, "New Bug Assigned - Bugify", emailBody, "AssignBug");
+                        await _emailSender.SendEmailAsync(developer.Email, "New Bug Assigned - Bugify", emailBody, "AssignBug");
+                    }                    
                 }
 
-                await _notification.AddNotification(userId.Value, 1, "You have been assigned a new bug!", bugId, "Bug");
-
-
-                await _auditLog.AddAuditLogAsync(userId.Value, $"Bug ID {bugId} assigned to Developer ID {developerId}", "Assign Bug");
-
+                return Json(new { success = true, message = "Bug assigned successfully!" });
             }
+            catch (Exception ex)
+            {
+                int? userId = HttpContext.Session.GetInt32("UserId");
+                if (userId.HasValue)
+                {
+                    await _auditLog.AddAuditLogAsync(userId.Value, $"Exception during bug assignment: {ex.Message}", "Assign Bug");
+                }
 
-
-            return Json(new { success = true, message = "Bug assigned successfully!" });
+                return Json(new { success = false, message = "An error occurred while assigning the bug. Please try again later." });
+            }
         }
 
         [HttpPost]

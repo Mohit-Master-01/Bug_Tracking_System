@@ -209,7 +209,7 @@ public partial class DbBug : DbContext
 
             entity.HasOne(d => d.Bug).WithMany(p => p.TaskAssignments)
                 .HasForeignKey(d => d.BugId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_Task_Bug");
 
             entity.HasOne(d => d.Project).WithMany(p => p.TaskAssignments)
