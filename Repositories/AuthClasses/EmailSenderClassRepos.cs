@@ -233,7 +233,34 @@ namespace Bug_Tracking_System.Repositories.AuthClasses
     </html>";
                 }
 
-                var bodyBuilder = new BodyBuilder { HtmlBody = emailBody };
+                else if (emailType == "ZoomMeetingInvitation")
+                {
+                    emailBody = $@"
+                                <html>
+                                    <head>
+                                        <style>
+                                            body {{ font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; }}
+                                            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }}
+                                            .header {{ text-align: center; margin-bottom: 20px; }}
+                                            .content {{ font-size: 16px; line-height: 1.5; }}
+                                            .info {{ font-size: 18px; font-weight: bold; color: #333; margin: 20px 0; }}
+                                            .footer {{ text-align: center; font-size: 12px; color: #888; margin-top: 20px; }}
+                                            a.button {{ display: inline-block; padding: 10px 20px; margin-top: 20px; font-size: 16px; color: #fff; background-color: #007bff; border-radius: 5px; text-decoration: none; }}
+                                            a.button:hover {{ background-color: #0056b3; }}
+                                        </style>
+                                    </head>
+                                    <body>
+                                        <div class='container'>
+                                            <div class='header'>
+                                                <h2>Zoom Meeting Invitation - Bugify</h2>
+                                            </div>
+                                            {body}
+                                        </div>
+                                    </body>
+                                </html>";
+                }
+
+                    var bodyBuilder = new BodyBuilder { HtmlBody = emailBody };
                 message.Body = bodyBuilder.ToMessageBody();
 
                 using (var smtpClient = new SmtpClient())

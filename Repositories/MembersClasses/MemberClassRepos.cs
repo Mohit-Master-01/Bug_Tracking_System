@@ -383,6 +383,7 @@ namespace Bug_Tracking_System.Repositories.MembersClasses
 
                 member.IsAdmin = false;
                 member.IsActive = true;
+                member.IsGoogleAccount = true;
 
                 if (isNewMember)
                 {

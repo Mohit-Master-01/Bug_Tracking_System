@@ -597,7 +597,7 @@ namespace Bug_Tracking_System.Controllers
                         <p>We look forward to your contributions!</p>
                     </div>
                     <div class='footer'>
-                        &copy; {DateTime.Now.Year} Bugify. All rights reserved.
+                        &copy; {DateTime.Now.Year} Bugify. All rights reserved. 
                     </div>
                 </div>";
 

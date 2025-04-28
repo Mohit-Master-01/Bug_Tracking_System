@@ -44,15 +44,27 @@
         <div class="card-header text-white d-flex justify-content-between align-items-center">
             <h4 class="mb-0">Members List</h4>
 
-            @if (ViewBag.PermissionType != "canView")
-            {
-                <a asp-action="SaveMember" class="btn btn-light btn-sm text-primary" style="margin-right: -769px;">
-                    <i class="fas fa-plus"></i> Add New Member
-                </a>
-            }
-            <button id="exportProductsBtn" class="btn btn-success"><i class="fas fa-file-excel"></i></button>
+            <div class="d-flex align-items-center gap-2">
 
+                @if (ViewBag.PermissionType != "canView")
+                {
+                    <a asp-action="SaveMember" class="btn btn-light btn-sm text-primary">
+                        <i class="fas fa-user-plus"></i> Add New Member
+                    </a>
+                }
+
+                <button id="createMeetingBtn" class="btn btn-primary btn-sm">
+                    <i class="fas fa-video" style="margin-right: 5px;"></i>
+                    Schedule a Zoom Meeting
+                </button>
+
+                <button id="exportProductsBtn" class="btn btn-success btn-sm">
+                    <i class="fas fa-file-excel"></i>
+                </button>
+
+            </div>
         </div>
+
         <div class="card-body">
 
             <div class="row mb-3">
@@ -248,7 +260,49 @@
             memberTable.draw(); // Redraw to remove filters
         });
 
-       
+           document.getElementById('createMeetingBtn').addEventListener('click', async function () {
+            const { value: formValues } = await Swal.fire({
+                title: 'Create Zoom Meeting',
+                html:
+                    '<input id="swal-topic" class="swal2-input" placeholder="Meeting Topic">' +
+                    '<input id="swal-starttime" type="datetime-local" class="swal2-input" placeholder="Start Time">',
+                focusConfirm: false,
+                preConfirm: () => {
+                    return [
+                        document.getElementById('swal-topic').value,
+                        document.getElementById('swal-starttime').value
+                    ];
+                }
+            });
+
+            if (formValues) {
+                const [topic, startTime] = formValues;
+
+                if (!topic || !startTime) {
+                    Swal.fire('Error', 'Please enter all fields', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/Zoom/CreateMeeting', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ topic, startTime })
+                    });
+
+                    if (!response.ok) throw new Error('Failed to create meeting.');
+
+                    const data = await response.json();
+
+                    Swal.fire('Meeting Created And Added To Google Calendar', `<a href="${data.meetingUrl}" target="_blank" style="font-weight:bold; font-size:18px; color:#3085d6; text-decoration:underline;">Join Meeting</a>`, 'success');
+                        }
+                catch (error) {
+                    Swal.fire('Error', error.message, 'error');
+                }
+            }
+        });
 
              $(document).ready(function () {
             $('.toggle-restriction').click(function (e) {

@@ -44,6 +44,7 @@ builder.Services.AddScoped<IImportRepos, ImportClassRepos>();
 builder.Services.AddScoped<IExportRepos, ExportClassRepos>();
 builder.Services.AddScoped<IDashboardRepos, DashboardClassRepos>();
 builder.Services.AddScoped<GoogleCalendarService>();
+builder.Services.AddScoped<ZoomService>();
 
 
 
