@@ -97,6 +97,19 @@ namespace Bug_Tracking_System.Controllers
                 HttpContext.Session.SetString("UserImage", user.ProfileImage);
 
 
+                // Sign in with identity cookie
+                var claims = new List<Claim>
+                            {
+                                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+                                new Claim(ClaimTypes.Name, user.UserName),
+                                new Claim(ClaimTypes.Email, user.Email),
+                                new Claim(ClaimTypes.Role, user.RoleId.ToString())
+                            };
+
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
 
                 // Optional: Update login time
                 user.LastLogin = DateTime.UtcNow;

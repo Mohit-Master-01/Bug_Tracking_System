@@ -27,17 +27,19 @@ namespace Bug_Tracking_System.Repositories
         private readonly DbBug _dbBug;
         private readonly SmtpSettings _smtpSettings;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly INotificationRepos _notification;
         //private readonly IAuditLogsRepos _auditLogs;
 
         private readonly string _accountId = "kuMeAgwfQp-NbfmTcwyPQw";
         private readonly string _clientId = "iv4vgzdgTU6BLtKymROohg";
         private readonly string _clientSecret = "0WZ6uNqYaTgT3QUf3pYZD3NChZNgnDqm";
 
-        public ZoomService(DbBug dbBug, IOptions<SmtpSettings> smtpSettings, IHttpContextAccessor httpContextAccessor)
+        public ZoomService(DbBug dbBug, INotificationRepos notificationRepos, IOptions<SmtpSettings> smtpSettings, IHttpContextAccessor httpContextAccessor)
         {
             _dbBug = dbBug;
             _smtpSettings = smtpSettings.Value;
             _httpContextAccessor = httpContextAccessor;
+            _notification = notificationRepos;
             // _auditLogs = auditLogs;
         }
 
@@ -113,6 +115,22 @@ namespace Bug_Tracking_System.Repositories
 
                 // 📢 Now create Google Calendar event
                 await CreateGoogleCalendarEventForMeeting(topic, startTime, joinUrl);
+
+                // ✅ Send Notification to all active users
+                var activeUsers = await _dbBug.Users
+                    .Where(u => (bool)u.IsActive && !string.IsNullOrEmpty(u.Email)) // or your own logic
+                    .ToListAsync();
+
+                foreach (var user in activeUsers)
+                {
+                    await _notification.AddNotification(
+                        user.UserId,
+                        type: 2, // You can define a custom type for meetings
+                        message: $"📢 A Zoom meeting '{meetingTopic}' has been scheduled at {startTime:hh:mm tt}.",
+                        relatedId: 0, // Optional: You can store Meeting ID if you want
+                        moduleType: "Meeting"
+                    );
+                }
 
                 return joinUrl;
             }

@@ -6,10 +6,12 @@ using Bug_Tracking_System.Repositories.BugsClasses;
 using Bug_Tracking_System.Repositories.Interfaces;
 using Bug_Tracking_System.Repositories.MembersClasses;
 using Bug_Tracking_System.Repositories.ProjectsClasses;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Mail;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +28,8 @@ builder.Services.AddSingleton<IEmailSenderRepos, EmailSenderClassRepos>(); // Em
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddSignalR()
-        .AddHubOptions<NotificationHub>(options => {
+        .AddHubOptions<NotificationHub>(options =>
+        {
             options.ClientTimeoutInterval = TimeSpan.FromMinutes(1); // optional tuning
         });
 
@@ -87,6 +90,10 @@ builder.Services.AddAuthentication(options =>
     options.Scope.Add("https://www.googleapis.com/auth/calendar");
 
     options.SaveTokens = true; // ?? REQUIRED for access_token   
+
+    options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "sub"); // ? This is critical
+    options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
+    options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
 
 });
 
