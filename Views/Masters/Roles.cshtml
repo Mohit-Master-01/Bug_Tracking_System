@@ -85,7 +85,45 @@
 </div>
 
 @section Scripts {
-    
+
+    <!-- Toastr CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+
+    <script>
+                     function showToast(type, message, onComplete) {
+            console.log("Toast type received:", type);
+
+            const validTypes = ["success", "error", "info", "warning"];
+            if (!validTypes.includes(type)) {
+                console.warn("Invalid toast type:", type);
+                type = "info";
+            }
+
+        toastr.options = {
+                closeButton: true,
+                progressBar: true,
+                positionClass: "toast-top-right",
+                timeOut: 4000,              // Show toast for 4 seconds
+                extendedTimeOut: 1000,      // Delay if hovered
+                showDuration: 300,
+                hideDuration: 1000,
+                showMethod: "fadeIn",
+                hideMethod: "fadeOut",
+                onShown: function () {
+                    $(".toast").css("opacity", "1"); // Force opacity to full
+                }
+            };
+
+            toastr[type](message);
+        }
+
+
+    </script>
+
     <script>
         function editCategory(id, name, isActive) {
             document.getElementById("RoleId").value = id;
@@ -93,7 +131,7 @@
             document.getElementById("IsActive").checked = isActive === "True";
         }
 
-        $(document).ready(function () {
+               $(document).ready(function () {
             $("#btnSaveRoles").click(function (e) {
                 e.preventDefault();
 
@@ -113,8 +151,10 @@
                     contentType: "application/json",
                     data: JSON.stringify(data),
                     success: function (response) {
-                        alert("Role saved successfully!");
-                        location.reload();
+                        showToast("success", "Role saved successfully!");
+                        setTimeout(function () {
+                            location.reload();
+                        }, 3000);
                     },
                     error: function (xhr, status, error) {
                         console.error("Error:", xhr.responseText);
@@ -123,5 +163,6 @@
                 });
             });
         });
+
     </script>
 }

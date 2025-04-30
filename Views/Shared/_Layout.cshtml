@@ -348,14 +348,21 @@
                     </li>
 
                     <li class="nav-item dropdown" style="margin-top: 4px; position: relative;">
-                        <a href="#" class="nav-link text-white p-0" id="notificationDropdown" data-bs-toggle="dropdown">
-                            <i class="fas fa-bell cursor-pointer"></i>
-                            <span id="notificationCount" class="badge bg-danger" style="display: none; position: absolute; top: -5px; right: -5px;">0</span>
+                        <a href="#" class="nav-link text-white p-0 position-relative" id="notificationDropdown" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell fa-lg"></i>
+                            <span id="notificationCount"
+                                  class="badge bg-danger rounded-circle position-absolute"
+                                  style="top: -6px; right: -12px; font-size: 0.7rem; padding: 4px 6px; display: none;">
+                                1
+                            </span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end" id="notificationList">
+                        <ul class="dropdown-menu dropdown-menu-end" id="notificationList"
+                            style="max-height: 300px; overflow-y: auto; width: 300px;">
                             <li><a class="dropdown-item text-center" href="#">No new notifications</a></li>
                         </ul>
                     </li>
+
+
 
 
                     <li class="nav-item px-3" style="margin-top: 4px">

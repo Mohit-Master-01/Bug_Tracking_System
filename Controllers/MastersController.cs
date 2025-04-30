@@ -50,11 +50,19 @@ namespace Bug_Tracking_System.Controllers
         {
             if (role.RoleId == 0)
             {
+                role.IsDelete = false; // Ensure it's 0 when inserting new role too
                 _bug.Roles.Add(role);
             }
             else
             {
-                _bug.Roles.Update(role);
+                var existingRole = _bug.Roles.FirstOrDefault(r => r.RoleId == role.RoleId);
+                if (existingRole != null)
+                {
+                    existingRole.RoleName = role.RoleName;
+                    existingRole.IsActive = role.IsActive;
+                    existingRole.IsDelete = false; // Explicitly set IsDelete to 0 when updating
+                    _bug.Roles.Update(existingRole);
+                }
             }
             _bug.SaveChanges();
             return Ok();

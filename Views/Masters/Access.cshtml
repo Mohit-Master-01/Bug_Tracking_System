@@ -126,6 +126,41 @@
 </div>
 
 @section Scripts {
+
+    <!-- Toastr CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+
+    <script>
+                 function showToast(type, message) {
+            console.log("Toast type received:", type); // Debug
+
+            // Validate the type
+            const validTypes = ["success", "error", "info", "warning"];
+            if (!validTypes.includes(type)) {
+                console.warn("Invalid toast type:", type);
+                type = "info"; // fallback to info
+            }
+
+            toastr.options = {
+                closeButton: true,
+                progressBar: true,
+                positionClass: "toast-top-right",
+                timeOut: 6000
+            };
+            toastr[type](message);
+        }
+
+                toastr.options.onShown = function () {
+            $(".toast").css("opacity", "0.95"); // Dynamically sets opacity on display
+        };
+
+
+    </script>
+
     <script src="/js/PermissionMaster.js"></script>
     <script>
         function filterTable() {
