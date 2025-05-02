@@ -173,24 +173,38 @@ namespace Bug_Tracking_System.Repositories
 
                         // Correctly use the body
                         string body = $@"
-                    <div class='container'>                                    
-                        <div class='content'>
-                            <p>Dear {member.UserName},</p>
-                            <p>We are excited to invite you to a <b>Zoom Meeting</b> scheduled as follows:</p>
-                            <div class='info'>
-                                <p><b>Meeting Topic:</b> {topic}</p>
-                                <p><b>Date and Time:</b> {startTime:dd-MM-yyyy hh:mm tt}</p>
-                                <p><b>Timezone:</b> Asia/Kolkata</p>
-                                <p><b>Meeting Link:</b> <a href='{joinUrl}' target='_blank'>Join Meeting</a></p>
-                            </div>
-                            <p>Please be ready to join on time. Click the above link to directly access the meeting.</p>
-                            <p>If you have any questions, feel free to contact us.</p>
-                            <p>Looking forward to your participation!</p>
-                        </div>
-                        <div class='footer'>
-                            &copy; {DateTime.Now.Year} Bugify. All rights reserved.
-                        </div>
-                    </div>";
+                                    <div style='max-width:600px;margin:auto;font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;background-color:#f9fbfd;
+                                                border:1px solid #dce3ec;border-radius:10px;padding:25px;color:#333;'>
+                                        <div style='text-align:center;padding-bottom:20px;'>
+                                            <img src='https://img.icons8.com/color/96/zoom.png' alt='Zoom Icon' style='width:60px;margin-bottom:10px;' />
+                                            <h2 style='margin:0;color:#2c3e50;'>Zoom Meeting Invitation</h2>
+                                        </div>
+                                        <div style='line-height:1.6;'>
+                                            <p>Dear <strong>{member.UserName}</strong>,</p>
+                                            <p>You are invited to join an upcoming <strong>Zoom Meeting</strong>:</p>
+
+                                            <div style='background-color:#ecf3fe;padding:15px 20px;margin:20px 0;
+                                                        border-left:4px solid #3b82f6;border-radius:5px;'>
+                                                <p style='margin:8px 0;'><strong>📌 Topic:</strong> {topic}</p>
+                                                <p style='margin:8px 0;'><strong>📅 Date & Time:</strong> {startTime:dd-MM-yyyy hh:mm tt}</p>
+                                                <p style='margin:8px 0;'><strong>🕒 Timezone:</strong> Asia/Kolkata</p>
+                                                <p style='margin:8px 0;'><strong>🔗 Join Link:</strong> 
+                                                    <a href='{joinUrl}' target='_blank' style='color:#0c63e4;font-weight:bold;text-decoration:none;'>
+                                                        Click here to join
+                                                    </a>
+                                                </p>
+                                            </div>
+
+                                            <p>Please be ready to join on time. Click the join link above to access the meeting.</p>
+                                            <p>Need assistance? Feel free to reply to this email.</p>
+                                            <p>We look forward to your presence!</p>
+                                        </div>
+                                        <div style='text-align:center;font-size:0.9em;color:#777;margin-top:30px;
+                                                    border-top:1px solid #ccc;padding-top:15px;'>
+                                            &copy; {DateTime.Now.Year} Bugify. All rights reserved.
+                                        </div>
+                                    </div>";
+
 
                         var bodyBuilder = new BodyBuilder
                         {

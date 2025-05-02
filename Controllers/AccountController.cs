@@ -186,7 +186,7 @@ namespace Bug_Tracking_System.Controllers
             {
                 if (await _acc.IsUsernameExist(users.UserName))
                 {
-                    return Json(new { success = false, message = $"{users.UserName} already exists." });
+                    return Json(new { success = false, message = $"'{users.UserName}' username already exists. Please try again!" });
                 }
 
                 if (await _acc.IsEmailExist(users.Email))

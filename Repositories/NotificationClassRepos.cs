@@ -13,12 +13,14 @@ namespace Bug_Tracking_System.Repositories
     {
         private readonly DbBug _dbBug;
         private readonly IHubContext<NotificationHub> _hubContext;
+        private readonly IAuditLogsRepos _auditLogs;
 
 
-        public NotificationClassRepos(DbBug dbBug, IHubContext<NotificationHub> hubContext) 
+        public NotificationClassRepos(DbBug dbBug, IAuditLogsRepos auditLogs, IHubContext<NotificationHub> hubContext) 
         {
             _dbBug = dbBug;
             _hubContext = hubContext;
+            _auditLogs = auditLogs;
         }
 
         public async Task AddNotification(int userId, int type, string message, int relatedId, string moduleType)
