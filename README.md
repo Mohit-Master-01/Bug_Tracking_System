@@ -118,8 +118,6 @@ A comprehensive web-based bug tracking and project management system with role-b
 
 ---
 
-## ⚙️ Setup Instructions
-
-1. Clone the repo  
- ```bash
- git clone https://github.com/Mohit-Master-01/Bug_Tracking_System.git
+## 📬 Contact
+Developed by: Mohit Mitesh Master 
+For queries or suggestions: mohitmaster440@gmail.com
