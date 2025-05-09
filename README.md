@@ -1,4 +1,4 @@
-# 🐞 Bug Tracking System
+# 🐞 Bugify - Bug Tracking System
 
 A comprehensive web-based bug tracking and project management system with role-based access, real-time capabilities, and integration with third-party services like Google and Zoom. Built on ASP.NET Core MVC with modular design and a secure architecture.
 
