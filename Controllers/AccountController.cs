@@ -272,8 +272,6 @@ namespace Bug_Tracking_System.Controllers
                     }
                 }
 
-
-
                 return Json(new { success = true, message = "Email not found!" });
             }
             catch (Exception ex)

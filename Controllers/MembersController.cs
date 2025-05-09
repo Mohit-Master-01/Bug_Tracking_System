@@ -54,7 +54,7 @@ namespace Bug_Tracking_System.Controllers
             {
 
                 ViewBag.PageTitle = "Members List";
-                ViewBag.Breadcrumb = "Reports";
+                ViewBag.Breadcrumb = "Manage Members";
                 var members = await _member.GetAllMembers();
 
                 var roles = await _dbBug.Roles.Where(r => r.IsActive == true).ToListAsync(); // Fetch roles
